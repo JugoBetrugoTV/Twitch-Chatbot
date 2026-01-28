@@ -1,3 +1,12 @@
+/**
+ * StreamCore Type Exports
+ */
+
+// New modular types
+export * from './events';
+export * from './plugins';
+
+// Legacy types (for backwards compatibility)
 export interface Viewer {
   username: string;
   displayName: string;

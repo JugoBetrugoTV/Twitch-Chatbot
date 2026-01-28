@@ -1,12 +1,15 @@
 {
-  "name": "twitch-chatbot",
-  "version": "1.0.0",
-  "description": "Desktop Twitch Chatbot with Song Requests, TTS, Viewer List - inspired by Deepbot & Streamlabs",
-  "main": "dist/electron/main.js",
+  "name": "streamcore",
+  "version": "2.0.0",
+  "description": "Next-gen modular Twitch chatbot - better than Streamlabs, Nightbot & MixItUp combined",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "electron .",
-    "dev": "tsc && electron .",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "dev:watch": "tsc -w & nodemon dist/index.js",
+    "electron": "tsc && electron .",
+    "electron:dev": "tsc && electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist:win": "electron-builder --win"

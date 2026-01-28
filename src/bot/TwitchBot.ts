@@ -64,7 +64,9 @@ export class TwitchBot extends EventEmitter {
         isMod: userstate.mod || false,
         isSub: userstate.subscriber || false,
         isVip: userstate.badges?.vip === '1',
-        badges: new Map(Object.entries(userstate.badges || {})),
+        badges: new Map(
+          Object.entries(userstate.badges || {}).filter((entry): entry is [string, string] => entry[1] !== undefined)
+        ),
         color: userstate.color || '#FFFFFF',
       };
 
@@ -241,7 +243,7 @@ export class TwitchBot extends EventEmitter {
   }
 
   public incrementStat(stat: keyof Omit<BotStats, 'uptime'>): void {
-    if (stat in this.stats && stat !== 'uptime') {
+    if (stat in this.stats) {
       (this.stats as any)[stat]++;
     }
   }

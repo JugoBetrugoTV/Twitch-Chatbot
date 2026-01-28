@@ -71,6 +71,7 @@ export class TwitchAdapter extends PlatformAdapter {
 
       for (const channel of this.twitchConfig.channels) {
         this.eventBus.emit('bot:connected', {
+          type: 'bot:connected',
           platform: 'twitch',
           channel: channel.replace('#', ''),
         });
@@ -82,6 +83,7 @@ export class TwitchAdapter extends PlatformAdapter {
       this.logger.warn(`Disconnected: ${reason}`);
 
       this.eventBus.emit('bot:disconnected', {
+        type: 'bot:disconnected',
         platform: 'twitch',
         reason,
       });
@@ -186,7 +188,7 @@ export class TwitchAdapter extends PlatformAdapter {
           channel: channelName,
           tier: this.parseTier(methods.plan),
           amount: 1,
-          totalGifted: parseInt(userstate['msg-param-sender-count'] || '0', 10),
+          totalGifted: parseInt(String(userstate['msg-param-sender-count'] || '0'), 10),
         });
       }
     );
@@ -224,7 +226,7 @@ export class TwitchAdapter extends PlatformAdapter {
     });
   }
 
-  private parseUser(userstate: tmi.ChatUserstate): ChatUser {
+  private parseUser(userstate: tmi.ChatUserstate | tmi.SubUserstate | tmi.SubGiftUserstate): ChatUser {
     const badges = userstate.badges || {};
 
     return {
@@ -238,16 +240,16 @@ export class TwitchAdapter extends PlatformAdapter {
           (entry): entry is [string, string] => entry[1] !== undefined
         )
       ),
-      isMod: userstate.mod || !!badges.moderator,
+      isMod: !!userstate.mod || !!badges.moderator,
       isVip: !!badges.vip,
-      isSub: userstate.subscriber || !!badges.subscriber,
+      isSub: !!userstate.subscriber || !!badges.subscriber,
       isFollower: true, // Can't determine from chat alone
       isBroadcaster: !!badges.broadcaster,
       subTier: badges.subscriber
-        ? this.parseTier(badges.subscriber)
+        ? this.parseTier(String(badges.subscriber))
         : undefined,
       subMonths: userstate['badge-info']?.subscriber
-        ? parseInt(userstate['badge-info'].subscriber, 10)
+        ? parseInt(String(userstate['badge-info'].subscriber), 10)
         : undefined,
     };
   }

@@ -1,96 +1,72 @@
-# Twitch Chatbot
+# Twitch Chatbot - Desktop App
 
-Ein Feature-reicher Twitch Chatbot inspiriert von Deepbot und Streamlabs. Enthält Song Requests, Text-to-Speech, Viewer-Tracking, Points-System und ein Web-Dashboard.
+Eine eigenständige Desktop-Anwendung für Twitch Streamer - inspiriert von Deepbot und Streamlabs.
 
 ## Features
 
 ### Chat & Viewer Management
-- Echtzeit Chat-Verbindung via TMI.js
+- Echtzeit Chat-Verbindung zu Twitch
 - Viewer-Liste mit Online-Status
-- Punkte-System (wie Deepbot)
+- **Punkte-System** (wie Deepbot)
 - Watch-Time Tracking
-- Subscriber/VIP/Mod Erkennung
+- Subscriber/VIP/Mod Badges
 
 ### Song Requests
-- YouTube Song Requests via Chat (`!sr`)
-- Song-Queue Management
+- `!sr <song>` - YouTube Songs anfordern
+- Song-Queue im Dashboard verwalten
 - Skip, Remove, Clear Funktionen
-- OBS Overlay für aktuelle Songs
-- Maximale Song-Länge konfigurierbar
+- Max. Song-Länge einstellbar
 
-### Text-to-Speech (TTS)
-- Google TTS Integration (wie speechchat.com)
-- Chat-Nachrichten vorlesen lassen
-- Wortfilter & User-Blacklist
-- OBS Overlay für TTS-Anzeige
-- Mehrsprachig (Standard: Deutsch)
+### Text-to-Speech
+- `!tts <nachricht>` - Nachrichten vorlesen lassen
+- Google TTS (wie speechchat.com)
+- Mehrsprachig (DE, EN, ES, FR)
+- Lautstärke regelbar
+- Wortfilter
 
-### Web-Dashboard
-- Live Chat-Ansicht
+### Desktop Dashboard
+- Modernes Twitch-Style Interface
+- Live Chat-Anzeige
 - Song Queue Management
-- TTS Kontrolle
-- Viewer-Statistiken
-- OBS Browser Source Overlays
+- TTS Kontrolle ein/aus
+- System Tray (minimiert in Taskleiste)
 
 ## Installation
 
-### Voraussetzungen
-- Node.js 18+
-- npm oder yarn
+### Schnellstart
 
-### Setup
+1. Lade die neueste Version aus den [Releases](../../releases)
+2. Führe die `.exe` Datei aus
+3. Gib deine Twitch-Credentials in den Einstellungen ein
+4. Klicke auf "Verbinden"
 
-1. **Repository klonen**
+### Development Setup
+
 ```bash
+# Repository klonen
 git clone https://github.com/yourusername/Twitch-Chatbot.git
 cd Twitch-Chatbot
-```
 
-2. **Dependencies installieren**
-```bash
+# Dependencies installieren
 npm install
-```
 
-3. **Konfiguration erstellen**
-```bash
-cp .env.example .env
-```
-
-4. **`.env` Datei ausfüllen**
-
-```env
-# Twitch Bot Credentials
-# OAuth Token von: https://twitchapps.com/tmi/
-TWITCH_BOT_USERNAME=dein_bot_name
-TWITCH_OAUTH_TOKEN=oauth:dein_token_hier
-TWITCH_CHANNEL=dein_kanal_name
-
-# Twitch API (für Viewer-Liste)
-# App erstellen: https://dev.twitch.tv/console/apps
-TWITCH_CLIENT_ID=deine_client_id
-TWITCH_CLIENT_SECRET=dein_client_secret
-
-# Web Dashboard
-WEB_PORT=3000
-
-# TTS Einstellungen
-TTS_ENABLED=true
-TTS_LANGUAGE=de
-
-# Song Request Einstellungen
-SONGREQUEST_ENABLED=true
-SONGREQUEST_MAX_DURATION=600
-```
-
-5. **Bot starten**
-```bash
-# Development (mit Hot-Reload)
+# App starten (Development)
 npm run dev
 
-# Production
-npm run build
-npm start
+# Windows .exe bauen
+npm run dist:win
 ```
+
+## Twitch Credentials
+
+Du brauchst:
+
+1. **Bot Username** - Ein Twitch-Account für den Bot (kann dein eigener sein)
+2. **OAuth Token** - Hol dir einen von [twitchapps.com/tmi](https://twitchapps.com/tmi/)
+3. **Channel Name** - Dein Twitch-Kanal
+
+**Optional** (für Viewer-Liste):
+- Client ID & Secret von [dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps)
 
 ## Chat Commands
 
@@ -98,10 +74,10 @@ npm start
 | Command | Beschreibung |
 |---------|-------------|
 | `!sr <song>` | Song zur Queue hinzufügen |
-| `!queue` | Aktuelle Queue anzeigen |
-| `!currentsong` | Aktuellen Song anzeigen |
-| `!skip` | Song überspringen (Mod) |
-| `!wrongsong` | Eigenen Request entfernen |
+| `!queue` | Queue anzeigen |
+| `!currentsong` | Aktueller Song |
+| `!skip` | Skip (Mod only) |
+| `!wrongsong` | Eigenen Song entfernen |
 | `!clearqueue` | Queue leeren (Mod) |
 
 ### Text-to-Speech
@@ -109,77 +85,52 @@ npm start
 |---------|-------------|
 | `!tts <text>` | TTS Nachricht senden |
 | `!skiptts` | TTS überspringen (Mod) |
-| `!ttson` / `!ttsoff` | TTS aktivieren/deaktivieren (Mod) |
+| `!ttson` / `!ttsoff` | TTS an/aus (Mod) |
 
 ### Viewer & Points
 | Command | Beschreibung |
 |---------|-------------|
-| `!points` | Eigene Punkte anzeigen |
-| `!watchtime` | Eigene Watch-Time anzeigen |
-| `!top` | Top 5 Viewer anzeigen |
-| `!viewers` | Aktuelle Viewer-Anzahl |
-| `!givepoints <user> <amount>` | Punkte vergeben (Mod) |
-
-### Allgemein
-| Command | Beschreibung |
-|---------|-------------|
-| `!commands` | Alle Commands anzeigen |
-| `!uptime` | Bot Uptime anzeigen |
-
-## OBS Integration
-
-### TTS Overlay
-1. In OBS eine Browser Source hinzufügen
-2. URL: `http://localhost:3000/overlay/tts`
-3. Breite: 800, Höhe: 200
-4. Transparenter Hintergrund aktivieren
-
-### Song Request Overlay
-1. In OBS eine Browser Source hinzufügen
-2. URL: `http://localhost:3000/overlay/songs`
-3. Breite: 400, Höhe: 300
-4. Transparenter Hintergrund aktivieren
-
-## Dashboard
-
-Das Web-Dashboard ist erreichbar unter `http://localhost:3000`
-
-Features:
-- Live Chat Monitor
-- Song Queue Verwaltung
-- TTS Ein/Aus Schalter
-- Viewer Liste
-- Bot Statistiken
+| `!points` | Punkte anzeigen |
+| `!watchtime` | Watch-Time anzeigen |
+| `!top` | Top 5 Leaderboard |
+| `!viewers` | Viewer-Anzahl |
+| `!givepoints <user> <amount>` | Punkte geben (Mod) |
 
 ## Projektstruktur
 
 ```
 Twitch-Chatbot/
+├── app/
+│   └── index.html          # Desktop UI
 ├── src/
+│   ├── electron/
+│   │   ├── main.ts         # Electron Main Process
+│   │   └── preload.ts      # IPC Bridge
 │   ├── bot/
-│   │   └── TwitchBot.ts       # Haupt-Bot Klasse
-│   ├── commands/
-│   │   └── index.ts           # Chat Commands
+│   │   └── TwitchBot.ts    # TMI.js Bot
 │   ├── features/
-│   │   ├── ViewerManager.ts   # Viewer Tracking
+│   │   ├── ViewerManager.ts
 │   │   ├── SongRequestManager.ts
 │   │   └── TTSManager.ts
+│   ├── commands/
+│   │   └── index.ts
 │   ├── utils/
-│   │   └── Database.ts        # JSON Datenbank
-│   ├── web/
-│   │   └── server.ts          # Express + Socket.IO
+│   │   └── Database.ts
 │   ├── types/
-│   │   └── index.ts           # TypeScript Types
-│   ├── config.ts              # Konfiguration
-│   └── index.ts               # Entry Point
-├── public/
-│   ├── index.html             # Dashboard
-│   ├── overlay-tts.html       # TTS Overlay
-│   └── overlay-songs.html     # Song Overlay
-├── data/                      # Datenbank Dateien
-├── .env.example
-├── package.json
-└── tsconfig.json
+│   │   └── index.ts
+│   └── config.ts
+├── assets/                  # Icons
+├── data/                    # User Data (auto-created)
+└── package.json
+```
+
+## Building
+
+```bash
+# Windows Installer erstellen
+npm run dist:win
+
+# Output in ./release/
 ```
 
 ## Lizenz

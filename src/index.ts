@@ -9,12 +9,27 @@ import 'dotenv/config';
 import { StreamCore, StreamCoreConfig } from './core/StreamCore';
 import { Logger } from './utils/logger';
 
-// Plugins
+// Core Plugins
 import { CoreCommandsPlugin } from './plugins/commands/CoreCommandsPlugin';
 import { CustomCommandsPlugin } from './plugins/commands/CustomCommandsPlugin';
 import { LoyaltyPlugin } from './plugins/loyalty/LoyaltyPlugin';
 import { TimerPlugin } from './plugins/timers/TimerPlugin';
 import { ModerationPlugin } from './plugins/moderation/ModerationPlugin';
+
+// Entertainment Plugins
+import { SongRequestPlugin } from './plugins/songrequest/SongRequestPlugin';
+import { TTSPlugin } from './plugins/tts/TTSPlugin';
+import { GamesPlugin } from './plugins/games/GamesPlugin';
+
+// Interaction Plugins
+import { GiveawayPlugin } from './plugins/giveaway/GiveawayPlugin';
+import { PollsPlugin } from './plugins/polls/PollsPlugin';
+import { QuotesPlugin } from './plugins/quotes/QuotesPlugin';
+import { QueuePlugin } from './plugins/queue/QueuePlugin';
+
+// Tools Plugins
+import { CountersPlugin } from './plugins/counters/CountersPlugin';
+import { RanksPlugin } from './plugins/ranks/RanksPlugin';
 
 const logger = new Logger('Main');
 
@@ -90,19 +105,37 @@ async function main() {
   console.log('');
 
   const plugins = [
-    { instance: new CoreCommandsPlugin(), name: 'Core Commands' },
-    { instance: new CustomCommandsPlugin(), name: 'Custom Commands' },
-    { instance: new LoyaltyPlugin(), name: 'Loyalty/Points' },
-    { instance: new TimerPlugin(), name: 'Timers' },
-    { instance: new ModerationPlugin(), name: 'Moderation' },
+    // Core
+    { instance: new CoreCommandsPlugin(), name: 'Core Commands', category: 'Core' },
+    { instance: new CustomCommandsPlugin(), name: 'Custom Commands', category: 'Core' },
+    { instance: new LoyaltyPlugin(), name: 'Loyalty/Points', category: 'Core' },
+    { instance: new TimerPlugin(), name: 'Timers', category: 'Core' },
+    { instance: new ModerationPlugin(), name: 'Moderation', category: 'Core' },
+    // Entertainment
+    { instance: new SongRequestPlugin(), name: 'Song Request', category: 'Entertainment' },
+    { instance: new TTSPlugin(), name: 'Text-to-Speech', category: 'Entertainment' },
+    { instance: new GamesPlugin(), name: 'Games', category: 'Entertainment' },
+    // Interaction
+    { instance: new GiveawayPlugin(), name: 'Giveaways', category: 'Interaction' },
+    { instance: new PollsPlugin(), name: 'Polls', category: 'Interaction' },
+    { instance: new QuotesPlugin(), name: 'Quotes', category: 'Interaction' },
+    { instance: new QueuePlugin(), name: 'Queue', category: 'Interaction' },
+    // Tools
+    { instance: new CountersPlugin(), name: 'Counters', category: 'Tools' },
+    { instance: new RanksPlugin(), name: 'Ranks', category: 'Tools' },
   ];
 
+  let currentCategory = '';
   for (const plugin of plugins) {
+    if (plugin.category !== currentCategory) {
+      currentCategory = plugin.category;
+      console.log(`  \x1b[33m── ${currentCategory} ──\x1b[0m`);
+    }
     try {
       await bot.loadPlugin(plugin.instance);
-      logger.info(`  ✅ ${plugin.name}`);
+      logger.info(`    ✅ ${plugin.name}`);
     } catch (error) {
-      logger.error(`  ❌ ${plugin.name}: ${error}`);
+      logger.error(`    ❌ ${plugin.name}: ${error}`);
     }
   }
 
@@ -126,24 +159,31 @@ async function main() {
   console.log(`  🎭 Mood:        \x1b[36m${bot.getMood()}\x1b[0m`);
   console.log('');
   console.log('\x1b[33m╔═══════════════════════════════════════════════════════════════╗');
-  console.log('║                      📋 QUICK REFERENCE                        ║');
+  console.log('║                      📋 COMMAND REFERENCE                      ║');
   console.log('╚═══════════════════════════════════════════════════════════════╝\x1b[0m');
   console.log('');
-  console.log('  \x1b[36m── Core Commands ──\x1b[0m');
-  console.log('  !ping, !uptime, !commands, !dice, !8ball, !hug, !shoutout');
+  console.log('  \x1b[36m── Core ──\x1b[0m');
+  console.log('  !ping !uptime !commands !dice !8ball !hug !shoutout');
   console.log('');
-  console.log('  \x1b[36m── Points System ──\x1b[0m');
-  console.log('  !points, !give, !gamble, !leaderboard, !watchtime');
+  console.log('  \x1b[36m── Points & Ranks ──\x1b[0m');
+  console.log('  !points !give !gamble !leaderboard !watchtime !rank !ranks');
   console.log('');
-  console.log('  \x1b[36m── Custom Commands (Mod) ──\x1b[0m');
-  console.log('  !addcmd, !editcmd, !delcmd, !togglecmd, !listcmds');
-  console.log('  !setcooldown, !setperm, !cmdinfo, !variables');
+  console.log('  \x1b[36m── Song Request ──\x1b[0m');
+  console.log('  !sr !queue !currentsong !wrongsong !skip* !volume*');
   console.log('');
-  console.log('  \x1b[36m── Timers (Mod) ──\x1b[0m');
-  console.log('  !timer add/remove/list/enable/disable');
+  console.log('  \x1b[36m── TTS ──\x1b[0m');
+  console.log('  !tts !ttsqueue !ttsskip* !ttslang* !ttstoggle*');
   console.log('');
-  console.log('  \x1b[36m── Moderation (Mod) ──\x1b[0m');
-  console.log('  !permit, !blacklist, !modstats, !modsettings, !modtoggle');
+  console.log('  \x1b[36m── Games ──\x1b[0m');
+  console.log('  !duel !accept !heist !slots !roulette !trivia*');
+  console.log('');
+  console.log('  \x1b[36m── Interaction ──\x1b[0m');
+  console.log('  !giveaway* !enter !poll* !vote !quote !join !leave !position');
+  console.log('');
+  console.log('  \x1b[36m── Tools ──\x1b[0m');
+  console.log('  !death !counter !addcmd* !timer* !blacklist* !permit*');
+  console.log('');
+  console.log('  \x1b[2m  * = Mod/Broadcaster only\x1b[0m');
   console.log('');
   console.log('\x1b[2m  Press Ctrl+C to stop the bot\x1b[0m');
   console.log('');

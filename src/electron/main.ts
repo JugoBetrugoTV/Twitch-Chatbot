@@ -13,23 +13,61 @@ import { StreamCore, StreamCoreConfig } from '../core/StreamCore';
 import { initDatabase, getDatabase } from '../services/Database';
 import { Logger } from '../utils/logger';
 
-// Import all plugins
+// Import ALL plugins
+// Core
 import { CoreCommandsPlugin } from '../plugins/commands/CoreCommandsPlugin';
 import { CustomCommandsPlugin } from '../plugins/commands/CustomCommandsPlugin';
 import { LoyaltyPlugin } from '../plugins/loyalty/LoyaltyPlugin';
 import { TimerPlugin } from '../plugins/timers/TimerPlugin';
 import { ModerationPlugin } from '../plugins/moderation/ModerationPlugin';
+// Entertainment
 import { SongRequestPlugin } from '../plugins/songrequest/SongRequestPlugin';
 import { TTSPlugin } from '../plugins/tts/TTSPlugin';
 import { GamesPlugin } from '../plugins/games/GamesPlugin';
+// Interaction
 import { GiveawayPlugin } from '../plugins/giveaway/GiveawayPlugin';
 import { PollsPlugin } from '../plugins/polls/PollsPlugin';
 import { QuotesPlugin } from '../plugins/quotes/QuotesPlugin';
 import { QueuePlugin } from '../plugins/queue/QueuePlugin';
+// Tools
 import { CountersPlugin } from '../plugins/counters/CountersPlugin';
 import { RanksPlugin } from '../plugins/ranks/RanksPlugin';
 import { WelcomePlugin } from '../plugins/welcome/WelcomePlugin';
+import { ShopPlugin } from '../plugins/shop/ShopPlugin';
+import { StreamControlPlugin } from '../plugins/streamcontrol/StreamControlPlugin';
+// Advanced
 import { ChatLogsPlugin } from '../plugins/chatlogs/ChatLogsPlugin';
+import { BettingPlugin } from '../plugins/betting/BettingPlugin';
+import { SubGoalsPlugin } from '../plugins/subgoals/SubGoalsPlugin';
+import { LurkPlugin } from '../plugins/lurk/LurkPlugin';
+import { AutoShoutoutPlugin } from '../plugins/autoshoutout/AutoShoutoutPlugin';
+import { ScheduledPlugin } from '../plugins/scheduled/ScheduledPlugin';
+import { SoundAlertsPlugin } from '../plugins/sounds/SoundAlertsPlugin';
+import { SpotifyPlugin } from '../plugins/spotify/SpotifyPlugin';
+import { AIChatPlugin } from '../plugins/ai/AIChatPlugin';
+import { VIPManagementPlugin } from '../plugins/vip/VIPManagementPlugin';
+import { PredictionsPlugin } from '../plugins/predictions/PredictionsPlugin';
+// Integration
+import { AlertsPlugin } from '../plugins/alerts/AlertsPlugin';
+import { DiscordPlugin } from '../plugins/discord/DiscordPlugin';
+import { DashboardPlugin } from '../plugins/dashboard/DashboardPlugin';
+// Twitch Tools
+import { TwitchInfoPlugin } from '../plugins/twitchinfo/TwitchInfoPlugin';
+import { HypeTrainPlugin } from '../plugins/hypetrain/HypeTrainPlugin';
+import { EmoteStatsPlugin } from '../plugins/emotestats/EmoteStatsPlugin';
+import { BitsLeaderboardPlugin } from '../plugins/bitsleaderboard/BitsLeaderboardPlugin';
+// Moderation+
+import { WatchlistPlugin } from '../plugins/watchlist/WatchlistPlugin';
+import { RaidProtectionPlugin } from '../plugins/raidprotection/RaidProtectionPlugin';
+import { ChatModesPlugin } from '../plugins/chatmodes/ChatModesPlugin';
+// Stream Tools
+import { OBSControlPlugin } from '../plugins/obscontrol/OBSControlPlugin';
+import { StreamNotesPlugin } from '../plugins/streamnotes/StreamNotesPlugin';
+import { HydrationPlugin } from '../plugins/hydration/HydrationPlugin';
+// Social
+import { TwitterPlugin } from '../plugins/twitter/TwitterPlugin';
+// Analytics
+import { AnalyticsPlugin } from '../plugins/analytics/AnalyticsPlugin';
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -200,24 +238,62 @@ async function startBot() {
     // Create bot
     bot = new StreamCore(config);
 
-    // Load essential plugins
+    // Load ALL plugins
     const plugins = [
+      // Core
       new CoreCommandsPlugin(),
       new CustomCommandsPlugin(),
       new LoyaltyPlugin(),
       new TimerPlugin(),
       new ModerationPlugin(),
+      // Entertainment
       new SongRequestPlugin(),
       new TTSPlugin(),
       new GamesPlugin(),
+      // Interaction
       new GiveawayPlugin(),
       new PollsPlugin(),
       new QuotesPlugin(),
       new QueuePlugin(),
+      // Tools
       new CountersPlugin(),
       new RanksPlugin(),
       new WelcomePlugin(),
+      new ShopPlugin(),
+      new StreamControlPlugin(),
+      // Advanced
       new ChatLogsPlugin(),
+      new BettingPlugin(),
+      new SubGoalsPlugin(),
+      new LurkPlugin(),
+      new AutoShoutoutPlugin(),
+      new ScheduledPlugin(),
+      new SoundAlertsPlugin(),
+      new SpotifyPlugin(),
+      new AIChatPlugin(),
+      new VIPManagementPlugin(),
+      new PredictionsPlugin(),
+      // Integration
+      new AlertsPlugin(),
+      new DiscordPlugin(),
+      new DashboardPlugin(),
+      // Twitch Tools
+      new TwitchInfoPlugin(),
+      new HypeTrainPlugin(),
+      new EmoteStatsPlugin(),
+      new BitsLeaderboardPlugin(),
+      // Moderation+
+      new WatchlistPlugin(),
+      new RaidProtectionPlugin(),
+      new ChatModesPlugin(),
+      // Stream Tools
+      new OBSControlPlugin(),
+      new StreamNotesPlugin(),
+      new HydrationPlugin(),
+      // Social
+      new TwitterPlugin(),
+      // Analytics
+      new AnalyticsPlugin(),
     ];
 
     for (const plugin of plugins) {

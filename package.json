@@ -54,15 +54,11 @@
           "target": "portable",
           "arch": ["x64"]
         }
-      ],
-      "icon": "assets/icon.svg"
+      ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "assets/icon.svg",
-      "uninstallerIcon": "assets/icon.svg",
-      "installerHeaderIcon": "assets/icon.svg",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "StreamCore"

@@ -29,3 +29,19 @@ export { RanksPlugin } from './ranks/RanksPlugin';
 export { WelcomePlugin } from './welcome/WelcomePlugin';
 export { ShopPlugin } from './shop/ShopPlugin';
 export { StreamControlPlugin } from './streamcontrol/StreamControlPlugin';
+
+// Advanced Features
+export { ChatLogsPlugin } from './chatlogs/ChatLogsPlugin';
+export { BettingPlugin } from './betting/BettingPlugin';
+export { SubGoalsPlugin } from './subgoals/SubGoalsPlugin';
+export { LurkPlugin } from './lurk/LurkPlugin';
+export { AutoShoutoutPlugin } from './autoshoutout/AutoShoutoutPlugin';
+export { ScheduledPlugin } from './scheduled/ScheduledPlugin';
+export { SoundAlertsPlugin } from './sounds/SoundAlertsPlugin';
+export { SpotifyPlugin } from './spotify/SpotifyPlugin';
+export { AIChatPlugin } from './ai/AIChatPlugin';
+export { VIPManagementPlugin } from './vip/VIPManagementPlugin';
+export { PredictionsPlugin } from './predictions/PredictionsPlugin';
+export { AlertsPlugin } from './alerts/AlertsPlugin';
+export { DiscordPlugin } from './discord/DiscordPlugin';
+export { DashboardPlugin } from './dashboard/DashboardPlugin';

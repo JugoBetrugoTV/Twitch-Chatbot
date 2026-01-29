@@ -18,3 +18,9 @@ export {
   getCache,
   getUserCache,
 } from './CacheService';
+
+export {
+  I18nService,
+  getI18n,
+  t,
+} from './i18n';

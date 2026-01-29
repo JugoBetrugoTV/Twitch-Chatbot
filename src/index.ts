@@ -34,6 +34,22 @@ import { WelcomePlugin } from './plugins/welcome/WelcomePlugin';
 import { ShopPlugin } from './plugins/shop/ShopPlugin';
 import { StreamControlPlugin } from './plugins/streamcontrol/StreamControlPlugin';
 
+// Advanced Plugins
+import { ChatLogsPlugin } from './plugins/chatlogs/ChatLogsPlugin';
+import { BettingPlugin } from './plugins/betting/BettingPlugin';
+import { SubGoalsPlugin } from './plugins/subgoals/SubGoalsPlugin';
+import { LurkPlugin } from './plugins/lurk/LurkPlugin';
+import { AutoShoutoutPlugin } from './plugins/autoshoutout/AutoShoutoutPlugin';
+import { ScheduledPlugin } from './plugins/scheduled/ScheduledPlugin';
+import { SoundAlertsPlugin } from './plugins/sounds/SoundAlertsPlugin';
+import { SpotifyPlugin } from './plugins/spotify/SpotifyPlugin';
+import { AIChatPlugin } from './plugins/ai/AIChatPlugin';
+import { VIPManagementPlugin } from './plugins/vip/VIPManagementPlugin';
+import { PredictionsPlugin } from './plugins/predictions/PredictionsPlugin';
+import { AlertsPlugin } from './plugins/alerts/AlertsPlugin';
+import { DiscordPlugin } from './plugins/discord/DiscordPlugin';
+import { DashboardPlugin } from './plugins/dashboard/DashboardPlugin';
+
 const logger = new Logger('Main');
 
 // ASCII Art Banner
@@ -129,6 +145,22 @@ async function main() {
     { instance: new WelcomePlugin(), name: 'Welcome', category: 'Tools' },
     { instance: new ShopPlugin(), name: 'Loyalty Shop', category: 'Tools' },
     { instance: new StreamControlPlugin(), name: 'Stream Control', category: 'Tools' },
+    // Advanced
+    { instance: new ChatLogsPlugin(), name: 'Chat Logs', category: 'Advanced' },
+    { instance: new BettingPlugin(), name: 'Betting', category: 'Advanced' },
+    { instance: new SubGoalsPlugin(), name: 'Sub Goals', category: 'Advanced' },
+    { instance: new LurkPlugin(), name: 'Lurk System', category: 'Advanced' },
+    { instance: new AutoShoutoutPlugin(), name: 'Auto-Shoutout', category: 'Advanced' },
+    { instance: new ScheduledPlugin(), name: 'Scheduled', category: 'Advanced' },
+    { instance: new SoundAlertsPlugin(), name: 'Sound Alerts', category: 'Advanced' },
+    { instance: new SpotifyPlugin(), name: 'Spotify', category: 'Advanced' },
+    { instance: new AIChatPlugin(), name: 'AI Chat', category: 'Advanced' },
+    { instance: new VIPManagementPlugin(), name: 'VIP Management', category: 'Advanced' },
+    { instance: new PredictionsPlugin(), name: 'Predictions', category: 'Advanced' },
+    // Integration
+    { instance: new AlertsPlugin(), name: 'Alerts (OBS)', category: 'Integration' },
+    { instance: new DiscordPlugin(), name: 'Discord', category: 'Integration' },
+    { instance: new DashboardPlugin(), name: 'Web Dashboard', category: 'Integration' },
   ];
 
   let currentCategory = '';
@@ -194,6 +226,13 @@ async function main() {
   console.log('');
   console.log('  \x1b[36m── Stream Control ──\x1b[0m');
   console.log('  !title !game !streaminfo !marker* !clip !tags');
+  console.log('');
+  console.log('  \x1b[36m── Advanced ──\x1b[0m');
+  console.log('  !logs* !bet !goal !lurk !unlurk !so* !sound !ai');
+  console.log('  !prediction* !vip* !srs (Spotify) !schedule*');
+  console.log('');
+  console.log('  \x1b[36m── Integration ──\x1b[0m');
+  console.log('  !testalert* !discord* !dashboard*');
   console.log('');
   console.log('  \x1b[2m  * = Mod/Broadcaster only\x1b[0m');
   console.log('');

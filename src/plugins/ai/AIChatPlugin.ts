@@ -139,71 +139,105 @@ export class AIChatPlugin extends Plugin {
       ...this.conversationHistory,
     ];
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.settings.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: this.settings.model,
-        messages,
-        max_tokens: this.settings.maxTokens,
-        temperature: this.settings.temperature,
-      }),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
-
-    const data = await response.json() as any;
-    const reply = data.choices?.[0]?.message?.content;
-
-    if (reply) {
-      this.conversationHistory.push({
-        role: 'assistant',
-        content: reply,
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.settings.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: this.settings.model,
+          messages,
+          max_tokens: this.settings.maxTokens,
+          temperature: this.settings.temperature,
+        }),
+        signal: controller.signal,
       });
-    }
 
-    return reply || null;
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        this.log.error(`OpenAI API error: ${response.status} - ${errorText}`);
+        return null;
+      }
+
+      const data = await response.json() as any;
+      const reply = data.choices?.[0]?.message?.content;
+
+      if (reply) {
+        this.conversationHistory.push({
+          role: 'assistant',
+          content: reply,
+        });
+      }
+
+      return reply || null;
+    } catch (error) {
+      if ((error as Error).name === 'AbortError') {
+        this.log.error('OpenAI API request timed out');
+      } else {
+        this.log.error(`OpenAI API error: ${error}`);
+      }
+      return null;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   private async callAnthropic(prompt: string): Promise<string | null> {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': this.settings.apiKey,
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: this.settings.model || 'claude-3-haiku-20240307',
-        max_tokens: this.settings.maxTokens,
-        system: this.settings.personality,
-        messages: this.conversationHistory.map((m) => ({
-          role: m.role === 'system' ? 'user' : m.role,
-          content: m.content,
-        })),
-      }),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
 
-    if (!response.ok) {
-      throw new Error(`Anthropic API error: ${response.status}`);
-    }
-
-    const data = await response.json() as any;
-    const reply = data.content?.[0]?.text;
-
-    if (reply) {
-      this.conversationHistory.push({
-        role: 'assistant',
-        content: reply,
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': this.settings.apiKey,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: this.settings.model || 'claude-3-haiku-20240307',
+          max_tokens: this.settings.maxTokens,
+          system: this.settings.personality,
+          messages: this.conversationHistory.map((m) => ({
+            role: m.role === 'system' ? 'user' : m.role,
+            content: m.content,
+          })),
+        }),
+        signal: controller.signal,
       });
-    }
 
-    return reply || null;
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        this.log.error(`Anthropic API error: ${response.status} - ${errorText}`);
+        return null;
+      }
+
+      const data = await response.json() as any;
+      const reply = data.content?.[0]?.text;
+
+      if (reply) {
+        this.conversationHistory.push({
+          role: 'assistant',
+          content: reply,
+        });
+      }
+
+      return reply || null;
+    } catch (error) {
+      if ((error as Error).name === 'AbortError') {
+        this.log.error('Anthropic API request timed out');
+      } else {
+        this.log.error(`Anthropic API error: ${error}`);
+      }
+      return null;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   private registerCommands(): void {

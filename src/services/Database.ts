@@ -69,6 +69,11 @@ export class DatabaseService {
   private db: Database.Database;
   private logger = new Logger('Database');
 
+  // Blacklist cache for performance
+  private blacklistCache: { word: string; type: string; action: string }[] | null = null;
+  private blacklistCacheTime: number = 0;
+  private readonly BLACKLIST_CACHE_TTL = 60000; // 1 minute
+
   constructor(dbPath?: string) {
     // Ensure data directory exists
     const dataDir = path.join(process.cwd(), 'data');
@@ -241,8 +246,12 @@ export class DatabaseService {
   }
 
   getTopUsers(limit: number = 10, orderBy: 'points' | 'watch_time' = 'points'): DBUser[] {
+    // Whitelist validation to prevent SQL injection
+    const allowedColumns = ['points', 'watch_time', 'message_count'];
+    const safeOrderBy = allowedColumns.includes(orderBy) ? orderBy : 'points';
+
     const stmt = this.db.prepare(`
-      SELECT * FROM users ORDER BY ${orderBy} DESC LIMIT ?
+      SELECT * FROM users ORDER BY ${safeOrderBy} DESC LIMIT ?
     `);
     return stmt.all(limit) as DBUser[];
   }
@@ -480,16 +489,30 @@ export class DatabaseService {
       INSERT OR IGNORE INTO blacklist (word, type, action) VALUES (?, ?, ?)
     `);
     stmt.run(word.toLowerCase(), type, action);
+    this.invalidateBlacklistCache();
   }
 
   removeBlacklistWord(word: string): void {
     const stmt = this.db.prepare('DELETE FROM blacklist WHERE LOWER(word) = LOWER(?)');
     stmt.run(word);
+    this.invalidateBlacklistCache();
+  }
+
+  private invalidateBlacklistCache(): void {
+    this.blacklistCache = null;
+    this.blacklistCacheTime = 0;
   }
 
   getBlacklist(): { word: string; type: string; action: string }[] {
+    const now = Date.now();
+    if (this.blacklistCache && now - this.blacklistCacheTime < this.BLACKLIST_CACHE_TTL) {
+      return this.blacklistCache;
+    }
+
     const stmt = this.db.prepare('SELECT word, type, action FROM blacklist');
-    return stmt.all() as { word: string; type: string; action: string }[];
+    this.blacklistCache = stmt.all() as { word: string; type: string; action: string }[];
+    this.blacklistCacheTime = now;
+    return this.blacklistCache;
   }
 
   isBlacklisted(text: string): { word: string; action: string } | null {

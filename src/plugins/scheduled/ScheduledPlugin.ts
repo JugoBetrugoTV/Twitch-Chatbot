@@ -96,7 +96,7 @@ export class ScheduledPlugin extends Plugin {
         schedule: {
           type: row.schedule_type,
           time: row.schedule_time,
-          days: row.schedule_days ? JSON.parse(row.schedule_days) : undefined,
+          days: row.schedule_days ? this.safeParseJson(row.schedule_days, []) : undefined,
           intervalMinutes: row.schedule_interval,
           nextRun: row.next_run ? new Date(row.next_run) : undefined,
         },
@@ -176,6 +176,15 @@ export class ScheduledPlugin extends Plugin {
         command: task.content,
         channel: task.channel,
       });
+    }
+  }
+
+  private safeParseJson<T>(json: string, fallback: T): T {
+    try {
+      return JSON.parse(json);
+    } catch {
+      this.log.warn(`Failed to parse JSON: ${json.substring(0, 50)}`);
+      return fallback;
     }
   }
 

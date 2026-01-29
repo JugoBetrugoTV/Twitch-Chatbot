@@ -40,6 +40,16 @@ export abstract class Plugin implements IPlugin {
    * Override this to cleanup resources
    */
   async onUnload(): Promise<void> {
+    // Cleanup event handlers
+    for (const { event, handler } of this.eventHandlers) {
+      this.ctx?.events?.off(event, handler);
+    }
+    this.eventHandlers = [];
+
+    // Clear registered commands and timers
+    this.commands = [];
+    this.timers = [];
+
     await this.destroy();
   }
 
@@ -79,6 +89,7 @@ export abstract class Plugin implements IPlugin {
     handler: EventHandler<EventMap[K]>
   ): void {
     this.eventHandlers.push({ event, handler });
+    this.ctx?.events?.on(event, handler);
   }
 
   /**

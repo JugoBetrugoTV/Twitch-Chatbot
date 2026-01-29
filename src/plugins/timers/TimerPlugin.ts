@@ -87,7 +87,13 @@ export class TimerPlugin extends Plugin {
       return; // Already running
     }
 
-    const messages = JSON.parse(timer.messages) as string[];
+    let messages: string[];
+    try {
+      messages = JSON.parse(timer.messages) as string[];
+    } catch {
+      this.log.error(`Invalid JSON in timer ${timer.name}, skipping`);
+      return;
+    }
 
     const activeTimer: ActiveTimer = {
       id: timer.id,
@@ -124,7 +130,13 @@ export class TimerPlugin extends Plugin {
       return;
     }
 
-    const messages = JSON.parse(dbTimer.messages) as string[];
+    let messages: string[];
+    try {
+      messages = JSON.parse(dbTimer.messages) as string[];
+    } catch {
+      this.log.error(`Invalid JSON in timer ${dbTimer.name}`);
+      return;
+    }
     if (messages.length === 0) {
       return;
     }

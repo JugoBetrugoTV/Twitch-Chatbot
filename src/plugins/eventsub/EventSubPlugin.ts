@@ -151,7 +151,15 @@ export class EventSubPlugin extends Plugin {
         return;
       }
 
-      const data = JSON.parse(body);
+      let data: any;
+      try {
+        data = JSON.parse(body);
+      } catch (parseError) {
+        this.log.error(`Invalid JSON in EventSub webhook: ${parseError}`);
+        res.writeHead(400);
+        res.end();
+        return;
+      }
 
       // Handle different message types
       switch (messageType) {
@@ -352,6 +360,9 @@ export class EventSubPlugin extends Plugin {
       return false;
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     try {
       const response = await fetch('https://api.twitch.tv/helix/eventsub/subscriptions', {
         method: 'POST',
@@ -372,6 +383,7 @@ export class EventSubPlugin extends Plugin {
             secret: this.settings.secret,
           },
         }),
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -381,6 +393,10 @@ export class EventSubPlugin extends Plugin {
       }
 
       const data = await response.json() as { data: any[] };
+      if (!data.data || data.data.length === 0) {
+        this.log.error('No subscription data returned');
+        return false;
+      }
       const subscription = data.data[0];
 
       this.subscriptions.set(subscription.id, {
@@ -395,8 +411,14 @@ export class EventSubPlugin extends Plugin {
       this.log.info(`Created EventSub subscription: ${type}`);
       return true;
     } catch (error) {
-      this.log.error(`Error creating subscription: ${error}`);
+      if ((error as Error).name === 'AbortError') {
+        this.log.error(`Subscription request timed out: ${type}`);
+      } else {
+        this.log.error(`Error creating subscription: ${error}`);
+      }
       return false;
+    } finally {
+      clearTimeout(timeout);
     }
   }
 

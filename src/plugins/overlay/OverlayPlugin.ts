@@ -378,13 +378,19 @@ export class OverlayPlugin extends Plugin {
       showAlert(icon, title, message);
     }
 
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
     function showAlert(icon, title, message) {
       const alert = document.createElement('div');
       alert.className = 'alert';
       alert.innerHTML = \`
-        <div class="alert-icon">\${icon}</div>
-        <div class="alert-title">\${title}</div>
-        <div class="alert-message">\${message}</div>
+        <div class="alert-icon">\${escapeHtml(icon)}</div>
+        <div class="alert-title">\${escapeHtml(title)}</div>
+        <div class="alert-message">\${escapeHtml(message)}</div>
       \`;
       container.appendChild(alert);
 

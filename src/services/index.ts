@@ -76,3 +76,60 @@ export {
   validateConfig,
   validateConfigOrExit,
 } from './ConfigValidator';
+
+// =============================================================================
+// RATE LIMITER SERVICE
+// =============================================================================
+export {
+  RateLimiterService,
+  RateLimitConfig,
+  RateLimitBucket,
+  getRateLimiter,
+  TwitchAPILimiter,
+} from './RateLimiterService';
+
+// =============================================================================
+// QUEUE SERVICE
+// =============================================================================
+export {
+  Queue,
+  QueueService,
+  QueueItem,
+  QueueConfig,
+  QueueStats,
+  getQueueService,
+} from './QueueService';
+
+// =============================================================================
+// NOTIFICATION SERVICE
+// =============================================================================
+export {
+  NotificationService,
+  Notification,
+  NotificationAction,
+  NotificationSettings,
+  getNotificationService,
+} from './NotificationService';
+
+// =============================================================================
+// METRICS SERVICE
+// =============================================================================
+export {
+  MetricsService,
+  MetricType,
+  MetricConfig,
+  MetricsSettings,
+  getMetricsService,
+  createStreamMetrics,
+} from './MetricsService';
+
+// =============================================================================
+// ENCRYPTION SERVICE
+// =============================================================================
+export {
+  EncryptionService,
+  EncryptedData,
+  EncryptionSettings,
+  getEncryptionService,
+  initializeEncryption,
+} from './EncryptionService';

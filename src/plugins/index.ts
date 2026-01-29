@@ -94,6 +94,35 @@ export { CasinoPlugin } from './casino/CasinoPlugin';
 // TRACKING PLUGINS - User tracking
 // =============================================================================
 export { WatchtimePlugin } from './watchtime/WatchtimePlugin';
+export { LeaderboardPlugin } from './leaderboard/LeaderboardPlugin';
+export { AchievementsPlugin } from './achievements/AchievementsPlugin';
+export { UserLevelsPlugin } from './userlevels/UserLevelsPlugin';
+
+// =============================================================================
+// GOALS PLUGINS - Stream goals
+// =============================================================================
+export { BitGoalsPlugin } from './goals/BitGoalsPlugin';
+
+// =============================================================================
+// SCHEDULE PLUGINS - Stream scheduling
+// =============================================================================
+export { StreamSchedulePlugin } from './schedule/StreamSchedulePlugin';
+
+// =============================================================================
+// RAID PLUGINS - Raid management
+// =============================================================================
+export { RaidManagerPlugin } from './raidmanager/RaidManagerPlugin';
+
+// =============================================================================
+// GAME PLUGINS - Chat games
+// =============================================================================
+export { TriviaPlugin } from './trivia/TriviaPlugin';
+export { WordGamesPlugin } from './wordgames/WordGamesPlugin';
+
+// =============================================================================
+// OVERLAY PLUGINS - Stream overlays
+// =============================================================================
+export { OverlayPlugin } from './overlay/OverlayPlugin';
 
 // =============================================================================
 // UTILITY PLUGINS - Tools and management
@@ -162,6 +191,15 @@ import { StreamControlPlugin } from './streamcontrol/StreamControlPlugin';
 import { HydrationPlugin } from './hydration/HydrationPlugin';
 import { VIPManagementPlugin } from './vip/VIPManagementPlugin';
 import { AIChatPlugin } from './ai/AIChatPlugin';
+import { LeaderboardPlugin } from './leaderboard/LeaderboardPlugin';
+import { AchievementsPlugin } from './achievements/AchievementsPlugin';
+import { UserLevelsPlugin } from './userlevels/UserLevelsPlugin';
+import { BitGoalsPlugin } from './goals/BitGoalsPlugin';
+import { StreamSchedulePlugin } from './schedule/StreamSchedulePlugin';
+import { RaidManagerPlugin } from './raidmanager/RaidManagerPlugin';
+import { TriviaPlugin } from './trivia/TriviaPlugin';
+import { WordGamesPlugin } from './wordgames/WordGamesPlugin';
+import { OverlayPlugin } from './overlay/OverlayPlugin';
 
 /** Command plugins for core bot functionality */
 export const CommandPlugins = {
@@ -246,6 +284,36 @@ export const GamblingPlugins = {
 /** Tracking plugins for user metrics */
 export const TrackingPlugins = {
   WatchtimePlugin,
+  LeaderboardPlugin,
+  AchievementsPlugin,
+  UserLevelsPlugin,
+};
+
+/** Goals plugins for stream goals */
+export const GoalsPlugins = {
+  SubGoalsPlugin,
+  BitGoalsPlugin,
+};
+
+/** Schedule plugins for stream scheduling */
+export const SchedulePlugins = {
+  StreamSchedulePlugin,
+};
+
+/** Raid plugins for raid management */
+export const RaidPlugins = {
+  RaidManagerPlugin,
+};
+
+/** Game plugins for chat games */
+export const GamePlugins = {
+  TriviaPlugin,
+  WordGamesPlugin,
+};
+
+/** Overlay plugins for stream overlays */
+export const OverlayPlugins = {
+  OverlayPlugin,
 };
 
 /** Utility plugins for tools and management */
@@ -295,6 +363,16 @@ export const AllPlugins = {
   ...UtilityPlugins,
   // AI
   ...AIPlugins,
+  // Goals
+  ...GoalsPlugins,
+  // Schedule
+  ...SchedulePlugins,
+  // Raids
+  ...RaidPlugins,
+  // Games
+  ...GamePlugins,
+  // Overlays
+  ...OverlayPlugins,
 };
 
 /** Plugin categories for UI/configuration */
@@ -312,6 +390,11 @@ export const PluginCategories = {
   tracking: { name: 'Tracking', plugins: TrackingPlugins },
   utility: { name: 'Utility', plugins: UtilityPlugins },
   ai: { name: 'AI', plugins: AIPlugins },
+  goals: { name: 'Goals', plugins: GoalsPlugins },
+  schedule: { name: 'Schedule', plugins: SchedulePlugins },
+  raids: { name: 'Raids', plugins: RaidPlugins },
+  games: { name: 'Games', plugins: GamePlugins },
+  overlays: { name: 'Overlays', plugins: OverlayPlugins },
 } as const;
 
 /** Get plugin class by name */

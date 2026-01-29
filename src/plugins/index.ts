@@ -45,3 +45,25 @@ export { PredictionsPlugin } from './predictions/PredictionsPlugin';
 export { AlertsPlugin } from './alerts/AlertsPlugin';
 export { DiscordPlugin } from './discord/DiscordPlugin';
 export { DashboardPlugin } from './dashboard/DashboardPlugin';
+
+// Twitch Tools
+export { TwitchInfoPlugin } from './twitchinfo/TwitchInfoPlugin';
+export { HypeTrainPlugin } from './hypetrain/HypeTrainPlugin';
+export { EmoteStatsPlugin } from './emotestats/EmoteStatsPlugin';
+export { BitsLeaderboardPlugin } from './bitsleaderboard/BitsLeaderboardPlugin';
+
+// Moderation+
+export { WatchlistPlugin } from './watchlist/WatchlistPlugin';
+export { RaidProtectionPlugin } from './raidprotection/RaidProtectionPlugin';
+export { ChatModesPlugin } from './chatmodes/ChatModesPlugin';
+
+// Stream Tools
+export { OBSControlPlugin } from './obscontrol/OBSControlPlugin';
+export { StreamNotesPlugin } from './streamnotes/StreamNotesPlugin';
+export { HydrationPlugin } from './hydration/HydrationPlugin';
+
+// Integrations
+export { TwitterPlugin } from './twitter/TwitterPlugin';
+
+// Analytics
+export { AnalyticsPlugin } from './analytics/AnalyticsPlugin';

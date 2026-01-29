@@ -50,6 +50,28 @@ import { AlertsPlugin } from './plugins/alerts/AlertsPlugin';
 import { DiscordPlugin } from './plugins/discord/DiscordPlugin';
 import { DashboardPlugin } from './plugins/dashboard/DashboardPlugin';
 
+// Twitch Tools Plugins
+import { TwitchInfoPlugin } from './plugins/twitchinfo/TwitchInfoPlugin';
+import { HypeTrainPlugin } from './plugins/hypetrain/HypeTrainPlugin';
+import { EmoteStatsPlugin } from './plugins/emotestats/EmoteStatsPlugin';
+import { BitsLeaderboardPlugin } from './plugins/bitsleaderboard/BitsLeaderboardPlugin';
+
+// Moderation+ Plugins
+import { WatchlistPlugin } from './plugins/watchlist/WatchlistPlugin';
+import { RaidProtectionPlugin } from './plugins/raidprotection/RaidProtectionPlugin';
+import { ChatModesPlugin } from './plugins/chatmodes/ChatModesPlugin';
+
+// Stream Tools Plugins
+import { OBSControlPlugin } from './plugins/obscontrol/OBSControlPlugin';
+import { StreamNotesPlugin } from './plugins/streamnotes/StreamNotesPlugin';
+import { HydrationPlugin } from './plugins/hydration/HydrationPlugin';
+
+// More Integrations
+import { TwitterPlugin } from './plugins/twitter/TwitterPlugin';
+
+// Analytics
+import { AnalyticsPlugin } from './plugins/analytics/AnalyticsPlugin';
+
 const logger = new Logger('Main');
 
 // ASCII Art Banner
@@ -161,6 +183,23 @@ async function main() {
     { instance: new AlertsPlugin(), name: 'Alerts (OBS)', category: 'Integration' },
     { instance: new DiscordPlugin(), name: 'Discord', category: 'Integration' },
     { instance: new DashboardPlugin(), name: 'Web Dashboard', category: 'Integration' },
+    // Twitch Tools
+    { instance: new TwitchInfoPlugin(), name: 'Twitch Info', category: 'Twitch Tools' },
+    { instance: new HypeTrainPlugin(), name: 'Hype Train', category: 'Twitch Tools' },
+    { instance: new EmoteStatsPlugin(), name: 'Emote Stats', category: 'Twitch Tools' },
+    { instance: new BitsLeaderboardPlugin(), name: 'Bits Leaderboard', category: 'Twitch Tools' },
+    // Moderation+
+    { instance: new WatchlistPlugin(), name: 'Watchlist', category: 'Moderation+' },
+    { instance: new RaidProtectionPlugin(), name: 'Raid Protection', category: 'Moderation+' },
+    { instance: new ChatModesPlugin(), name: 'Chat Modes', category: 'Moderation+' },
+    // Stream Tools
+    { instance: new OBSControlPlugin(), name: 'OBS Control', category: 'Stream Tools' },
+    { instance: new StreamNotesPlugin(), name: 'Stream Notes', category: 'Stream Tools' },
+    { instance: new HydrationPlugin(), name: 'Health Reminders', category: 'Stream Tools' },
+    // More Integrations
+    { instance: new TwitterPlugin(), name: 'Twitter/X', category: 'Social' },
+    // Analytics
+    { instance: new AnalyticsPlugin(), name: 'Analytics', category: 'System' },
   ];
 
   let currentCategory = '';
@@ -232,7 +271,20 @@ async function main() {
   console.log('  !prediction* !vip* !srs (Spotify) !schedule*');
   console.log('');
   console.log('  \x1b[36m── Integration ──\x1b[0m');
-  console.log('  !testalert* !discord* !dashboard*');
+  console.log('  !testalert* !discord* !dashboard* !tweet*');
+  console.log('');
+  console.log('  \x1b[36m── Twitch Tools ──\x1b[0m');
+  console.log('  !followage !accountage !userinfo !hypetrain !emotes !bitsboard');
+  console.log('');
+  console.log('  \x1b[36m── Moderation+ ──\x1b[0m');
+  console.log('  !warn* !strikes !watchlist* !raidprotect* !emergency*');
+  console.log('  !emoteonly* !slow* !subonly* !followeronly* !shield*');
+  console.log('');
+  console.log('  \x1b[36m── Stream Tools ──\x1b[0m');
+  console.log('  !scene* !obs* !note* !highlight* !hydrate* !stretch* !posture*');
+  console.log('');
+  console.log('  \x1b[36m── Analytics ──\x1b[0m');
+  console.log('  !analytics* !topcommands* !peakhours* !chatters* !growth*');
   console.log('');
   console.log('  \x1b[2m  * = Mod/Broadcaster only\x1b[0m');
   console.log('');

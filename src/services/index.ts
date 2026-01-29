@@ -52,3 +52,27 @@ export {
   getRestAPI,
   createRestAPI,
 } from './RestAPI';
+
+// =============================================================================
+// WEBHOOK SERVICE
+// =============================================================================
+export {
+  WebhookService,
+  Webhook,
+  WebhookPayload,
+  getWebhookService,
+} from './WebhookService';
+
+// =============================================================================
+// CONFIG VALIDATOR
+// =============================================================================
+export {
+  ConfigValidator,
+  ConfigSchema,
+  ConfigField,
+  ValidationResult,
+  STREAMCORE_CONFIG_SCHEMA,
+  getConfigValidator,
+  validateConfig,
+  validateConfigOrExit,
+} from './ConfigValidator';

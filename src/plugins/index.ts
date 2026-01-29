@@ -81,6 +81,19 @@ export { DiscordPlugin } from './discord/DiscordPlugin';
 export { TwitterPlugin } from './twitter/TwitterPlugin';
 export { OBSControlPlugin } from './obscontrol/OBSControlPlugin';
 export { TwitchInfoPlugin } from './twitchinfo/TwitchInfoPlugin';
+export { EventSubPlugin } from './eventsub/EventSubPlugin';
+export { ChannelPointsPlugin } from './channelpoints/ChannelPointsPlugin';
+export { ClipsPlugin } from './clips/ClipsPlugin';
+
+// =============================================================================
+// GAMBLING PLUGINS - Casino games
+// =============================================================================
+export { CasinoPlugin } from './casino/CasinoPlugin';
+
+// =============================================================================
+// TRACKING PLUGINS - User tracking
+// =============================================================================
+export { WatchtimePlugin } from './watchtime/WatchtimePlugin';
 
 // =============================================================================
 // UTILITY PLUGINS - Tools and management
@@ -137,6 +150,11 @@ import { DiscordPlugin } from './discord/DiscordPlugin';
 import { TwitterPlugin } from './twitter/TwitterPlugin';
 import { OBSControlPlugin } from './obscontrol/OBSControlPlugin';
 import { TwitchInfoPlugin } from './twitchinfo/TwitchInfoPlugin';
+import { EventSubPlugin } from './eventsub/EventSubPlugin';
+import { ChannelPointsPlugin } from './channelpoints/ChannelPointsPlugin';
+import { ClipsPlugin } from './clips/ClipsPlugin';
+import { CasinoPlugin } from './casino/CasinoPlugin';
+import { WatchtimePlugin } from './watchtime/WatchtimePlugin';
 import { DashboardPlugin } from './dashboard/DashboardPlugin';
 import { AnalyticsPlugin } from './analytics/AnalyticsPlugin';
 import { StreamNotesPlugin } from './streamnotes/StreamNotesPlugin';
@@ -215,6 +233,19 @@ export const IntegrationPlugins = {
   TwitterPlugin,
   OBSControlPlugin,
   TwitchInfoPlugin,
+  EventSubPlugin,
+  ChannelPointsPlugin,
+  ClipsPlugin,
+};
+
+/** Gambling plugins for casino games */
+export const GamblingPlugins = {
+  CasinoPlugin,
+};
+
+/** Tracking plugins for user metrics */
+export const TrackingPlugins = {
+  WatchtimePlugin,
 };
 
 /** Utility plugins for tools and management */
@@ -256,6 +287,10 @@ export const AllPlugins = {
   ...AutomationPlugins,
   // Integrations
   ...IntegrationPlugins,
+  // Gambling
+  ...GamblingPlugins,
+  // Tracking
+  ...TrackingPlugins,
   // Utility
   ...UtilityPlugins,
   // AI
@@ -273,6 +308,8 @@ export const PluginCategories = {
   alerts: { name: 'Alerts', plugins: AlertPlugins },
   automation: { name: 'Automation', plugins: AutomationPlugins },
   integrations: { name: 'Integrations', plugins: IntegrationPlugins },
+  gambling: { name: 'Gambling', plugins: GamblingPlugins },
+  tracking: { name: 'Tracking', plugins: TrackingPlugins },
   utility: { name: 'Utility', plugins: UtilityPlugins },
   ai: { name: 'AI', plugins: AIPlugins },
 } as const;

@@ -11,3 +11,10 @@ export {
   DBSettings,
   DBEvent,
 } from './Database';
+
+export {
+  CacheService,
+  UserCache,
+  getCache,
+  getUserCache,
+} from './CacheService';

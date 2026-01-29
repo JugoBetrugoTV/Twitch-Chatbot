@@ -26,3 +26,6 @@ export { QueuePlugin } from './queue/QueuePlugin';
 // Tools
 export { CountersPlugin } from './counters/CountersPlugin';
 export { RanksPlugin } from './ranks/RanksPlugin';
+export { WelcomePlugin } from './welcome/WelcomePlugin';
+export { ShopPlugin } from './shop/ShopPlugin';
+export { StreamControlPlugin } from './streamcontrol/StreamControlPlugin';

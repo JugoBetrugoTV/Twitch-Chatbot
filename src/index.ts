@@ -30,6 +30,9 @@ import { QueuePlugin } from './plugins/queue/QueuePlugin';
 // Tools Plugins
 import { CountersPlugin } from './plugins/counters/CountersPlugin';
 import { RanksPlugin } from './plugins/ranks/RanksPlugin';
+import { WelcomePlugin } from './plugins/welcome/WelcomePlugin';
+import { ShopPlugin } from './plugins/shop/ShopPlugin';
+import { StreamControlPlugin } from './plugins/streamcontrol/StreamControlPlugin';
 
 const logger = new Logger('Main');
 
@@ -123,6 +126,9 @@ async function main() {
     // Tools
     { instance: new CountersPlugin(), name: 'Counters', category: 'Tools' },
     { instance: new RanksPlugin(), name: 'Ranks', category: 'Tools' },
+    { instance: new WelcomePlugin(), name: 'Welcome', category: 'Tools' },
+    { instance: new ShopPlugin(), name: 'Loyalty Shop', category: 'Tools' },
+    { instance: new StreamControlPlugin(), name: 'Stream Control', category: 'Tools' },
   ];
 
   let currentCategory = '';
@@ -182,6 +188,12 @@ async function main() {
   console.log('');
   console.log('  \x1b[36m── Tools ──\x1b[0m');
   console.log('  !death !counter !addcmd* !timer* !blacklist* !permit*');
+  console.log('');
+  console.log('  \x1b[36m── Shop ──\x1b[0m');
+  console.log('  !shop !buy !shopitem* !redemptions*');
+  console.log('');
+  console.log('  \x1b[36m── Stream Control ──\x1b[0m');
+  console.log('  !title !game !streaminfo !marker* !clip !tags');
   console.log('');
   console.log('  \x1b[2m  * = Mod/Broadcaster only\x1b[0m');
   console.log('');

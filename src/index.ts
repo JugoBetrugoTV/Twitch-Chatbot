@@ -8,6 +8,7 @@
 import 'dotenv/config';
 import { StreamCore, StreamCoreConfig } from './core/StreamCore';
 import { Logger } from './utils/logger';
+import { initDatabase } from './services/Database';
 
 // Core Plugins
 import { CoreCommandsPlugin } from './plugins/commands/CoreCommandsPlugin';
@@ -134,6 +135,11 @@ async function main() {
     mood: (process.env.DEFAULT_MOOD as any) || 'competitive',
     debug: process.env.DEBUG === 'true',
   };
+
+  // Initialize database (required for sql.js async loading)
+  logger.info('Initializing database...');
+  await initDatabase();
+  logger.info('Database initialized successfully');
 
   // Create StreamCore instance
   const bot = new StreamCore(config);

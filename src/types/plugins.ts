@@ -20,12 +20,24 @@ export interface PluginConfig {
   [key: string]: any;
 }
 
+export interface PluginEventEmitter {
+  on: (event: string, handler: (data: any) => void) => void;
+  off: (event: string, handler: (data: any) => void) => void;
+  emit: (event: string, data: any) => void;
+}
+
+export interface PluginChatService {
+  send: (message: string, channel?: string) => void;
+}
+
 export interface PluginContext {
   config: PluginConfig;
   logger: PluginLogger;
   db: PluginDatabase;
   emit: (event: EventName, data: any) => void;
   sendMessage: (channel: string, message: string) => void;
+  events: PluginEventEmitter;
+  chat: PluginChatService;
 }
 
 export interface PluginLogger {

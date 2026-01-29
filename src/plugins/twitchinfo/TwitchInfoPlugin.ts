@@ -37,7 +37,7 @@ export class TwitchInfoPlugin extends Plugin {
     this.cache = getCache();
     this.log.info('Initializing Twitch Info...');
 
-    this.tokens = this.db.getSetting<TwitchTokens>('twitch_tokens', null);
+    this.tokens = this.db.getSetting<TwitchTokens>('twitch_tokens') || null;
     this.registerCommands();
 
     this.log.info('Twitch Info initialized!');

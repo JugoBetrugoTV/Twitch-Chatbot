@@ -54,7 +54,7 @@ export class StreamControlPlugin extends Plugin {
     this.log.info('Initializing Stream Control...');
 
     // Load tokens from database
-    this.tokens = this.db.getSetting<TwitchTokens>('twitch_tokens', null);
+    this.tokens = this.db.getSetting<TwitchTokens>('twitch_tokens') || null;
 
     if (!this.tokens) {
       this.log.warn('Twitch API tokens not configured. Use !settoken to configure.');

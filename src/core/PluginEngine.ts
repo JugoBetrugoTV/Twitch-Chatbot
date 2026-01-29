@@ -295,6 +295,24 @@ export class PluginEngine {
    * Create plugin context
    */
   private createPluginContext(name: string, config: PluginConfig): PluginContext {
+    const sendMessage = (channel: string, message: string) => {
+      for (const [, platform] of this.platforms) {
+        if (platform.isConnected()) {
+          platform.sendMessage(channel, message);
+        }
+      }
+    };
+
+    // Get default channel from first platform
+    const getDefaultChannel = (): string => {
+      for (const [, platform] of this.platforms) {
+        if (platform.isConnected()) {
+          return (platform as any).channels?.[0] || '';
+        }
+      }
+      return process.env.TWITCH_CHANNEL || '';
+    };
+
     return {
       config,
       logger: this.createPluginLogger(name),
@@ -302,13 +320,23 @@ export class PluginEngine {
       emit: (eventName: EventName, data: any) => {
         this.eventBus.emit(eventName, data);
       },
-      sendMessage: (channel: string, message: string) => {
-        // Send to all connected platforms
-        for (const [, platform] of this.platforms) {
-          if (platform.isConnected()) {
-            platform.sendMessage(channel, message);
-          }
-        }
+      sendMessage,
+      events: {
+        on: (event: string, handler: (data: any) => void) => {
+          this.eventBus.on(event as EventName, handler);
+        },
+        off: (event: string, handler: (data: any) => void) => {
+          this.eventBus.off(event as EventName, handler);
+        },
+        emit: (event: string, data: any) => {
+          this.eventBus.emit(event as EventName, data);
+        },
+      },
+      chat: {
+        send: (message: string, channel?: string) => {
+          const targetChannel = channel || getDefaultChannel();
+          sendMessage(targetChannel, message);
+        },
       },
     };
   }

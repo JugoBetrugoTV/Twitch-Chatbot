@@ -87,7 +87,7 @@ export class SpotifyPlugin extends Plugin {
   }
 
   private loadTokens(): void {
-    this.tokens = this.db.getSetting<SpotifyTokens>('spotify_tokens', null);
+    this.tokens = this.db.getSetting<SpotifyTokens>('spotify_tokens') || null;
   }
 
   private saveTokens(): void {

@@ -285,7 +285,7 @@ export class ChatModesPlugin extends Plugin {
       permission: Permission.MODERATOR,
       cooldown: { user: 10, global: 5 },
       handler: async (ctx) => {
-        const modes = [];
+        const modes: string[] = [];
 
         if (this.currentModes.emoteOnly) modes.push('Emote-Only');
         if (this.currentModes.slowMode > 0) modes.push(`Slow (${this.currentModes.slowMode}s)`);

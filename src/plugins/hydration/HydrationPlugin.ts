@@ -78,7 +78,7 @@ export class HydrationPlugin extends Plugin {
 
   private db!: DatabaseService;
   private settings: ReminderSettings = DEFAULT_SETTINGS;
-  private timers: Map<string, NodeJS.Timeout> = new Map();
+  private reminderTimers: Map<string, NodeJS.Timeout> = new Map();
   private paused = false;
   private isLive = false;
   private lastReminders: Map<string, Date> = new Map();
@@ -136,29 +136,29 @@ export class HydrationPlugin extends Plugin {
     if (this.settings.hydrationEnabled) {
       const timer = setInterval(() => this.sendReminder('hydration'),
         this.settings.hydrationInterval * 60 * 1000);
-      this.timers.set('hydration', timer);
+      this.reminderTimers.set('hydration', timer);
     }
 
     if (this.settings.stretchEnabled) {
       const timer = setInterval(() => this.sendReminder('stretch'),
         this.settings.stretchInterval * 60 * 1000);
-      this.timers.set('stretch', timer);
+      this.reminderTimers.set('stretch', timer);
     }
 
     if (this.settings.postureEnabled) {
       const timer = setInterval(() => this.sendReminder('posture'),
         this.settings.postureInterval * 60 * 1000);
-      this.timers.set('posture', timer);
+      this.reminderTimers.set('posture', timer);
     }
 
     this.log.info('Reminder timers started');
   }
 
   private stopTimers(): void {
-    for (const timer of this.timers.values()) {
+    for (const timer of this.reminderTimers.values()) {
       clearInterval(timer);
     }
-    this.timers.clear();
+    this.reminderTimers.clear();
   }
 
   private isQuietHours(): boolean {

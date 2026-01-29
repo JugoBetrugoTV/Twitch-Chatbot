@@ -287,9 +287,17 @@ export class TimerPlugin extends Plugin {
     ctx.reply(`✅ Timer "${name}" ${enabled ? 'aktiviert' : 'deaktiviert'}!`);
   }
 
-  // Public API
-  getTimers(): DBTimer[] {
-    return this.db.getAllTimers();
+  // Public API - convert DBTimer to Timer format
+  getTimers() {
+    return this.db.getAllTimers().map((t) => ({
+      id: t.id,
+      name: t.name,
+      messages: JSON.parse(t.messages),
+      intervalMinutes: t.interval_minutes,
+      minChatMessages: t.min_messages,
+      enabled: t.enabled,
+      lastTriggered: t.last_triggered ? new Date(t.last_triggered) : undefined,
+    }));
   }
 
   addTimer(name: string, messages: string[], intervalMinutes: number, minMessages: number = 5): DBTimer {

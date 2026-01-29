@@ -89,14 +89,9 @@ export class LoyaltyPlugin extends Plugin {
 
   private setupEventHandlers(): void {
     // Track chat activity and give message points
-    this.ctx.emit = ((originalEmit) => {
-      return (event: string, data: any) => {
-        if (event === 'chat:message') {
-          this.handleChatMessage(data);
-        }
-        return originalEmit(event, data);
-      };
-    })(this.ctx.emit);
+    this.ctx.events.on('chat:message', (data: any) => {
+      this.handleChatMessage(data as ChatMessageEvent);
+    });
   }
 
   private handleChatMessage(event: ChatMessageEvent): void {

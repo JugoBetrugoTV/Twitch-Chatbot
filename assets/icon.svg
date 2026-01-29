@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9147ff"/>
+      <stop offset="50%" style="stop-color:#772ce8"/>
+      <stop offset="100%" style="stop-color:#5c16c5"/>
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4aa"/>
+      <stop offset="100%" style="stop-color:#00b894"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="256" height="256" rx="48" fill="url(#mainGradient)"/>
+
+  <!-- Core Symbol -->
+  <g transform="translate(28, 28)">
+    <!-- Main S Shape -->
+    <path d="M60 50
+             C60 38, 80 32, 100 32
+             C140 32, 155 50, 155 70
+             C155 90, 135 102, 100 102
+             C65 102, 45 118, 45 140
+             C45 160, 65 175, 100 175
+             C120 175, 140 168, 140 155"
+          fill="none"
+          stroke="white"
+          stroke-width="22"
+          stroke-linecap="round"
+          opacity="0.95"/>
+
+    <!-- Streaming Waves -->
+    <path d="M160 60 L180 40 M160 75 L185 55 M160 90 L180 75"
+          fill="none"
+          stroke="url(#accentGradient)"
+          stroke-width="6"
+          stroke-linecap="round"/>
+
+    <!-- Accent Dot -->
+    <circle cx="150" cy="150" r="12" fill="url(#accentGradient)"/>
+  </g>
+</svg>

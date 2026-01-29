@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src 'self' data: https: blob:; img-src 'self' data: https:;">
-  <title>StreamBot - Twitch Chatbot</title>
+  <title>StreamCore - Next-Gen Twitch Bot</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -1371,13 +1371,25 @@
 
     .hidden { display: none !important; }
   </style>
+  <link rel="stylesheet" href="css/enhancements.css">
 </head>
 <body>
+  <!-- Splash Screen -->
+  <div id="splashScreen" class="splash-screen">
+    <img src="img/logo.svg" class="splash-logo" alt="StreamCore Logo">
+    <h1 class="splash-title">StreamCore</h1>
+    <p class="splash-subtitle">Next-Gen Twitch Bot</p>
+    <div class="splash-loader">
+      <div class="splash-loader-bar"></div>
+    </div>
+    <p class="splash-status" id="splashStatus">Initialisiere...</p>
+  </div>
+
   <!-- Titlebar -->
   <div class="titlebar">
     <div class="titlebar-title">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.64 5.93h1.43v4.28h-1.43m3.93-4.28H17v4.28h-1.43M7 2L3.43 5.57v12.86h4.28V22l3.58-3.57h2.85L20.57 12V2m-1.43 9.29l-2.85 2.85h-2.86l-2.5 2.5v-2.5H7.71V3.43h11.43z"/></svg>
-      StreamBot v1.0
+      <img src="img/logo.svg" width="20" height="20" alt="Logo" style="margin-right: 8px;">
+      StreamCore v2.0
     </div>
     <div class="titlebar-controls">
       <button class="titlebar-btn minimize"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg></button>
@@ -1954,7 +1966,39 @@
   <audio id="songAudio"></audio>
 
   <script>
-    // State
+    // ========================================
+    // SPLASH SCREEN
+    // ========================================
+    const splashMessages = [
+      'Initialisiere Plugins...',
+      'Lade Konfiguration...',
+      'Verbinde mit Twitch...',
+      'Lade Befehle...',
+      'Starte Dashboard...'
+    ];
+
+    let splashIndex = 0;
+    const splashInterval = setInterval(() => {
+      const status = document.getElementById('splashStatus');
+      if (status && splashIndex < splashMessages.length) {
+        status.textContent = splashMessages[splashIndex];
+        splashIndex++;
+      }
+    }, 400);
+
+    // Hide splash after 2 seconds
+    setTimeout(() => {
+      clearInterval(splashInterval);
+      const splash = document.getElementById('splashScreen');
+      if (splash) {
+        splash.classList.add('fade-out');
+        setTimeout(() => splash.remove(), 500);
+      }
+    }, 2000);
+
+    // ========================================
+    // STATE
+    // ========================================
     let isConnected = false;
     let chatMessages = [];
     const maxMessages = 200;

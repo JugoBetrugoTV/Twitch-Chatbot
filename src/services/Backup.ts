@@ -152,14 +152,20 @@ export class BackupService {
   }
 
   private exportDatabase(): Record<string, any[]> {
-    const db = getDatabase().raw();
+    const db = getDatabase().rawSqlJs();
     const tables: Record<string, any[]> = {};
 
-    // Get all tables
-    const tableList = db.prepare(`
+    // Get all tables using sql.js API
+    const tableStmt = db.prepare(`
       SELECT name FROM sqlite_master
       WHERE type='table' AND name NOT LIKE 'sqlite_%'
-    `).all() as any[];
+    `);
+
+    const tableList: { name: string }[] = [];
+    while (tableStmt.step()) {
+      tableList.push(tableStmt.getAsObject() as { name: string });
+    }
+    tableStmt.free();
 
     for (const table of tableList) {
       // Security: Validate table name format before using in query
@@ -167,7 +173,13 @@ export class BackupService {
         this.log.warn(`Skipping invalid table name in export: ${table.name}`);
         continue;
       }
-      const rows = db.prepare(`SELECT * FROM "${table.name}"`).all();
+
+      const rowStmt = db.prepare(`SELECT * FROM "${table.name}"`);
+      const rows: any[] = [];
+      while (rowStmt.step()) {
+        rows.push(rowStmt.getAsObject());
+      }
+      rowStmt.free();
       tables[table.name] = rows;
     }
 
@@ -179,14 +191,17 @@ export class BackupService {
     const settings: Record<string, any> = {};
 
     try {
-      const rows = db.raw().prepare('SELECT key, value FROM settings').all() as any[];
-      for (const row of rows) {
+      const rawDb = db.rawSqlJs();
+      const stmt = rawDb.prepare('SELECT key, value FROM settings');
+      while (stmt.step()) {
+        const row = stmt.getAsObject() as { key: string; value: string };
         try {
           settings[row.key] = JSON.parse(row.value);
         } catch {
           settings[row.key] = row.value;
         }
       }
+      stmt.free();
     } catch (error) {
       this.log.warn(`Could not export settings: ${error}`);
     }
@@ -249,13 +264,16 @@ export class BackupService {
   }
 
   private async restoreDatabase(tables: Record<string, any[]>): Promise<void> {
-    const db = getDatabase().raw();
+    const db = getDatabase().rawSqlJs();
 
-    // Get actual tables in the database for validation
-    const existingTables = new Set(
-      (db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`).all() as any[])
-        .map(t => t.name)
-    );
+    // Get actual tables in the database for validation using sql.js API
+    const existingTables = new Set<string>();
+    const tableStmt = db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`);
+    while (tableStmt.step()) {
+      const row = tableStmt.getAsObject() as { name: string };
+      existingTables.add(row.name);
+    }
+    tableStmt.free();
 
     for (const [tableName, rows] of Object.entries(tables)) {
       if (rows.length === 0) continue;
@@ -283,16 +301,14 @@ export class BackupService {
 
       try {
         // Clear existing data - table name is now validated
-        db.exec(`DELETE FROM "${tableName}"`);
+        db.run(`DELETE FROM "${tableName}"`);
 
-        // Insert backup data - columns are validated
-        const stmt = db.prepare(`
-          INSERT INTO "${tableName}" (${columns.map(c => `"${c}"`).join(', ')})
-          VALUES (${placeholders})
-        `);
-
+        // Insert backup data - columns are validated (sql.js API)
         for (const row of rows) {
-          stmt.run(...columns.map((col) => row[col]));
+          db.run(
+            `INSERT INTO "${tableName}" (${columns.map(c => `"${c}"`).join(', ')}) VALUES (${placeholders})`,
+            columns.map((col) => row[col])
+          );
         }
 
         this.log.info(`Restored ${rows.length} rows to ${tableName}`);
@@ -300,6 +316,9 @@ export class BackupService {
         this.log.error(`Failed to restore table ${tableName}: ${error}`);
       }
     }
+
+    // Save changes
+    getDatabase().save();
   }
 
   private async restoreSettings(settings: Record<string, any>): Promise<void> {

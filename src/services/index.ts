@@ -10,6 +10,7 @@
 export {
   DatabaseService,
   getDatabase,
+  initDatabase,
   DBUser,
   DBCommand,
   DBTimer,

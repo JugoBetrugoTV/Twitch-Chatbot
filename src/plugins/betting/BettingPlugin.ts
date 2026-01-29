@@ -35,6 +35,7 @@ export class BettingPlugin extends Plugin {
   private db!: DatabaseService;
   private activeBets: Map<string, Bet> = new Map();
   private pendingChallenges: Map<string, Bet> = new Map(); // challengeId -> Bet
+  private cleanupInterval?: NodeJS.Timeout;
 
   protected async init(): Promise<void> {
     this.db = getDatabase();
@@ -44,12 +45,14 @@ export class BettingPlugin extends Plugin {
     this.registerCommands();
 
     // Cleanup expired bets every minute
-    setInterval(() => this.cleanupExpired(), 60000);
+    this.cleanupInterval = setInterval(() => this.cleanupExpired(), 60000);
 
     this.log.info('Betting system initialized!');
   }
 
-  protected async destroy(): Promise<void> {}
+  protected async destroy(): Promise<void> {
+    if (this.cleanupInterval) clearInterval(this.cleanupInterval);
+  }
 
   private initTables(): void {
     const db = this.db.raw();

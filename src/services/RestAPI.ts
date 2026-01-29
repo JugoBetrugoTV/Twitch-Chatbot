@@ -101,9 +101,18 @@ export class RestAPIService {
   private async handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const startTime = Date.now();
 
-    // CORS
+    // CORS - restrict to localhost only for security
     if (this.config.enableCORS) {
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      const origin = req.headers.origin;
+      const allowedOrigins = [
+        `http://localhost:${this.config.port}`,
+        `http://127.0.0.1:${this.config.port}`,
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+      ];
+      if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+      }
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
     }

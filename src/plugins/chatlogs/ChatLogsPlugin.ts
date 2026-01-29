@@ -55,6 +55,7 @@ export class ChatLogsPlugin extends Plugin {
   private db!: DatabaseService;
   private settings: LogSettings = DEFAULT_SETTINGS;
   private messageCount = 0;
+  private cleanupInterval?: NodeJS.Timeout;
 
   protected async init(): Promise<void> {
     this.db = getDatabase();
@@ -69,7 +70,9 @@ export class ChatLogsPlugin extends Plugin {
     this.log.info('Chat Logs initialized!');
   }
 
-  protected async destroy(): Promise<void> {}
+  protected async destroy(): Promise<void> {
+    if (this.cleanupInterval) clearInterval(this.cleanupInterval);
+  }
 
   private initTables(): void {
     const db = this.db.raw();
@@ -151,7 +154,7 @@ export class ChatLogsPlugin extends Plugin {
 
   private startCleanup(): void {
     // Clean old logs daily
-    setInterval(() => {
+    this.cleanupInterval = setInterval(() => {
       const db = this.db.raw();
       const stmt = db.prepare(`
         DELETE FROM chat_logs

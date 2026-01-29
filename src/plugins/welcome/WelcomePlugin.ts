@@ -67,6 +67,7 @@ export class WelcomePlugin extends Plugin {
   private settings: WelcomeSettings = DEFAULT_SETTINGS;
   private lastWelcome: number = 0;
   private welcomedToday: Set<string> = new Set();
+  private clearInterval?: NodeJS.Timeout;
 
   protected async init(): Promise<void> {
     this.db = getDatabase();
@@ -86,7 +87,7 @@ export class WelcomePlugin extends Plugin {
     this.registerCommands();
 
     // Clear welcomed users daily
-    setInterval(() => {
+    this.clearInterval = setInterval(() => {
       this.welcomedToday.clear();
     }, 24 * 60 * 60 * 1000);
 
@@ -94,7 +95,7 @@ export class WelcomePlugin extends Plugin {
   }
 
   protected async destroy(): Promise<void> {
-    // Cleanup
+    if (this.clearInterval) clearInterval(this.clearInterval);
   }
 
   private setupMessageHandler(): void {

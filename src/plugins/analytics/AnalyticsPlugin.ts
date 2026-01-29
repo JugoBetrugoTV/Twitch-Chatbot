@@ -79,6 +79,8 @@ export class AnalyticsPlugin extends Plugin {
   private hourlyUsers: Map<number, Set<string>> = new Map();
   private commandUsage: Map<string, number> = new Map();
   private activeUsers: Set<string> = new Set();
+  private saveInterval?: NodeJS.Timeout;
+  private cleanupInterval?: NodeJS.Timeout;
 
   protected async init(): Promise<void> {
     this.db = getDatabase();
@@ -94,6 +96,9 @@ export class AnalyticsPlugin extends Plugin {
   }
 
   protected async destroy(): Promise<void> {
+    // Clear intervals
+    if (this.saveInterval) clearInterval(this.saveInterval);
+    if (this.cleanupInterval) clearInterval(this.cleanupInterval);
     // Save current session data
     this.saveSessionData();
   }
@@ -193,7 +198,7 @@ export class AnalyticsPlugin extends Plugin {
     });
 
     // Save data periodically
-    setInterval(() => this.saveSessionData(), 5 * 60 * 1000); // Every 5 minutes
+    this.saveInterval = setInterval(() => this.saveSessionData(), 5 * 60 * 1000); // Every 5 minutes
   }
 
   private updateUserActivity(username: string, type: 'message' | 'command'): void {
@@ -276,7 +281,7 @@ export class AnalyticsPlugin extends Plugin {
 
   private startCleanupSchedule(): void {
     // Run cleanup daily
-    setInterval(() => {
+    this.cleanupInterval = setInterval(() => {
       this.cleanupOldData();
     }, 24 * 60 * 60 * 1000);
   }

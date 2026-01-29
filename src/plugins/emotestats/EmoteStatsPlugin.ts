@@ -28,6 +28,7 @@ export class EmoteStatsPlugin extends Plugin {
   private db!: DatabaseService;
   private emoteCache: Map<string, number> = new Map();
   private sessionEmotes: Map<string, number> = new Map();
+  private saveInterval?: NodeJS.Timeout;
 
   protected async init(): Promise<void> {
     this.db = getDatabase();
@@ -42,6 +43,7 @@ export class EmoteStatsPlugin extends Plugin {
   }
 
   protected async destroy(): Promise<void> {
+    if (this.saveInterval) clearInterval(this.saveInterval);
     // Save session emotes before shutdown
     this.saveEmoteCounts();
   }
@@ -97,7 +99,7 @@ export class EmoteStatsPlugin extends Plugin {
     });
 
     // Save emotes every 5 minutes
-    setInterval(() => {
+    this.saveInterval = setInterval(() => {
       if (this.sessionEmotes.size > 0) {
         this.saveEmoteCounts();
       }

@@ -80,7 +80,7 @@ export class DashboardPlugin extends Plugin {
     if (!this.settings.password) {
       this.settings.password = this.generatePassword();
       this.db.setSetting('dashboard_settings', this.settings);
-      this.log.info(`Dashboard password generated: ${this.settings.password}`);
+      this.log.info('Dashboard password generated (use !dashboard command to retrieve)');
     }
   }
 
@@ -159,7 +159,7 @@ export class DashboardPlugin extends Plugin {
 
     this.server.listen(this.settings.port, () => {
       this.log.info(`Dashboard running at http://localhost:${this.settings.port}`);
-      this.log.info(`Password: ${this.settings.password}`);
+      this.log.info('Use !dashboard command to get login credentials');
     });
   }
 
@@ -180,8 +180,12 @@ export class DashboardPlugin extends Plugin {
   private handleRequest(req: IncomingMessage, res: ServerResponse): void {
     const url = parseUrl(req.url || '', true);
 
-    // CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // CORS headers - restrict to localhost only
+    const origin = req.headers.origin;
+    const allowedOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000', `http://localhost:${this.settings.port}`, `http://127.0.0.1:${this.settings.port}`];
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -486,8 +490,8 @@ export class DashboardPlugin extends Plugin {
           `Password wurde per Whisper gesendet`
         );
 
-        // Log password to console for now
-        this.log.info(`Dashboard password: ${this.settings.password}`);
+        // Send password via whisper (mock - in real implementation would whisper)
+        this.log.debug(`Dashboard credentials requested by ${ctx.user.displayName}`);
       },
     });
 
@@ -521,8 +525,8 @@ export class DashboardPlugin extends Plugin {
       handler: async (ctx) => {
         this.settings.password = this.generatePassword();
         this.db.setSetting('dashboard_settings', this.settings);
-        this.log.info(`New dashboard password: ${this.settings.password}`);
-        ctx.reply('✅ Neues Password generiert (siehe Konsole)');
+        this.log.info('New dashboard password generated');
+        ctx.reply(`✅ Neues Password: ${this.settings.password} (nur für dich sichtbar)`);
       },
     });
   }

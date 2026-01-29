@@ -58,6 +58,7 @@ export class AIChatPlugin extends Plugin {
   private messageCount = 0;
   private messageCountReset = Date.now();
   private conversationHistory: ConversationMessage[] = [];
+  private resetInterval?: NodeJS.Timeout;
 
   protected async init(): Promise<void> {
     this.db = getDatabase();
@@ -67,7 +68,7 @@ export class AIChatPlugin extends Plugin {
     this.registerCommands();
 
     // Reset message count every minute
-    setInterval(() => {
+    this.resetInterval = setInterval(() => {
       this.messageCount = 0;
       this.messageCountReset = Date.now();
     }, 60000);
@@ -79,7 +80,10 @@ export class AIChatPlugin extends Plugin {
     this.log.info('AI Chat initialized!');
   }
 
-  protected async destroy(): Promise<void> {}
+  protected async destroy(): Promise<void> {
+    if (this.resetInterval) clearInterval(this.resetInterval);
+    this.conversationHistory = [];
+  }
 
   private loadSettings(): void {
     const saved = this.db.getSetting<AISettings>('ai_settings');

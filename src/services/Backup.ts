@@ -136,7 +136,12 @@ export class BackupService {
     `).all() as any[];
 
     for (const table of tableList) {
-      const rows = db.prepare(`SELECT * FROM ${table.name}`).all();
+      // Security: Validate table name format before using in query
+      if (!this.isValidIdentifier(table.name)) {
+        this.log.warn(`Skipping invalid table name in export: ${table.name}`);
+        continue;
+      }
+      const rows = db.prepare(`SELECT * FROM "${table.name}"`).all();
       tables[table.name] = rows;
     }
 
@@ -204,30 +209,70 @@ export class BackupService {
     }
   }
 
+  // Whitelist of allowed table names for restore operations
+  private static readonly ALLOWED_TABLES = new Set([
+    'users', 'custom_commands', 'timers', 'quotes', 'settings',
+    'events', 'blacklist', 'counters', 'polls', 'giveaways',
+    'chat_logs', 'analytics', 'sessions', 'loyalty_rewards',
+    'sound_alerts', 'scheduled_tasks', 'betting', 'trivia',
+  ]);
+
+  // Validate that a name contains only safe characters (alphanumeric and underscore)
+  private isValidIdentifier(name: string): boolean {
+    return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name);
+  }
+
   private async restoreDatabase(tables: Record<string, any[]>): Promise<void> {
     const db = getDatabase().raw();
+
+    // Get actual tables in the database for validation
+    const existingTables = new Set(
+      (db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`).all() as any[])
+        .map(t => t.name)
+    );
 
     for (const [tableName, rows] of Object.entries(tables)) {
       if (rows.length === 0) continue;
 
-      // Get column names from first row
-      const columns = Object.keys(rows[0]);
-      const placeholders = columns.map(() => '?').join(', ');
-
-      // Clear existing data
-      db.exec(`DELETE FROM ${tableName}`);
-
-      // Insert backup data
-      const stmt = db.prepare(`
-        INSERT INTO ${tableName} (${columns.join(', ')})
-        VALUES (${placeholders})
-      `);
-
-      for (const row of rows) {
-        stmt.run(...columns.map((col) => row[col]));
+      // Security: Validate table name against whitelist and existing tables
+      if (!BackupService.ALLOWED_TABLES.has(tableName) && !existingTables.has(tableName)) {
+        this.log.warn(`Skipping unknown table: ${tableName}`);
+        continue;
       }
 
-      this.log.info(`Restored ${rows.length} rows to ${tableName}`);
+      // Security: Validate table name format
+      if (!this.isValidIdentifier(tableName)) {
+        this.log.warn(`Skipping invalid table name: ${tableName}`);
+        continue;
+      }
+
+      // Get column names from first row and validate them
+      const columns = Object.keys(rows[0]).filter(col => this.isValidIdentifier(col));
+      if (columns.length === 0) {
+        this.log.warn(`No valid columns for table: ${tableName}`);
+        continue;
+      }
+
+      const placeholders = columns.map(() => '?').join(', ');
+
+      try {
+        // Clear existing data - table name is now validated
+        db.exec(`DELETE FROM "${tableName}"`);
+
+        // Insert backup data - columns are validated
+        const stmt = db.prepare(`
+          INSERT INTO "${tableName}" (${columns.map(c => `"${c}"`).join(', ')})
+          VALUES (${placeholders})
+        `);
+
+        for (const row of rows) {
+          stmt.run(...columns.map((col) => row[col]));
+        }
+
+        this.log.info(`Restored ${rows.length} rows to ${tableName}`);
+      } catch (error) {
+        this.log.error(`Failed to restore table ${tableName}: ${error}`);
+      }
     }
   }
 

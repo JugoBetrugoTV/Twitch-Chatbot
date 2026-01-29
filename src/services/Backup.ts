@@ -72,6 +72,32 @@ export class BackupService {
     }
   }
 
+  /**
+   * Create a backup on startup if needed
+   * Only creates if last backup is older than threshold
+   */
+  async startupBackup(thresholdHours: number = 24): Promise<boolean> {
+    const backups = this.listBackups();
+
+    if (backups.length === 0) {
+      this.log.info('No existing backups found, creating startup backup...');
+      await this.createBackup('startup - initial');
+      return true;
+    }
+
+    const latestBackup = backups[0];
+    const hoursSinceBackup = (Date.now() - latestBackup.timestamp.getTime()) / (1000 * 60 * 60);
+
+    if (hoursSinceBackup >= thresholdHours) {
+      this.log.info(`Last backup is ${hoursSinceBackup.toFixed(1)}h old, creating startup backup...`);
+      await this.createBackup('startup - scheduled');
+      return true;
+    }
+
+    this.log.info(`Last backup is ${hoursSinceBackup.toFixed(1)}h old, skipping startup backup`);
+    return false;
+  }
+
   stop(): void {
     if (this.backupTimer) {
       clearInterval(this.backupTimer);

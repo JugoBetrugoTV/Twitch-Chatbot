@@ -41,6 +41,9 @@ export {
 // =============================================================================
 export {
   BackupService,
+  BackupConfig,
+  getBackupService,
+  createBackupService,
 } from './Backup';
 
 // =============================================================================
@@ -133,3 +136,44 @@ export {
   getEncryptionService,
   initializeEncryption,
 } from './EncryptionService';
+
+// =============================================================================
+// INPUT VALIDATOR SERVICE
+// =============================================================================
+export {
+  InputValidator,
+  ValidationResult as InputValidationResult,
+  ValidationRule,
+  ValidationSchema,
+  ValidationPatterns,
+  Patterns,
+  getValidator,
+} from './InputValidator';
+
+// =============================================================================
+// HEALTH SERVICE
+// =============================================================================
+export {
+  HealthService,
+  HealthStatus,
+  HealthCheck,
+  SystemInfo,
+  HealthCheckConfig,
+  getHealthService,
+  formatBytes,
+  formatUptime,
+} from './HealthService';
+
+// =============================================================================
+// AUDIT LOGGER SERVICE
+// =============================================================================
+export {
+  AuditLogger,
+  AuditEntry,
+  AuditEventType,
+  AuditSeverity,
+  AuditConfig,
+  AuditQuery,
+  getAuditLogger,
+  createAuditLogger,
+} from './AuditLogger';

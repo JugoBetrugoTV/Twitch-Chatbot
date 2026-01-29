@@ -279,11 +279,50 @@ export class RestAPIService {
   }
 
   private registerDefaultRoutes(): void {
-    // Health check
+    // Health check - basic
     this.get('/api/health', () => ({
       status: 200,
       data: { status: 'ok', timestamp: new Date().toISOString() },
     }));
+
+    // Health check - detailed
+    this.get('/api/health/detailed', async () => {
+      try {
+        const { getHealthService } = await import('./HealthService');
+        const health = await getHealthService().getHealth();
+        return {
+          status: health.status === 'healthy' ? 200 : health.status === 'degraded' ? 200 : 503,
+          data: health,
+        };
+      } catch {
+        return {
+          status: 200,
+          data: { status: 'ok', timestamp: new Date().toISOString() },
+        };
+      }
+    });
+
+    // Liveness probe (for Kubernetes/Docker)
+    this.get('/api/health/live', async () => {
+      try {
+        const { getHealthService } = await import('./HealthService');
+        const result = await getHealthService().liveness();
+        return { status: 200, data: result };
+      } catch {
+        return { status: 200, data: { alive: true, timestamp: new Date().toISOString() } };
+      }
+    });
+
+    // Readiness probe (for Kubernetes/Docker)
+    this.get('/api/health/ready', async () => {
+      try {
+        const { getHealthService } = await import('./HealthService');
+        const result = await getHealthService().readiness();
+        return { status: result.ready ? 200 : 503, data: result };
+      } catch {
+        return { status: 200, data: { ready: true, timestamp: new Date().toISOString() } };
+      }
+    });
 
     // Bot status
     this.get('/api/status', () => {

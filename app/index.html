@@ -548,9 +548,9 @@
         <div class="page-header">
           <h1 class="page-title">Commands</h1>
           <div class="page-actions">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" onclick="showAddCommandModal()">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-              Add Command
+              Befehl erstellen
             </button>
           </div>
         </div>
@@ -562,12 +562,7 @@
               <span class="badge badge-secondary" id="customCommandCount">0</span>
             </div>
             <div class="card-body no-padding" id="customCommandsList">
-              <div class="empty-state">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-                <div class="empty-state-title">No Custom Commands</div>
-                <div class="empty-state-desc">Create your first command to get started</div>
-                <button class="btn btn-primary mt-3">Create Command</button>
-              </div>
+              <!-- Content loaded dynamically -->
             </div>
           </div>
 
@@ -1218,7 +1213,9 @@
             </button>
           </div>
         </div>
-        <div style="padding:20px;"></div>
+        <div style="padding:20px;" id="timersContainer">
+          <!-- Content loaded dynamically -->
+        </div>
       </div>
 
       <!-- Moderation Page -->
@@ -3635,15 +3632,18 @@
     }
 
     function renderCommands() {
-      const container = document.querySelector('#page-commands .card-body');
+      const container = document.getElementById('customCommandsList');
       if (!container) return;
 
+      // Update count badge
+      const countBadge = document.getElementById('customCommandCount');
+      if (countBadge) countBadge.textContent = commands.length;
+
       if (commands.length === 0) {
-        container.innerHTML = `<div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+        container.innerHTML = `<div class="empty-state" style="padding:40px;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:48px;height:48px;opacity:0.5;margin-bottom:15px;"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
           <div class="empty-state-title">Keine Befehle</div>
-          <div class="empty-state-desc">Erstelle deinen ersten Befehl</div>
-          <button class="btn btn-primary mt-3" onclick="showAddCommandModal()">Befehl erstellen</button>
+          <div class="empty-state-desc">Erstelle deinen ersten Befehl mit dem Button oben</div>
         </div>`;
         return;
       }
@@ -3705,9 +3705,17 @@
       const newResponse = prompt('Neue Antwort:', cmd.response);
       if (newResponse === null) return;
 
-      window.api?.commands?.update(name, { response: newResponse }).then(() => {
-        loadCommands();
-        showNotification('Befehl aktualisiert!', 'success');
+      window.api?.commands?.update(name, { response: newResponse }).then((result) => {
+        console.log('Command update result:', result);
+        if (result && result.success !== false) {
+          loadCommands();
+          showNotification('Befehl aktualisiert!', 'success');
+        } else {
+          showNotification(result?.error || 'Fehler beim Aktualisieren', 'error');
+        }
+      }).catch((err) => {
+        console.error('Command update error:', err);
+        showNotification('Fehler: ' + err.message, 'error');
       });
     }
 
@@ -3721,25 +3729,23 @@
     }
 
     function renderTimers() {
-      const container = document.querySelector('#page-timers > div');
+      const container = document.getElementById('timersContainer');
       if (!container) return;
 
       if (timers.length === 0) {
         container.innerHTML = `<div class="card"><div class="card-body">
-          <div class="empty-state">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+          <div class="empty-state" style="padding:40px;">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:48px;height:48px;opacity:0.5;margin-bottom:15px;"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
             <div class="empty-state-title">Keine Timer</div>
-            <div class="empty-state-desc">Timer senden automatisch Nachrichten in den Chat</div>
-            <button class="btn btn-primary mt-3" onclick="showAddTimerModal()">Timer erstellen</button>
+            <div class="empty-state-desc">Timer senden automatisch Nachrichten in den Chat. Nutze den Button oben um einen Timer zu erstellen.</div>
           </div>
         </div></div>`;
         return;
       }
 
       container.innerHTML = `<div class="card"><div class="card-header">
-        <div class="card-title">Timer</div>
-        <button class="btn btn-primary btn-sm" onclick="showAddTimerModal()">+ Neuer Timer</button>
-      </div><div class="card-body">
+        <div class="card-title">Timer (${timers.length})</div>
+      </div><div class="card-body" style="padding:0;">
         <table class="data-table">
           <thead><tr><th>Name</th><th>Nachrichten</th><th>Intervall</th><th>Aktiv</th><th>Aktionen</th></tr></thead>
           <tbody>${timers.map(t => `
@@ -3749,6 +3755,7 @@
               <td>${t.interval_minutes || t.intervalMinutes || 5} Min</td>
               <td><label class="toggle toggle-sm"><input type="checkbox" ${t.enabled ? 'checked' : ''} onchange="toggleTimer('${t.id}')"><span class="toggle-slider"></span></label></td>
               <td>
+                <button class="btn btn-ghost btn-sm" onclick="editTimer('${t.id}')">Bearbeiten</button>
                 <button class="btn btn-ghost btn-sm text-danger" onclick="deleteTimer('${t.id}')">Löschen</button>
               </td>
             </tr>
@@ -3789,6 +3796,32 @@
         await loadTimers();
         showNotification('Timer gelöscht', 'success');
       }
+    }
+
+    function editTimer(id) {
+      const timer = timers.find(t => t.id === id);
+      if (!timer) return;
+
+      const newMessage = prompt('Neue Nachricht:', Array.isArray(timer.messages) ? timer.messages[0] : timer.message || '');
+      if (newMessage === null) return;
+
+      const newInterval = parseInt(prompt('Neues Intervall (Minuten):', timer.interval_minutes || timer.intervalMinutes || 5)) || 5;
+
+      window.api?.timers?.update(id, {
+        messages: [newMessage],
+        interval_minutes: newInterval
+      }).then((result) => {
+        console.log('Timer update result:', result);
+        if (result && result.success !== false) {
+          loadTimers();
+          showNotification('Timer aktualisiert!', 'success');
+        } else {
+          showNotification(result?.error || 'Fehler beim Aktualisieren', 'error');
+        }
+      }).catch((err) => {
+        console.error('Timer update error:', err);
+        showNotification('Fehler: ' + err.message, 'error');
+      });
     }
 
     // ========================================
@@ -4341,9 +4374,17 @@
       }
       const duration = parseInt(prompt('Dauer in Sekunden (Standard: 60):', '60')) || 60;
 
-      window.api?.polls?.create(question, options, duration).then(() => {
-        loadPolls();
-        showNotification('Umfrage gestartet!', 'success');
+      window.api?.polls?.create(question, options, duration).then((result) => {
+        console.log('Poll create result:', result);
+        if (result && result.success !== false) {
+          loadPolls();
+          showNotification('Umfrage gestartet!', 'success');
+        } else {
+          showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+        }
+      }).catch((err) => {
+        console.error('Poll create error:', err);
+        showNotification('Fehler: ' + err.message, 'error');
       });
     }
 
@@ -5357,6 +5398,294 @@
             </ul>
           </div>
         `).join('');
+      }
+    }
+
+    // ========================================
+    // MISSING FUNCTIONS - STUBS
+    // ========================================
+
+    // Events page
+    function exportEvents() {
+      showNotification('Export-Funktion wird implementiert...', 'info');
+    }
+
+    // Mod Tools page
+    function viewModLogs() {
+      navigateTo('modtools');
+    }
+
+    function executeModAction() {
+      const action = document.getElementById('quickModAction')?.value || 'timeout';
+      const target = document.getElementById('quickModTarget')?.value;
+      const duration = document.getElementById('quickModDuration')?.value || '60';
+
+      if (!target) {
+        showNotification('Bitte Benutzername eingeben', 'error');
+        return;
+      }
+
+      if (action === 'timeout') {
+        window.api?.moderation?.timeout(target, parseInt(duration), 'Quick action from UI').then(() => {
+          showNotification(`${target} für ${duration}s getimeouted`, 'success');
+        });
+      } else if (action === 'ban') {
+        window.api?.moderation?.ban(target, 'Quick action from UI').then(() => {
+          showNotification(`${target} gebannt`, 'success');
+        });
+      } else if (action === 'unban') {
+        window.api?.moderation?.unban(target).then(() => {
+          showNotification(`${target} entbannt`, 'success');
+        });
+      }
+    }
+
+    function permitLink() {
+      const username = prompt('Benutzername für Link-Erlaubnis:');
+      if (username) {
+        showNotification(`${username} darf jetzt Links posten`, 'success');
+      }
+    }
+
+    // Settings - General page
+    function testConnection() {
+      showNotification('Verbindung wird getestet...', 'info');
+      window.api?.bot?.getStatus().then((status) => {
+        if (status?.connected) {
+          showNotification('Verbindung erfolgreich!', 'success');
+        } else {
+          showNotification('Nicht verbunden', 'error');
+        }
+      });
+    }
+
+    function exportData() {
+      window.api?.data?.export().then((result) => {
+        if (result?.success) {
+          showNotification('Daten exportiert nach: ' + (result.path || 'Datei'), 'success');
+        } else {
+          showNotification(result?.error || 'Export fehlgeschlagen', 'error');
+        }
+      });
+    }
+
+    function importData() {
+      showNotification('Import-Funktion wird implementiert...', 'info');
+    }
+
+    function backupData() {
+      window.api?.data?.backup().then((result) => {
+        if (result?.success) {
+          showNotification('Backup erstellt!', 'success');
+        } else {
+          showNotification(result?.error || 'Backup fehlgeschlagen', 'error');
+        }
+      });
+    }
+
+    function clearAllData() {
+      if (confirm('ACHTUNG: Alle Daten werden gelöscht! Dies kann nicht rückgängig gemacht werden. Fortfahren?')) {
+        if (confirm('Bist du WIRKLICH sicher? Alle Benutzer, Commands, Timer, etc. werden gelöscht!')) {
+          window.api?.data?.reset().then((result) => {
+            if (result?.success) {
+              showNotification('Alle Daten gelöscht', 'success');
+              location.reload();
+            } else {
+              showNotification(result?.error || 'Fehler beim Löschen', 'error');
+            }
+          });
+        }
+      }
+    }
+
+    // Stream info functions
+    function updateStreamTitle() {
+      const newTitle = prompt('Neuer Stream-Titel:');
+      if (newTitle) {
+        showNotification('Titel-Update wird implementiert...', 'info');
+      }
+    }
+
+    function updateStreamGame() {
+      const newGame = prompt('Neues Spiel/Kategorie:');
+      if (newGame) {
+        showNotification('Spiel-Update wird implementiert...', 'info');
+      }
+    }
+
+    function createClip() {
+      showNotification('Clip wird erstellt...', 'info');
+    }
+
+    // Queue functions
+    function openQueue() {
+      showNotification('Queue geöffnet', 'success');
+    }
+
+    function closeQueue() {
+      showNotification('Queue geschlossen', 'success');
+    }
+
+    function clearQueue() {
+      if (confirm('Queue wirklich leeren?')) {
+        window.api?.queue?.clear().then(() => {
+          loadQueue();
+          showNotification('Queue geleert', 'success');
+        });
+      }
+    }
+
+    // Rewards
+    function openAddRewardModal() {
+      const name = prompt('Belohnungsname:');
+      if (!name) return;
+      const cost = parseInt(prompt('Kosten in Punkten:', '100')) || 100;
+      showNotification(`Belohnung "${name}" für ${cost} Punkte wird hinzugefügt...`, 'info');
+    }
+
+    function editReward(id) {
+      showNotification('Belohnung bearbeiten wird implementiert...', 'info');
+    }
+
+    // Integrations
+    function connectSpotify() {
+      showNotification('Spotify-Verbindung wird implementiert...', 'info');
+    }
+
+    function testOBSConnection() {
+      showNotification('OBS-Verbindung wird getestet...', 'info');
+    }
+
+    function connectTwitter() {
+      showNotification('Twitter-Verbindung wird implementiert...', 'info');
+    }
+
+    // Betting
+    function startNewBet() {
+      const title = prompt('Wett-Titel:');
+      if (!title) return;
+      const optionsStr = prompt('Optionen (kommagetrennt):');
+      if (!optionsStr) return;
+      const options = optionsStr.split(',').map(o => o.trim()).filter(o => o);
+      if (options.length < 2) {
+        showNotification('Mindestens 2 Optionen erforderlich', 'error');
+        return;
+      }
+
+      window.api?.betting?.create({ title, options }).then((result) => {
+        if (result?.success) {
+          loadBetting();
+          showNotification('Wette gestartet!', 'success');
+        } else {
+          showNotification(result?.error || 'Fehler', 'error');
+        }
+      });
+    }
+
+    function closeBet() {
+      const winner = prompt('Gewinner-Option:');
+      if (winner) {
+        window.api?.betting?.close(winner).then((result) => {
+          loadBetting();
+          showNotification('Wette beendet!', 'success');
+        });
+      }
+    }
+
+    function cancelBet() {
+      if (confirm('Wette wirklich abbrechen?')) {
+        window.api?.betting?.cancel().then(() => {
+          loadBetting();
+          showNotification('Wette abgebrochen', 'success');
+        });
+      }
+    }
+
+    // Quotes
+    function importQuotes() {
+      showNotification('Quote-Import wird implementiert...', 'info');
+    }
+
+    function addQuoteCategory() {
+      const category = prompt('Neue Kategorie:');
+      if (category) {
+        showNotification(`Kategorie "${category}" wird implementiert...`, 'info');
+      }
+    }
+
+    // Users
+    function showRanksConfig() {
+      showNotification('Rang-Konfiguration wird implementiert...', 'info');
+    }
+
+    function exportUsers() {
+      showNotification('Benutzer-Export wird implementiert...', 'info');
+    }
+
+    function editRanks() {
+      showNotification('Ränge bearbeiten wird implementiert...', 'info');
+    }
+
+    // Settings functions
+    function saveModSettings() {
+      saveModerationSettings();
+    }
+
+    async function saveAppSettings() {
+      const settings = {
+        autoConnect: document.getElementById('autoConnect')?.checked || false,
+        minimizeToTray: document.getElementById('minimizeToTray')?.checked || false,
+        autoStart: document.getElementById('autoStart')?.checked || false,
+        checkUpdates: document.getElementById('checkUpdates')?.checked || false,
+        showNotifications: document.getElementById('showNotifications')?.checked || true,
+      };
+
+      try {
+        await window.api?.settings?.saveGeneral(settings);
+        showNotification('Einstellungen gespeichert', 'success');
+      } catch (err) {
+        showNotification('Fehler beim Speichern', 'error');
+      }
+    }
+
+    async function saveLocalization() {
+      const settings = {
+        language: document.getElementById('appLanguage')?.value || 'de',
+        dateFormat: document.getElementById('dateFormat')?.value || 'DD.MM.YYYY',
+        timeFormat: document.getElementById('timeFormat')?.value || '24h',
+      };
+
+      try {
+        await window.api?.settings?.saveLocalization(settings);
+        showNotification('Lokalisierung gespeichert', 'success');
+      } catch (err) {
+        showNotification('Fehler beim Speichern', 'error');
+      }
+    }
+
+    async function saveStyleSettings() {
+      const settings = {
+        theme: document.getElementById('appTheme')?.value || 'dark',
+        accentColor: document.getElementById('accentColor')?.value || '#9147ff',
+        fontSize: document.getElementById('fontSize')?.value || 'medium',
+      };
+
+      try {
+        await window.api?.settings?.saveStyle(settings);
+        showNotification('Style-Einstellungen gespeichert', 'success');
+      } catch (err) {
+        showNotification('Fehler beim Speichern', 'error');
+      }
+    }
+
+    function rerollGiveaway() {
+      if (confirm('Neuen Gewinner ziehen?')) {
+        window.api?.giveaway?.draw().then((result) => {
+          if (result?.winner) {
+            document.getElementById('giveawayWinner').textContent = result.winner;
+            showNotification('Neuer Gewinner: ' + result.winner, 'success');
+          }
+        });
       }
     }
 

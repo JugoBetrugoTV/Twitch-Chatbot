@@ -3241,6 +3241,42 @@
       debugError('Unhandled Promise Rejection', event.reason);
     };
 
+    // ========================================
+    // SAFE ELEMENT GETTER (prevents null errors)
+    // ========================================
+    function getEl(id) {
+      const el = document.getElementById(id);
+      if (!el) {
+        debug('WARN', `Element not found: #${id}`);
+      }
+      return el;
+    }
+
+    function setChecked(id, value) {
+      const el = getEl(id);
+      if (el) el.checked = !!value;
+    }
+
+    function setVal(id, value) {
+      const el = getEl(id);
+      if (el) el.value = value ?? '';
+    }
+
+    function setText(id, value) {
+      const el = getEl(id);
+      if (el) el.textContent = value ?? '';
+    }
+
+    function getChecked(id) {
+      const el = getEl(id);
+      return el ? el.checked : false;
+    }
+
+    function getVal(id) {
+      const el = getEl(id);
+      return el ? el.value : '';
+    }
+
     debug('INFO', '========================================');
     debug('INFO', 'StreamCore Debug System Active');
     debug('INFO', '========================================');
@@ -4615,10 +4651,17 @@
     let activePoll = null;
 
     async function loadPolls() {
+      debug('INFO', 'Loading polls...');
       if (!window.api) return;
-      const data = await window.api.polls?.getActive();
-      activePoll = data?.poll || null;
-      renderPolls();
+      try {
+        const polls = await window.api.polls?.getAll();
+        // Find active poll from list
+        activePoll = polls?.find(p => p.active) || null;
+        renderPolls();
+        debug('SUCCESS', `Polls loaded, active: ${activePoll ? activePoll.title : 'none'}`);
+      } catch (err) {
+        debugError('loadPolls', err);
+      }
     }
 
     function renderPolls() {
@@ -4655,6 +4698,7 @@
     }
 
     async function showCreatePollModal() {
+      debug('BUTTON', 'showCreatePollModal clicked');
       const question = await showInputModal('Umfrage-Frage:');
       if (!question) return;
       const optionsStr = await showInputModal('Optionen (kommagetrennt):');
@@ -4662,31 +4706,38 @@
       const options = optionsStr.split(',').map(o => o.trim()).filter(o => o);
       if (options.length < 2) {
         showNotification('Mindestens 2 Optionen erforderlich!', 'error');
+        debug('WARN', 'Poll creation cancelled - less than 2 options');
         return;
       }
       const durationStr = await showInputModal('Dauer in Sekunden:', '60');
       const duration = parseInt(durationStr) || 60;
 
       try {
+        debug('INFO', `Creating poll: "${question}" with ${options.length} options`);
         const result = await window.api?.polls?.create(question, options, duration);
-        console.log('Poll create result:', result);
         if (result && result.success !== false) {
           loadPolls();
           showNotification('Umfrage gestartet!', 'success');
+          debug('SUCCESS', 'Poll created');
         } else {
           showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+          debug('ERROR', 'Poll creation failed', result);
         }
       } catch (err) {
-        console.error('Poll create error:', err);
+        debugError('showCreatePollModal', err);
         showNotification('Fehler: ' + err.message, 'error');
       }
     }
 
     async function endPoll() {
-      await window.api?.polls?.end();
+      debug('BUTTON', 'endPoll clicked');
+      if (activePoll?.id) {
+        await window.api?.polls?.end(activePoll.id);
+      }
       activePoll = null;
       renderPolls();
       showNotification('Umfrage beendet!', 'success');
+      debug('SUCCESS', 'Poll ended');
     }
 
     // ========================================
@@ -5210,46 +5261,63 @@
     // MINIGAMES
     // ========================================
     async function loadMinigames() {
+      debug('INFO', 'Loading minigame settings...');
       if (!window.api) return;
-      const settings = await window.api.minigames?.getSettings();
-      if (settings) {
-        document.getElementById('slotsEnabled').checked = settings.slotsEnabled || false;
-        document.getElementById('diceEnabled').checked = settings.diceEnabled || false;
-        document.getElementById('blackjackEnabled').checked = settings.blackjackEnabled || false;
-        document.getElementById('duelEnabled').checked = settings.duelEnabled || false;
-        document.getElementById('heistEnabled').checked = settings.heistEnabled || false;
-        document.getElementById('rouletteEnabled').checked = settings.rouletteEnabled || false;
-        document.getElementById('minBet').value = settings.minBet || 10;
-        document.getElementById('maxBet').value = settings.maxBet || 1000;
-        document.getElementById('gameCooldown').value = settings.cooldown || 30;
+      try {
+        const settings = await window.api.minigames?.getSettings();
+        if (settings) {
+          setChecked('slotsEnabled', settings.slotsEnabled);
+          setChecked('diceEnabled', settings.diceEnabled);
+          setChecked('duelEnabled', settings.duelEnabled);
+          setChecked('heistEnabled', settings.heistEnabled);
+          setChecked('rouletteEnabled', settings.rouletteEnabled);
+          setVal('minBet', settings.minBet || 10);
+          setVal('maxBet', settings.maxBet || 1000);
+          setVal('gameCooldown', settings.cooldown || 30);
+          debug('SUCCESS', 'Minigame settings loaded');
+        }
+      } catch (err) {
+        debugError('loadMinigames', err);
       }
     }
 
     async function saveMinigameSettings() {
-      const settings = {
-        slotsEnabled: document.getElementById('slotsEnabled').checked,
-        diceEnabled: document.getElementById('diceEnabled').checked,
-        blackjackEnabled: document.getElementById('blackjackEnabled').checked,
-        duelEnabled: document.getElementById('duelEnabled').checked,
-        heistEnabled: document.getElementById('heistEnabled').checked,
-        rouletteEnabled: document.getElementById('rouletteEnabled').checked,
-        minBet: parseInt(document.getElementById('minBet').value) || 10,
-        maxBet: parseInt(document.getElementById('maxBet').value) || 1000,
-        cooldown: parseInt(document.getElementById('gameCooldown').value) || 30
-      };
-      await window.api?.minigames?.saveSettings(settings);
-      showNotification('Minigame-Einstellungen gespeichert', 'success');
+      debug('BUTTON', 'saveMinigameSettings clicked');
+      try {
+        const settings = {
+          slotsEnabled: getChecked('slotsEnabled'),
+          diceEnabled: getChecked('diceEnabled'),
+          duelEnabled: getChecked('duelEnabled'),
+          heistEnabled: getChecked('heistEnabled'),
+          rouletteEnabled: getChecked('rouletteEnabled'),
+          minBet: parseInt(getVal('minBet')) || 10,
+          maxBet: parseInt(getVal('maxBet')) || 1000,
+          cooldown: parseInt(getVal('gameCooldown')) || 30
+        };
+        await window.api?.minigames?.saveSettings(settings);
+        showNotification('Minigame-Einstellungen gespeichert', 'success');
+        debug('SUCCESS', 'Minigame settings saved');
+      } catch (err) {
+        debugError('saveMinigameSettings', err);
+        showNotification('Fehler beim Speichern', 'error');
+      }
     }
 
     // ========================================
     // BETTING
     // ========================================
     async function loadBetting() {
+      debug('INFO', 'Loading betting data...');
       if (!window.api) return;
-      const active = await window.api.betting?.getActive();
-      const history = await window.api.betting?.getHistory();
-      renderActiveBet(active);
-      renderBetHistory(history || []);
+      try {
+        const active = await window.api.betting?.getActive();
+        const history = await window.api.betting?.getHistory();
+        renderActiveBet(active);
+        renderBetHistory(history || []);
+        debug('SUCCESS', `Betting loaded, active: ${active ? 'yes' : 'no'}, history: ${(history || []).length}`);
+      } catch (err) {
+        debugError('loadBetting', err);
+      }
     }
 
     function renderActiveBet(bet) {
@@ -5291,30 +5359,52 @@
       `).join('');
     }
 
-    function startNewBet() {
-      const title = prompt('Wetten-Titel:');
-      if (!title) return;
-      const options = prompt('Optionen (kommasepariert):');
+    async function startNewBet() {
+      debug('BUTTON', 'startNewBet clicked');
+      const title = await showInputModal('Wetten-Titel:');
+      if (!title) {
+        debug('INFO', 'Bet creation cancelled');
+        return;
+      }
+      const options = await showInputModal('Optionen (kommasepariert):');
       if (!options) return;
-      window.api?.betting?.create({ title, options: options.split(',').map(o => o.trim()) });
-      loadBetting();
-      showNotification('Wette gestartet', 'success');
+      try {
+        await window.api?.betting?.create({ title, options: options.split(',').map(o => o.trim()).filter(o => o) });
+        loadBetting();
+        showNotification('Wette gestartet', 'success');
+        debug('SUCCESS', `Bet started: ${title}`);
+      } catch (err) {
+        debugError('startNewBet', err);
+        showNotification('Fehler beim Starten', 'error');
+      }
     }
 
     async function closeBet() {
-      const winner = prompt('Gewinner-Option:');
-      if (winner) {
+      debug('BUTTON', 'closeBet clicked');
+      const winner = await showInputModal('Gewinner-Option:');
+      if (!winner) return;
+      try {
         await window.api?.betting?.close(winner);
         loadBetting();
         showNotification('Wette beendet', 'success');
+        debug('SUCCESS', `Bet closed, winner: ${winner}`);
+      } catch (err) {
+        debugError('closeBet', err);
       }
     }
 
     async function cancelBet() {
-      if (confirm('Wette wirklich abbrechen? Alle Einsätze werden zurückgegeben.')) {
-        await window.api?.betting?.cancel();
-        loadBetting();
-        showNotification('Wette abgebrochen', 'info');
+      debug('BUTTON', 'cancelBet clicked');
+      const confirmed = await showConfirmModal('Wette wirklich abbrechen? Alle Einsätze werden zurückgegeben.');
+      if (confirmed) {
+        try {
+          await window.api?.betting?.cancel();
+          loadBetting();
+          showNotification('Wette abgebrochen', 'info');
+          debug('SUCCESS', 'Bet cancelled');
+        } catch (err) {
+          debugError('cancelBet', err);
+        }
       }
     }
 
@@ -5322,10 +5412,16 @@
     // EVENTS
     // ========================================
     async function loadEvents() {
+      debug('INFO', 'Loading events...');
       if (!window.api) return;
-      const filter = document.getElementById('eventFilter')?.value || 'all';
-      const data = await window.api.events?.getAll(filter);
-      renderEvents(data || []);
+      try {
+        const filter = getVal('eventFilter') || 'all';
+        const data = await window.api.events?.getAll(filter);
+        renderEvents(data || []);
+        debug('SUCCESS', `${(data || []).length} events loaded`);
+      } catch (err) {
+        debugError('loadEvents', err);
+      }
     }
 
     function renderEvents(events) {
@@ -5371,20 +5467,25 @@
     // MOD TOOLS
     // ========================================
     async function loadModTools() {
+      debug('INFO', 'Loading mod tools settings...');
       if (!window.api) return;
-      const settings = await window.api.modtools?.getSettings();
-      const logs = await window.api.modtools?.getLogs();
-      if (settings) {
-        document.getElementById('automodEnabled').checked = settings.automodEnabled || false;
-        document.getElementById('capsFilter').checked = settings.capsFilter || false;
-        document.getElementById('linkFilter').checked = settings.linkFilter || false;
-        document.getElementById('symbolFilter').checked = settings.symbolFilter || false;
-        document.getElementById('emoteFilter').checked = settings.emoteFilter || false;
-        document.getElementById('maxCaps').value = settings.maxCaps || 80;
-        document.getElementById('maxEmotes').value = settings.maxEmotes || 10;
-        document.getElementById('timeoutDuration').value = settings.timeoutDuration || 60;
+      try {
+        const settings = await window.api.modtools?.getSettings();
+        const logs = await window.api.modtools?.getLogs();
+        if (settings) {
+          setChecked('automodEnabled', settings.automodEnabled);
+          setChecked('modCapsFilter', settings.capsFilter);
+          setChecked('modLinkFilter', settings.linkFilter);
+          setChecked('modSpamFilter', settings.spam);
+          setChecked('modSymbolFilter', settings.symbolFilter);
+          setVal('modMaxCaps', settings.maxCaps || 80);
+          setVal('modEmoteLimit', settings.maxEmotes || 10);
+          debug('SUCCESS', 'Mod tools settings loaded');
+        }
+        renderModLogs(logs || []);
+      } catch (err) {
+        debugError('loadModTools', err);
       }
-      renderModLogs(logs || []);
     }
 
     function renderModLogs(logs) {
@@ -5405,51 +5506,70 @@
     }
 
     async function saveModToolsSettings() {
-      const settings = {
-        automodEnabled: document.getElementById('automodEnabled').checked,
-        capsFilter: document.getElementById('capsFilter').checked,
-        linkFilter: document.getElementById('linkFilter').checked,
-        symbolFilter: document.getElementById('symbolFilter').checked,
-        emoteFilter: document.getElementById('emoteFilter').checked,
-        maxCaps: parseInt(document.getElementById('maxCaps').value) || 80,
-        maxEmotes: parseInt(document.getElementById('maxEmotes').value) || 10,
-        timeoutDuration: parseInt(document.getElementById('timeoutDuration').value) || 60
-      };
-      await window.api?.modtools?.saveSettings(settings);
-      showNotification('Mod Tools Einstellungen gespeichert', 'success');
+      debug('BUTTON', 'saveModToolsSettings clicked');
+      try {
+        const settings = {
+          automodEnabled: getChecked('automodEnabled'),
+          capsFilter: getChecked('modCapsFilter'),
+          linkFilter: getChecked('modLinkFilter'),
+          spam: getChecked('modSpamFilter'),
+          symbolFilter: getChecked('modSymbolFilter'),
+          maxCaps: parseInt(getVal('modMaxCaps')) || 80,
+          maxEmotes: parseInt(getVal('modEmoteLimit')) || 10
+        };
+        await window.api?.modtools?.saveSettings(settings);
+        showNotification('Mod Tools Einstellungen gespeichert', 'success');
+        debug('SUCCESS', 'Mod tools settings saved');
+      } catch (err) {
+        debugError('saveModToolsSettings', err);
+        showNotification('Fehler beim Speichern', 'error');
+      }
     }
 
     // ========================================
     // NOTIFICATIONS
     // ========================================
     async function loadNotifications() {
+      debug('INFO', 'Loading notification settings...');
       if (!window.api) return;
-      const settings = await window.api.notifications?.getSettings();
-      if (settings) {
-        document.getElementById('notifyFollows').checked = settings.follows || false;
-        document.getElementById('notifySubs').checked = settings.subs || false;
-        document.getElementById('notifyRaids').checked = settings.raids || false;
-        document.getElementById('notifyHosts').checked = settings.hosts || false;
-        document.getElementById('notifyCheers').checked = settings.cheers || false;
-        document.getElementById('notifySound').value = settings.sound || 'default';
-        document.getElementById('notifyVolume').value = settings.volume || 50;
-        document.getElementById('notifyDuration').value = settings.duration || 5;
+      try {
+        const settings = await window.api.notifications?.getSettings();
+        if (settings) {
+          setChecked('notifFollow', settings.follows);
+          setChecked('notifSub', settings.subs);
+          setChecked('notifRaid', settings.raids);
+          setChecked('notifBits', settings.cheers);
+          setVal('notifFollowMsg', settings.followMsg || 'Danke für den Follow, {user}! 💜');
+          setVal('notifSubMsg', settings.subMsg || 'Willkommen im Club, {user}! ⭐');
+          setVal('notifRaidMsg', settings.raidMsg || 'Danke für den Raid, {user}! 🎉');
+          setVal('notifBitsMsg', settings.bitsMsg || 'Danke für {amount} Bits, {user}! 💎');
+          debug('SUCCESS', 'Notification settings loaded');
+        }
+      } catch (err) {
+        debugError('loadNotifications', err);
       }
     }
 
     async function saveNotificationSettings() {
-      const settings = {
-        follows: document.getElementById('notifyFollows').checked,
-        subs: document.getElementById('notifySubs').checked,
-        raids: document.getElementById('notifyRaids').checked,
-        hosts: document.getElementById('notifyHosts').checked,
-        cheers: document.getElementById('notifyCheers').checked,
-        sound: document.getElementById('notifySound').value,
-        volume: parseInt(document.getElementById('notifyVolume').value) || 50,
-        duration: parseInt(document.getElementById('notifyDuration').value) || 5
-      };
-      await window.api?.notifications?.saveSettings(settings);
-      showNotification('Benachrichtigungs-Einstellungen gespeichert', 'success');
+      debug('BUTTON', 'saveNotificationSettings clicked');
+      try {
+        const settings = {
+          follows: getChecked('notifFollow'),
+          subs: getChecked('notifSub'),
+          raids: getChecked('notifRaid'),
+          cheers: getChecked('notifBits'),
+          followMsg: getVal('notifFollowMsg'),
+          subMsg: getVal('notifSubMsg'),
+          raidMsg: getVal('notifRaidMsg'),
+          bitsMsg: getVal('notifBitsMsg')
+        };
+        await window.api?.notifications?.saveSettings(settings);
+        showNotification('Benachrichtigungs-Einstellungen gespeichert', 'success');
+        debug('SUCCESS', 'Notification settings saved');
+      } catch (err) {
+        debugError('saveNotificationSettings', err);
+        showNotification('Fehler beim Speichern', 'error');
+      }
     }
 
     function testNotification() {
@@ -5460,29 +5580,38 @@
     // DISCORD
     // ========================================
     async function loadDiscord() {
+      debug('INFO', 'Loading Discord settings...');
       if (!window.api) return;
-      const settings = await window.api.discord?.getSettings();
-      if (settings) {
-        document.getElementById('discordWebhook').value = settings.webhook || '';
-        document.getElementById('discordBotToken').value = settings.botToken || '';
-        document.getElementById('discordChannelId').value = settings.channelId || '';
-        document.getElementById('discordStreamNotify').checked = settings.streamNotify || false;
-        document.getElementById('discordClipNotify').checked = settings.clipNotify || false;
-        document.getElementById('discordChatBridge').checked = settings.chatBridge || false;
+      try {
+        const settings = await window.api.discord?.getSettings();
+        if (settings) {
+          setVal('discordWebhookUrl', settings.webhook);
+          setChecked('discordNotifyLive', settings.streamNotify);
+          setChecked('discordNotifyOffline', settings.offlineNotify);
+          setChecked('discordNotifyFollow', settings.followNotify);
+          debug('SUCCESS', 'Discord settings loaded');
+        }
+      } catch (err) {
+        debugError('loadDiscord', err);
       }
     }
 
     async function saveDiscordSettings() {
-      const settings = {
-        webhook: document.getElementById('discordWebhook').value,
-        botToken: document.getElementById('discordBotToken').value,
-        channelId: document.getElementById('discordChannelId').value,
-        streamNotify: document.getElementById('discordStreamNotify').checked,
-        clipNotify: document.getElementById('discordClipNotify').checked,
-        chatBridge: document.getElementById('discordChatBridge').checked
-      };
-      await window.api?.discord?.saveSettings(settings);
-      showNotification('Discord-Einstellungen gespeichert', 'success');
+      debug('BUTTON', 'saveDiscordSettings clicked');
+      try {
+        const settings = {
+          webhook: getVal('discordWebhookUrl'),
+          streamNotify: getChecked('discordNotifyLive'),
+          offlineNotify: getChecked('discordNotifyOffline'),
+          followNotify: getChecked('discordNotifyFollow')
+        };
+        await window.api?.discord?.saveSettings(settings);
+        showNotification('Discord-Einstellungen gespeichert', 'success');
+        debug('SUCCESS', 'Discord settings saved');
+      } catch (err) {
+        debugError('saveDiscordSettings', err);
+        showNotification('Fehler beim Speichern', 'error');
+      }
     }
 
     async function testDiscordWebhook() {
@@ -5498,62 +5627,102 @@
     // SETTINGS PAGES
     // ========================================
     async function loadSettingsGeneral() {
+      debug('INFO', 'Loading general settings...');
       if (!window.api) return;
-      const settings = await window.api.settings?.getGeneral();
-      if (settings) {
-        document.getElementById('settingsAutoStart').checked = settings.autoStart || false;
-        document.getElementById('settingsMinimizeToTray').checked = settings.minimizeToTray || false;
-        document.getElementById('settingsAutoConnect').checked = settings.autoConnect || false;
-        document.getElementById('settingsCheckUpdates').checked = settings.checkUpdates || true;
+      try {
+        const settings = await window.api.settings?.getGeneral();
+        if (settings) {
+          setChecked('settingAutoStart', settings.autoStart);
+          setChecked('settingMinimizeToTray', settings.minimizeToTray !== false);
+          setChecked('settingAutoConnect', settings.autoConnect);
+          setChecked('settingCheckUpdates', settings.checkUpdates !== false);
+          setChecked('settingDesktopNotifs', settings.desktopNotifications !== false);
+          debug('SUCCESS', 'General settings loaded');
+        }
+      } catch (err) {
+        debugError('loadSettingsGeneral', err);
       }
     }
 
     async function saveSettingsGeneral() {
-      const settings = {
-        autoStart: document.getElementById('settingsAutoStart').checked,
-        minimizeToTray: document.getElementById('settingsMinimizeToTray').checked,
-        autoConnect: document.getElementById('settingsAutoConnect').checked,
-        checkUpdates: document.getElementById('settingsCheckUpdates').checked
-      };
-      await window.api?.settings?.saveGeneral(settings);
-      showNotification('Allgemeine Einstellungen gespeichert', 'success');
+      debug('BUTTON', 'saveSettingsGeneral clicked');
+      try {
+        const settings = {
+          autoStart: getChecked('settingAutoStart'),
+          minimizeToTray: getChecked('settingMinimizeToTray'),
+          autoConnect: getChecked('settingAutoConnect'),
+          checkUpdates: getChecked('settingCheckUpdates'),
+          desktopNotifications: getChecked('settingDesktopNotifs')
+        };
+        await window.api?.settings?.saveGeneral(settings);
+        showNotification('Allgemeine Einstellungen gespeichert', 'success');
+        debug('SUCCESS', 'General settings saved');
+      } catch (err) {
+        debugError('saveSettingsGeneral', err);
+        showNotification('Fehler beim Speichern', 'error');
+      }
     }
 
     async function loadSettingsLocalization() {
+      debug('INFO', 'Loading localization settings...');
       if (!window.api) return;
-      const settings = await window.api.settings?.getLocalization();
-      if (settings) {
-        document.getElementById('settingsLanguage').value = settings.language || 'de';
-        document.getElementById('settingsTimezone').value = settings.timezone || 'Europe/Berlin';
-        document.getElementById('settingsDateFormat').value = settings.dateFormat || 'DD.MM.YYYY';
+      try {
+        const settings = await window.api.settings?.getLocalization();
+        if (settings) {
+          setVal('settingLanguage', settings.language || 'de');
+          setVal('settingTimezone', settings.timezone || 'Europe/Berlin');
+          setVal('settingDateFormat', settings.dateFormat || 'DD.MM.YYYY');
+          debug('SUCCESS', 'Localization settings loaded');
+        }
+      } catch (err) {
+        debugError('loadSettingsLocalization', err);
       }
     }
 
     async function saveSettingsLocalization() {
-      const settings = {
-        language: document.getElementById('settingsLanguage').value,
-        timezone: document.getElementById('settingsTimezone').value,
-        dateFormat: document.getElementById('settingsDateFormat').value
-      };
-      await window.api?.settings?.saveLocalization(settings);
-      showNotification('Lokalisierungs-Einstellungen gespeichert', 'success');
+      debug('BUTTON', 'saveSettingsLocalization clicked');
+      try {
+        const settings = {
+          language: getVal('settingLanguage'),
+          timezone: getVal('settingTimezone'),
+          dateFormat: getVal('settingDateFormat')
+        };
+        await window.api?.settings?.saveLocalization(settings);
+        showNotification('Lokalisierungs-Einstellungen gespeichert', 'success');
+        debug('SUCCESS', 'Localization settings saved');
+      } catch (err) {
+        debugError('saveSettingsLocalization', err);
+        showNotification('Fehler beim Speichern', 'error');
+      }
     }
 
     async function loadSettingsUsage() {
+      debug('INFO', 'Loading usage stats...');
       if (!window.api) return;
-      const data = await window.api.settings?.getUsageStats();
-      if (data) {
-        document.getElementById('usageUptime').textContent = data.uptime || '-';
-        document.getElementById('usageMessagesTotal').textContent = data.messagesTotal || 0;
-        document.getElementById('usageCommandsTotal').textContent = data.commandsTotal || 0;
-        document.getElementById('usageStorageUsed').textContent = data.storageUsed || '-';
+      try {
+        const data = await window.api.settings?.getUsageStats();
+        if (data) {
+          setText('usageUptime', data.uptime || '-');
+          setText('usageMessagesTotal', data.messagesTotal || 0);
+          setText('usageCommandsTotal', data.commandsTotal || 0);
+          setText('usageStorageUsed', data.storageUsed || '-');
+          debug('SUCCESS', 'Usage stats loaded');
+        }
+      } catch (err) {
+        debugError('loadSettingsUsage', err);
       }
     }
 
     async function loadSettingsMacros() {
+      debug('INFO', 'Loading macros...');
       if (!window.api) return;
-      const macros = await window.api.settings?.getMacros();
-      renderMacros(macros || []);
+      try {
+        const macros = await window.api.settings?.getMacros();
+        renderMacros(macros || []);
+        debug('SUCCESS', `${(macros || []).length} macros loaded`);
+      } catch (err) {
+        debugError('loadSettingsMacros', err);
+      }
     }
 
     function renderMacros(macros) {
@@ -5577,39 +5746,58 @@
     }
 
     async function addMacro() {
-      const name = prompt('Macro-Name (ohne !):');
-      if (name) {
-        const commands = prompt('Befehle (ein Befehl pro Zeile, mit ; trennen):');
-        if (commands) {
-          try {
-            const result = await window.api?.settings?.addMacro({ name, commands: commands.split(';').map(c => c.trim()) });
-            console.log('Macro add result:', result);
-            if (result && result.success !== false) {
-              loadSettingsMacros();
-              showNotification('Macro erstellt', 'success');
-            } else {
-              showNotification(result?.error || 'Fehler beim Erstellen', 'error');
-            }
-          } catch (err) {
-            console.error('Macro add error:', err);
-            showNotification('Fehler: ' + err.message, 'error');
-          }
+      debug('BUTTON', 'addMacro clicked');
+      const name = await showInputModal('Macro-Name (ohne !):');
+      if (!name) {
+        debug('INFO', 'Macro creation cancelled');
+        return;
+      }
+      const commands = await showInputModal('Befehle (mit ; trennen):');
+      if (!commands) return;
+      try {
+        const result = await window.api?.settings?.addMacro({
+          name,
+          commands: commands.split(';').map(c => c.trim()).filter(c => c)
+        });
+        if (result && result.success !== false) {
+          loadSettingsMacros();
+          showNotification('Macro erstellt', 'success');
+          debug('SUCCESS', `Macro created: ${name}`);
+        } else {
+          showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+          debug('ERROR', 'Macro creation failed', result);
         }
+      } catch (err) {
+        debugError('addMacro', err);
+        showNotification('Fehler: ' + err.message, 'error');
       }
     }
 
     async function deleteMacro(id) {
-      if (confirm('Macro wirklich löschen?')) {
-        await window.api?.settings?.deleteMacro(id);
-        loadSettingsMacros();
-        showNotification('Macro gelöscht', 'success');
+      debug('BUTTON', `deleteMacro clicked: ${id}`);
+      const confirmed = await showConfirmModal('Macro wirklich löschen?');
+      if (confirmed) {
+        try {
+          await window.api?.settings?.deleteMacro(id);
+          loadSettingsMacros();
+          showNotification('Macro gelöscht', 'success');
+          debug('SUCCESS', 'Macro deleted');
+        } catch (err) {
+          debugError('deleteMacro', err);
+        }
       }
     }
 
     async function loadSettingsHotkeys() {
+      debug('INFO', 'Loading hotkeys...');
       if (!window.api) return;
-      const hotkeys = await window.api.settings?.getHotkeys();
-      renderHotkeys(hotkeys || []);
+      try {
+        const hotkeys = await window.api.settings?.getHotkeys();
+        renderHotkeys(hotkeys || []);
+        debug('SUCCESS', `${(hotkeys || []).length} hotkeys loaded`);
+      } catch (err) {
+        debugError('loadSettingsHotkeys', err);
+      }
     }
 
     function renderHotkeys(hotkeys) {
@@ -5629,72 +5817,101 @@
     }
 
     async function addHotkey() {
-      const action = prompt('Aktion (z.B. "Toggle TTS"):');
-      if (action) {
-        const keys = prompt('Tastenkombination (z.B. "Ctrl+Shift+T"):');
-        if (keys) {
-          try {
-            const result = await window.api?.settings?.addHotkey({ action, keys });
-            console.log('Hotkey add result:', result);
-            if (result && result.success !== false) {
-              loadSettingsHotkeys();
-              showNotification('Hotkey erstellt', 'success');
-            } else {
-              showNotification(result?.error || 'Fehler beim Erstellen', 'error');
-            }
-          } catch (err) {
-            console.error('Hotkey add error:', err);
-            showNotification('Fehler: ' + err.message, 'error');
-          }
+      debug('BUTTON', 'addHotkey clicked');
+      const action = await showInputModal('Aktion (z.B. "Toggle TTS"):');
+      if (!action) {
+        debug('INFO', 'Hotkey creation cancelled');
+        return;
+      }
+      const keys = await showInputModal('Tastenkombination (z.B. "Ctrl+Shift+T"):');
+      if (!keys) return;
+      try {
+        const result = await window.api?.settings?.addHotkey({ action, keys });
+        if (result && result.success !== false) {
+          loadSettingsHotkeys();
+          showNotification('Hotkey erstellt', 'success');
+          debug('SUCCESS', `Hotkey created: ${keys}`);
+        } else {
+          showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+          debug('ERROR', 'Hotkey creation failed', result);
         }
+      } catch (err) {
+        debugError('addHotkey', err);
+        showNotification('Fehler: ' + err.message, 'error');
       }
     }
 
     async function deleteHotkey(id) {
-      if (confirm('Hotkey wirklich löschen?')) {
-        await window.api?.settings?.deleteHotkey(id);
-        loadSettingsHotkeys();
-        showNotification('Hotkey gelöscht', 'success');
+      debug('BUTTON', `deleteHotkey clicked: ${id}`);
+      const confirmed = await showConfirmModal('Hotkey wirklich löschen?');
+      if (confirmed) {
+        try {
+          await window.api?.settings?.deleteHotkey(id);
+          loadSettingsHotkeys();
+          showNotification('Hotkey gelöscht', 'success');
+          debug('SUCCESS', 'Hotkey deleted');
+        } catch (err) {
+          debugError('deleteHotkey', err);
+        }
       }
     }
 
     async function loadSettingsStyle() {
+      debug('INFO', 'Loading style settings...');
       if (!window.api) return;
-      const settings = await window.api.settings?.getStyle();
-      if (settings) {
-        document.getElementById('stylePrimaryColor').value = settings.primaryColor || '#9147ff';
-        document.getElementById('styleFontSize').value = settings.fontSize || 14;
-        document.getElementById('styleCompactMode').checked = settings.compactMode || false;
-        document.getElementById('styleAnimations').checked = settings.animations !== false;
+      try {
+        const settings = await window.api.settings?.getStyle();
+        if (settings) {
+          setVal('settingAccentColor', settings.primaryColor || '#9147ff');
+          setVal('settingTheme', settings.theme || 'dark');
+          setChecked('settingCompact', settings.compactMode);
+          setChecked('settingAnimations', settings.animations !== false);
+          debug('SUCCESS', 'Style settings loaded');
+        }
+      } catch (err) {
+        debugError('loadSettingsStyle', err);
       }
     }
 
     async function saveSettingsStyle() {
-      const settings = {
-        primaryColor: document.getElementById('stylePrimaryColor').value,
-        fontSize: parseInt(document.getElementById('styleFontSize').value) || 14,
-        compactMode: document.getElementById('styleCompactMode').checked,
-        animations: document.getElementById('styleAnimations').checked
-      };
-      await window.api?.settings?.saveStyle(settings);
-      document.documentElement.style.setProperty('--primary', settings.primaryColor);
-      showNotification('Style-Einstellungen gespeichert', 'success');
+      debug('BUTTON', 'saveSettingsStyle clicked');
+      try {
+        const settings = {
+          primaryColor: getVal('settingAccentColor') || '#9147ff',
+          theme: getVal('settingTheme') || 'dark',
+          compactMode: getChecked('settingCompact'),
+          animations: getChecked('settingAnimations')
+        };
+        await window.api?.settings?.saveStyle(settings);
+        document.documentElement.style.setProperty('--primary', settings.primaryColor);
+        showNotification('Style-Einstellungen gespeichert', 'success');
+        debug('SUCCESS', 'Style settings saved');
+      } catch (err) {
+        debugError('saveSettingsStyle', err);
+        showNotification('Fehler beim Speichern', 'error');
+      }
     }
 
     async function loadSettingsChangelog() {
+      debug('INFO', 'Loading changelog...');
       if (!window.api) return;
-      const changelog = await window.api.settings?.getChangelog();
-      const container = document.getElementById('changelogContent');
-      if (container && changelog) {
-        container.innerHTML = changelog.map(entry => `
-          <div style="margin-bottom:30px;">
-            <h3 style="color:var(--primary); margin-bottom:10px;">Version ${entry.version}</h3>
-            <div style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">${entry.date}</div>
-            <ul style="color:var(--text-secondary); line-height:1.8;">
-              ${entry.changes.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
-            </ul>
-          </div>
-        `).join('');
+      try {
+        const changelog = await window.api.settings?.getChangelog();
+        const container = document.getElementById('changelogContent');
+        if (container && changelog) {
+          container.innerHTML = changelog.map(entry => `
+            <div style="margin-bottom:30px;">
+              <h3 style="color:var(--primary); margin-bottom:10px;">Version ${entry.version}</h3>
+              <div style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">${entry.date}</div>
+              <ul style="color:var(--text-secondary); line-height:1.8;">
+                ${entry.changes.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
+              </ul>
+            </div>
+          `).join('');
+          debug('SUCCESS', `Changelog loaded: ${changelog.length} versions`);
+        }
+      } catch (err) {
+        debugError('loadSettingsChangelog', err);
       }
     }
 

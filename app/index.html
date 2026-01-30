@@ -210,6 +210,40 @@
             <div class="stat-value" id="statSongs">0</div>
             <div class="stat-label">Songs Played</div>
           </div>
+          <div class="stat-card green">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+            <div class="stat-value" id="statFollows">0</div>
+            <div class="stat-label">Follows</div>
+          </div>
+          <div class="stat-card pink">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
+            <div class="stat-value" id="statUptime">0:00</div>
+            <div class="stat-label">Uptime</div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="navigateTo('commands')">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            Commands
+          </button>
+          <button class="btn btn-secondary" onclick="navigateTo('giveaway')">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/></svg>
+            Giveaway
+          </button>
+          <button class="btn btn-secondary" onclick="navigateTo('songrequest')">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            Songs
+          </button>
+          <button class="btn btn-secondary" onclick="navigateTo('minigames')">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            Minigames
+          </button>
+          <button class="btn btn-secondary" onclick="toggleTTS()">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            <span id="ttsQuickStatus">TTS An</span>
+          </button>
         </div>
 
         <div class="dashboard-grid">
@@ -367,16 +401,209 @@
           </div>
         </div>
         <div style="padding:20px;">
+          <!-- Custom Commands Card -->
           <div class="card">
             <div class="card-header">
               <div class="card-title">Custom Commands</div>
+              <span class="badge badge-secondary" id="customCommandCount">0</span>
             </div>
-            <div class="card-body">
+            <div class="card-body no-padding" id="customCommandsList">
               <div class="empty-state">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
                 <div class="empty-state-title">No Custom Commands</div>
                 <div class="empty-state-desc">Create your first command to get started</div>
                 <button class="btn btn-primary mt-3">Create Command</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Built-in Commands Reference -->
+          <div class="card" style="margin-top:20px;">
+            <div class="card-header">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;margin-right:8px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+                Built-in Commands Reference
+              </div>
+            </div>
+            <div class="card-body" style="padding:0;">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border);">
+                <!-- Song Request Commands -->
+                <div style="background:var(--bg-secondary); padding:15px;">
+                  <div style="font-weight:600; color:var(--accent); margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                    Song Request
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!sr [song]</code>
+                    <span>Request a song by name or YouTube URL</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!song</code>
+                    <span>Show current song playing</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!queue</code>
+                    <span>Show song queue position</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!skip</code>
+                    <span>Skip current song (Mod only)</span>
+                  </div>
+                </div>
+
+                <!-- Points/Currency Commands -->
+                <div style="background:var(--bg-secondary); padding:15px;">
+                  <div style="font-weight:600; color:var(--warning); margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    Points & Currency
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!points</code>
+                    <span>Check your current points balance</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!gamble [amount]</code>
+                    <span>Gamble points (50% win chance)</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!gift [user] [amount]</code>
+                    <span>Gift points to another user</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!leaderboard</code>
+                    <span>Show top 5 point holders</span>
+                  </div>
+                </div>
+
+                <!-- Minigame Commands -->
+                <div style="background:var(--bg-secondary); padding:15px;">
+                  <div style="font-weight:600; color:var(--success); margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                    Minigames
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!duel [user] [bet]</code>
+                    <span>Challenge user to a duel</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!slots [bet]</code>
+                    <span>Play the slot machine</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!dice [bet]</code>
+                    <span>Roll dice against the house</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!8ball [question]</code>
+                    <span>Ask the magic 8-ball</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!roulette [bet] [choice]</code>
+                    <span>Play roulette (red/black/number)</span>
+                  </div>
+                </div>
+
+                <!-- Interactive Commands -->
+                <div style="background:var(--bg-secondary); padding:15px;">
+                  <div style="font-weight:600; color:var(--info); margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>
+                    Interactive
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!tts [message]</code>
+                    <span>Send a text-to-speech message</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!quote</code>
+                    <span>Get a random saved quote</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!addquote [text]</code>
+                    <span>Add a new quote</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!hug [user]</code>
+                    <span>Give someone a virtual hug</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!love [user]</code>
+                    <span>Check love compatibility</span>
+                  </div>
+                </div>
+
+                <!-- Giveaway Commands -->
+                <div style="background:var(--bg-secondary); padding:15px;">
+                  <div style="font-weight:600; color:#e91e63; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>
+                    Giveaway
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!join</code>
+                    <span>Enter the active giveaway</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!giveaway</code>
+                    <span>Check giveaway status</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!ticket</code>
+                    <span>Check your entry status</span>
+                  </div>
+                </div>
+
+                <!-- Utility Commands -->
+                <div style="background:var(--bg-secondary); padding:15px;">
+                  <div style="font-weight:600; color:#9c27b0; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+                    Utility
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!uptime</code>
+                    <span>Show stream uptime</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!followage</code>
+                    <span>Check how long you've followed</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!watchtime</code>
+                    <span>Show your total watch time</span>
+                  </div>
+                  <div class="command-ref-item">
+                    <code>!commands</code>
+                    <span>List available commands</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Command Statistics -->
+          <div class="card" style="margin-top:20px;">
+            <div class="card-header">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;margin-right:8px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                Command Statistics
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:15px;">
+                <div style="text-align:center; padding:15px; background:var(--bg-tertiary); border-radius:8px;">
+                  <div style="font-size:24px; font-weight:700; color:var(--accent);" id="totalCommandsUsed">0</div>
+                  <div style="font-size:12px; color:var(--text-secondary);">Commands Used</div>
+                </div>
+                <div style="text-align:center; padding:15px; background:var(--bg-tertiary); border-radius:8px;">
+                  <div style="font-size:24px; font-weight:700; color:var(--success);" id="mostUsedCommand">-</div>
+                  <div style="font-size:12px; color:var(--text-secondary);">Most Popular</div>
+                </div>
+                <div style="text-align:center; padding:15px; background:var(--bg-tertiary); border-radius:8px;">
+                  <div style="font-size:24px; font-weight:700; color:var(--warning);" id="uniqueCommandUsers">0</div>
+                  <div style="font-size:12px; color:var(--text-secondary);">Unique Users</div>
+                </div>
+                <div style="text-align:center; padding:15px; background:var(--bg-tertiary); border-radius:8px;">
+                  <div style="font-size:24px; font-weight:700; color:var(--info);" id="commandsPerMinute">0</div>
+                  <div style="font-size:12px; color:var(--text-secondary);">Per Minute</div>
+                </div>
               </div>
             </div>
           </div>
@@ -517,8 +744,113 @@
       <div class="page-content" id="page-giveaway">
         <div class="page-header">
           <h1 class="page-title">Giveaway</h1>
+          <div class="page-actions">
+            <span class="badge" id="giveawayStatusBadge" style="display:none;">Aktiv</span>
+          </div>
         </div>
-        <div style="padding:20px;">
+        <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+          <!-- Create/Active Giveaway -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Giveaway erstellen</div>
+            </div>
+            <div class="card-body" id="giveawayCreateForm">
+              <div class="form-group">
+                <label class="form-label">Preis / Gewinn</label>
+                <input type="text" class="form-input" id="giveawayPrize" placeholder="z.B. 100€ Steam Guthaben">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Dauer (Minuten)</label>
+                <input type="number" class="form-input" id="giveawayDuration" value="5" min="1" max="60">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Keyword zum Teilnehmen</label>
+                <input type="text" class="form-input" id="giveawayKeyword" value="!join" placeholder="!join">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Teilnahmebedingungen</label>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+                  <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                    <input type="checkbox" id="giveawayFollowerOnly">
+                    <span>Nur Follower</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                    <input type="checkbox" id="giveawaySubOnly">
+                    <span>Nur Subscriber</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                    <input type="checkbox" id="giveawayMinWatchtime">
+                    <span>Min. 10 Min. Watch Time</span>
+                  </label>
+                </div>
+              </div>
+              <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn btn-primary" onclick="startGiveaway()" id="btnStartGiveaway">
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M8 5v14l11-7z"/></svg>
+                  Giveaway starten
+                </button>
+              </div>
+            </div>
+            <!-- Active Giveaway Display (hidden by default) -->
+            <div class="card-body" id="giveawayActiveDisplay" style="display:none;">
+              <div style="text-align:center; padding:20px;">
+                <div style="font-size:48px; margin-bottom:15px;">🎁</div>
+                <h2 style="margin-bottom:10px;" id="activeGiveawayPrize">-</h2>
+                <div style="font-size:24px; color:var(--purple); margin-bottom:20px;" id="activeGiveawayTimer">--:--</div>
+                <div class="badge green" style="font-size:16px; padding:8px 16px;" id="activeGiveawayEntries">0 Teilnehmer</div>
+              </div>
+              <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                <button class="btn btn-primary" onclick="drawGiveawayWinner()">
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  Gewinner ziehen
+                </button>
+                <button class="btn btn-danger" onclick="endGiveaway()">Beenden</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Entries List -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Teilnehmer</div>
+              <span class="badge" id="giveawayEntryCount">0</span>
+            </div>
+            <div class="card-body" id="giveawayEntriesList" style="max-height:300px; overflow-y:auto;">
+              <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                <div class="empty-state-title">Keine Teilnehmer</div>
+                <div class="empty-state-desc">Starte ein Giveaway um Teilnehmer zu sehen</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Winner Display -->
+          <div class="card" id="giveawayWinnerCard" style="display:none;">
+            <div class="card-header">
+              <div class="card-title">🎉 Gewinner!</div>
+            </div>
+            <div class="card-body" style="text-align:center; padding:30px;">
+              <div style="font-size:64px; margin-bottom:15px;">🏆</div>
+              <h1 style="color:var(--purple); margin-bottom:10px;" id="giveawayWinnerName">-</h1>
+              <p style="color:var(--text-muted);">hat gewonnen:</p>
+              <h3 id="giveawayWinnerPrize">-</h3>
+              <button class="btn btn-secondary mt-4" onclick="rerollGiveaway()">Neu auslosen</button>
+            </div>
+          </div>
+
+          <!-- Winner History -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Vergangene Gewinner</div>
+            </div>
+            <div class="card-body" id="giveawayHistory" style="max-height:300px; overflow-y:auto;">
+              <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+                <div class="empty-state-title">Keine Historie</div>
+                <div class="empty-state-desc">Vergangene Gewinner werden hier angezeigt</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1103,40 +1435,127 @@
       <div class="page-content" id="page-currency">
         <div class="page-header">
           <h1 class="page-title">Currency</h1>
+          <div class="page-actions">
+            <button class="btn btn-secondary" onclick="openAddRewardModal()">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              Belohnung hinzufügen
+            </button>
+          </div>
         </div>
-        <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Währungs-Einstellungen</div>
+        <div style="padding:20px;">
+          <!-- Stats Row -->
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:15px; margin-bottom:20px;">
+            <div class="card" style="padding:20px; text-align:center;">
+              <div style="font-size:32px; font-weight:bold; color:var(--purple);" id="currencyTotalDistributed">0</div>
+              <div style="color:var(--text-muted); font-size:13px;">Gesamt verteilt</div>
             </div>
-            <div class="card-body">
-              <div class="form-group">
-                <label class="form-label">Währungsname</label>
-                <input type="text" class="form-input" id="currencyName" placeholder="z.B. Punkte, Coins, Credits">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Punkte pro Minute (Viewer)</label>
-                <input type="number" class="form-input" id="currencyPerMinute" value="1" min="0">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Bonus für Subscriber</label>
-                <input type="number" class="form-input" id="currencySubBonus" value="2" min="0">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Startguthaben</label>
-                <input type="number" class="form-input" id="currencyStartAmount" value="100" min="0">
-              </div>
-              <button class="btn btn-primary" onclick="saveCurrencySettings()">Speichern</button>
+            <div class="card" style="padding:20px; text-align:center;">
+              <div style="font-size:32px; font-weight:bold; color:var(--green);" id="currencyAvgBalance">0</div>
+              <div style="color:var(--text-muted); font-size:13px;">Ø Guthaben</div>
+            </div>
+            <div class="card" style="padding:20px; text-align:center;">
+              <div style="font-size:32px; font-weight:bold; color:var(--yellow);" id="currencyRichestUser">-</div>
+              <div style="color:var(--text-muted); font-size:13px;">Reichster Viewer</div>
+            </div>
+            <div class="card" style="padding:20px; text-align:center;">
+              <div style="font-size:32px; font-weight:bold; color:var(--blue);" id="currencyActiveUsers">0</div>
+              <div style="color:var(--text-muted); font-size:13px;">Aktive Sammler</div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Top Währungs-Besitzer</div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <!-- Settings -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Währungs-Einstellungen</div>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label">Währungsname</label>
+                  <input type="text" class="form-input" id="currencyName" placeholder="z.B. Punkte, Coins, Credits">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Punkte pro Minute (Viewer)</label>
+                  <input type="number" class="form-input" id="currencyPerMinute" value="1" min="0">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Bonus für Subscriber (x Multiplikator)</label>
+                  <input type="number" class="form-input" id="currencySubBonus" value="2" min="1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Startguthaben (neue Viewer)</label>
+                  <input type="number" class="form-input" id="currencyStartAmount" value="100" min="0">
+                </div>
+                <button class="btn btn-primary" onclick="saveCurrencySettings()">Speichern</button>
+              </div>
             </div>
-            <div class="card-body" id="currencyLeaderboard">
-              <div class="empty-state">
-                <div class="empty-state-title">Noch keine Daten</div>
-                <div class="empty-state-desc">Verbinde mit Twitch, um Währung zu sammeln</div>
+
+            <!-- Leaderboard -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🏆 Leaderboard</div>
+              </div>
+              <div class="card-body" id="currencyLeaderboard" style="max-height:300px; overflow-y:auto;">
+                <div class="empty-state">
+                  <div class="empty-state-title">Noch keine Daten</div>
+                  <div class="empty-state-desc">Verbinde mit Twitch, um Währung zu sammeln</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shop/Rewards -->
+            <div class="card" style="grid-column: span 2;">
+              <div class="card-header">
+                <div class="card-title">🛒 Belohnungen Shop</div>
+                <span class="badge" id="rewardCount">0 Belohnungen</span>
+              </div>
+              <div class="card-body" id="currencyShopList">
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:15px;" id="rewardsGrid">
+                  <!-- Default rewards -->
+                  <div class="card" style="background:var(--bg-secondary); border:1px solid var(--border-color);">
+                    <div class="card-body text-center" style="padding:20px;">
+                      <div style="font-size:36px; margin-bottom:10px;">⭐</div>
+                      <h4>VIP für 1 Stunde</h4>
+                      <p style="color:var(--text-muted); font-size:12px; margin:10px 0;">VIP Badge im Chat</p>
+                      <div style="font-weight:bold; color:var(--purple); margin-bottom:10px;">5.000 Punkte</div>
+                      <button class="btn btn-sm btn-secondary" onclick="editReward('vip1h')">Bearbeiten</button>
+                    </div>
+                  </div>
+                  <div class="card" style="background:var(--bg-secondary); border:1px solid var(--border-color);">
+                    <div class="card-body text-center" style="padding:20px;">
+                      <div style="font-size:36px; margin-bottom:10px;">🎵</div>
+                      <h4>Song Request</h4>
+                      <p style="color:var(--text-muted); font-size:12px; margin:10px 0;">Lied in die Queue</p>
+                      <div style="font-weight:bold; color:var(--purple); margin-bottom:10px;">500 Punkte</div>
+                      <button class="btn btn-sm btn-secondary" onclick="editReward('songreq')">Bearbeiten</button>
+                    </div>
+                  </div>
+                  <div class="card" style="background:var(--bg-secondary); border:1px solid var(--border-color);">
+                    <div class="card-body text-center" style="padding:20px;">
+                      <div style="font-size:36px; margin-bottom:10px;">🎤</div>
+                      <h4>TTS Nachricht</h4>
+                      <p style="color:var(--text-muted); font-size:12px; margin:10px 0;">Nachricht vorlesen</p>
+                      <div style="font-weight:bold; color:var(--purple); margin-bottom:10px;">200 Punkte</div>
+                      <button class="btn btn-sm btn-secondary" onclick="editReward('tts')">Bearbeiten</button>
+                    </div>
+                  </div>
+                  <div class="card" style="background:var(--bg-secondary); border:1px solid var(--border-color);">
+                    <div class="card-body text-center" style="padding:20px;">
+                      <div style="font-size:36px; margin-bottom:10px;">🎲</div>
+                      <h4>Bonus Würfeln</h4>
+                      <p style="color:var(--text-muted); font-size:12px; margin:10px 0;">Extra Würfelwurf</p>
+                      <div style="font-weight:bold; color:var(--purple); margin-bottom:10px;">100 Punkte</div>
+                      <button class="btn btn-sm btn-secondary" onclick="editReward('bonusdice')">Bearbeiten</button>
+                    </div>
+                  </div>
+                  <div class="card" style="background:var(--bg-secondary); border:1px dashed var(--border-color); cursor:pointer;" onclick="openAddRewardModal()">
+                    <div class="card-body text-center" style="padding:20px;">
+                      <div style="font-size:36px; margin-bottom:10px; color:var(--text-muted);">+</div>
+                      <h4 style="color:var(--text-muted);">Neue Belohnung</h4>
+                      <p style="color:var(--text-muted); font-size:12px; margin:10px 0;">Klicken zum Hinzufügen</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1148,13 +1567,58 @@
         <div class="page-header">
           <h1 class="page-title">Minigames</h1>
         </div>
-        <div style="padding:20px;">
+        <div style="padding:20px; display:flex; flex-direction:column; gap:20px;">
+          <!-- Minigame Statistics -->
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:15px;">
+            <div class="stat-card" style="--stat-color: var(--purple);">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="totalGamesPlayed">0</span>
+                <span class="stat-label">Games Played</span>
+              </div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--yellow);">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="totalWagered">0</span>
+                <span class="stat-label">Total Wagered</span>
+              </div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--green);">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="biggestWin">0</span>
+                <span class="stat-label">Biggest Win</span>
+              </div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--cyan);">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="winRate">0%</span>
+                <span class="stat-label">Avg Win Rate</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Game Cards -->
           <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px;">
             <div class="card game-card">
               <div class="card-body text-center" style="padding:30px;">
                 <div style="font-size:48px; margin-bottom:15px;">🎰</div>
                 <h3 style="margin-bottom:10px;">Slots</h3>
-                <p style="color:var(--text-muted); margin-bottom:20px;">Spielautomaten für Viewer</p>
+                <p style="color:var(--text-muted); margin-bottom:15px;">Spielautomaten für Viewer</p>
+                <div style="display:flex; justify-content:center; gap:20px; margin-bottom:15px; font-size:12px;">
+                  <div><span style="color:var(--text-muted);">Played:</span> <span style="color:var(--text-primary); font-weight:600;" id="slotsPlayed">0</span></div>
+                  <div><span style="color:var(--text-muted);">Jackpots:</span> <span style="color:var(--green); font-weight:600;" id="slotsJackpots">0</span></div>
+                </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="slotsEnabled">
                   <span class="toggle-slider"></span>
@@ -1164,8 +1628,12 @@
             <div class="card game-card">
               <div class="card-body text-center" style="padding:30px;">
                 <div style="font-size:48px; margin-bottom:15px;">🎲</div>
-                <h3 style="margin-bottom:10px;">Würfeln</h3>
-                <p style="color:var(--text-muted); margin-bottom:20px;">Würfelspiel mit Wetteinsatz</p>
+                <h3 style="margin-bottom:10px;">Dice</h3>
+                <p style="color:var(--text-muted); margin-bottom:15px;">Würfelspiel mit Wetteinsatz</p>
+                <div style="display:flex; justify-content:center; gap:20px; margin-bottom:15px; font-size:12px;">
+                  <div><span style="color:var(--text-muted);">Played:</span> <span style="color:var(--text-primary); font-weight:600;" id="dicePlayed">0</span></div>
+                  <div><span style="color:var(--text-muted);">Win Rate:</span> <span style="color:var(--green); font-weight:600;" id="diceWinRate">0%</span></div>
+                </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="diceEnabled">
                   <span class="toggle-slider"></span>
@@ -1174,20 +1642,13 @@
             </div>
             <div class="card game-card">
               <div class="card-body text-center" style="padding:30px;">
-                <div style="font-size:48px; margin-bottom:15px;">🃏</div>
-                <h3 style="margin-bottom:10px;">Blackjack</h3>
-                <p style="color:var(--text-muted); margin-bottom:20px;">Kartenspiel gegen den Bot</p>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="blackjackEnabled">
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
-            <div class="card game-card">
-              <div class="card-body text-center" style="padding:30px;">
                 <div style="font-size:48px; margin-bottom:15px;">🎯</div>
-                <h3 style="margin-bottom:10px;">Duell</h3>
-                <p style="color:var(--text-muted); margin-bottom:20px;">Fordere andere Viewer heraus</p>
+                <h3 style="margin-bottom:10px;">Duel</h3>
+                <p style="color:var(--text-muted); margin-bottom:15px;">Fordere andere Viewer heraus</p>
+                <div style="display:flex; justify-content:center; gap:20px; margin-bottom:15px; font-size:12px;">
+                  <div><span style="color:var(--text-muted);">Duels:</span> <span style="color:var(--text-primary); font-weight:600;" id="duelsPlayed">0</span></div>
+                  <div><span style="color:var(--text-muted);">Total Pot:</span> <span style="color:var(--yellow); font-weight:600;" id="duelsPot">0</span></div>
+                </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="duelEnabled">
                   <span class="toggle-slider"></span>
@@ -1196,9 +1657,28 @@
             </div>
             <div class="card game-card">
               <div class="card-body text-center" style="padding:30px;">
+                <div style="font-size:48px; margin-bottom:15px;">🎡</div>
+                <h3 style="margin-bottom:10px;">Roulette</h3>
+                <p style="color:var(--text-muted); margin-bottom:15px;">Klassisches Casino-Spiel</p>
+                <div style="display:flex; justify-content:center; gap:20px; margin-bottom:15px; font-size:12px;">
+                  <div><span style="color:var(--text-muted);">Spins:</span> <span style="color:var(--text-primary); font-weight:600;" id="rouletteSpins">0</span></div>
+                  <div><span style="color:var(--text-muted);">Big Wins:</span> <span style="color:var(--green); font-weight:600;" id="rouletteBigWins">0</span></div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="rouletteEnabled">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="card game-card">
+              <div class="card-body text-center" style="padding:30px;">
                 <div style="font-size:48px; margin-bottom:15px;">🏦</div>
                 <h3 style="margin-bottom:10px;">Heist</h3>
-                <p style="color:var(--text-muted); margin-bottom:20px;">Gemeinsamer Raubüberfall</p>
+                <p style="color:var(--text-muted); margin-bottom:15px;">Gemeinsamer Raubüberfall</p>
+                <div style="display:flex; justify-content:center; gap:20px; margin-bottom:15px; font-size:12px;">
+                  <div><span style="color:var(--text-muted);">Heists:</span> <span style="color:var(--text-primary); font-weight:600;" id="heistsPlayed">0</span></div>
+                  <div><span style="color:var(--text-muted);">Success:</span> <span style="color:var(--green); font-weight:600;" id="heistsSuccess">0%</span></div>
+                </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="heistEnabled">
                   <span class="toggle-slider"></span>
@@ -1207,36 +1687,160 @@
             </div>
             <div class="card game-card">
               <div class="card-body text-center" style="padding:30px;">
-                <div style="font-size:48px; margin-bottom:15px;">🎰</div>
-                <h3 style="margin-bottom:10px;">Roulette</h3>
-                <p style="color:var(--text-muted); margin-bottom:20px;">Klassisches Casino-Spiel</p>
+                <div style="font-size:48px; margin-bottom:15px;">🎱</div>
+                <h3 style="margin-bottom:10px;">8-Ball</h3>
+                <p style="color:var(--text-muted); margin-bottom:15px;">Frag die magische Kugel</p>
+                <div style="display:flex; justify-content:center; gap:20px; margin-bottom:15px; font-size:12px;">
+                  <div><span style="color:var(--text-muted);">Asked:</span> <span style="color:var(--text-primary); font-weight:600;" id="eightballAsked">0</span></div>
+                  <div><span style="color:var(--text-muted);">Today:</span> <span style="color:var(--purple); font-weight:600;" id="eightballToday">0</span></div>
+                </div>
                 <label class="toggle-switch">
-                  <input type="checkbox" id="rouletteEnabled">
+                  <input type="checkbox" id="eightballEnabled" checked>
                   <span class="toggle-slider"></span>
                 </label>
               </div>
             </div>
           </div>
-          <div class="card" style="margin-top:20px;">
+
+          <!-- Leaderboard and Recent Games Row -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <!-- Game Leaderboard -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;margin-right:8px;"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
+                  Top Gamblers
+                </div>
+                <select class="form-input" style="width:auto; font-size:12px;" id="leaderboardGame">
+                  <option value="all">All Games</option>
+                  <option value="slots">Slots</option>
+                  <option value="dice">Dice</option>
+                  <option value="duel">Duel</option>
+                  <option value="roulette">Roulette</option>
+                </select>
+              </div>
+              <div class="card-body no-padding" id="gameLeaderboard">
+                <div class="leaderboard-item">
+                  <span class="leaderboard-rank gold">1</span>
+                  <div class="leaderboard-info">
+                    <span class="leaderboard-name">LuckyPlayer</span>
+                    <span class="leaderboard-stats">152 wins • +25,400 profit</span>
+                  </div>
+                  <span class="leaderboard-value profit">+25.4k</span>
+                </div>
+                <div class="leaderboard-item">
+                  <span class="leaderboard-rank silver">2</span>
+                  <div class="leaderboard-info">
+                    <span class="leaderboard-name">HighRoller99</span>
+                    <span class="leaderboard-stats">89 wins • +18,200 profit</span>
+                  </div>
+                  <span class="leaderboard-value profit">+18.2k</span>
+                </div>
+                <div class="leaderboard-item">
+                  <span class="leaderboard-rank bronze">3</span>
+                  <div class="leaderboard-info">
+                    <span class="leaderboard-name">SlotMaster</span>
+                    <span class="leaderboard-stats">210 wins • +12,800 profit</span>
+                  </div>
+                  <span class="leaderboard-value profit">+12.8k</span>
+                </div>
+                <div class="leaderboard-item">
+                  <span class="leaderboard-rank">4</span>
+                  <div class="leaderboard-info">
+                    <span class="leaderboard-name">DiceKing</span>
+                    <span class="leaderboard-stats">67 wins • +8,500 profit</span>
+                  </div>
+                  <span class="leaderboard-value profit">+8.5k</span>
+                </div>
+                <div class="leaderboard-item">
+                  <span class="leaderboard-rank">5</span>
+                  <div class="leaderboard-info">
+                    <span class="leaderboard-name">RiskTaker</span>
+                    <span class="leaderboard-stats">45 wins • -2,100 loss</span>
+                  </div>
+                  <span class="leaderboard-value loss">-2.1k</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Games -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;margin-right:8px;"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                  Recent Games
+                </div>
+              </div>
+              <div class="card-body no-padding" id="recentGames">
+                <div class="recent-game-item">
+                  <div class="game-type-icon" style="background:rgba(145, 71, 255, 0.15); color:var(--purple);">🎰</div>
+                  <div class="game-details">
+                    <span class="game-player">LuckyPlayer</span>
+                    <span class="game-desc">won slots jackpot</span>
+                  </div>
+                  <span class="game-result win">+5,000</span>
+                </div>
+                <div class="recent-game-item">
+                  <div class="game-type-icon" style="background:rgba(239, 68, 68, 0.15); color:var(--red);">🎲</div>
+                  <div class="game-details">
+                    <span class="game-player">UnluckyGamer</span>
+                    <span class="game-desc">lost at dice</span>
+                  </div>
+                  <span class="game-result lose">-500</span>
+                </div>
+                <div class="recent-game-item">
+                  <div class="game-type-icon" style="background:rgba(34, 197, 94, 0.15); color:var(--green);">🎯</div>
+                  <div class="game-details">
+                    <span class="game-player">DuelChamp</span>
+                    <span class="game-desc">defeated Challenger42</span>
+                  </div>
+                  <span class="game-result win">+1,200</span>
+                </div>
+                <div class="recent-game-item">
+                  <div class="game-type-icon" style="background:rgba(234, 179, 8, 0.15); color:var(--yellow);">🎡</div>
+                  <div class="game-details">
+                    <span class="game-player">RouletteRick</span>
+                    <span class="game-desc">bet on red 17</span>
+                  </div>
+                  <span class="game-result win">+3,500</span>
+                </div>
+                <div class="recent-game-item">
+                  <div class="game-type-icon" style="background:rgba(6, 182, 212, 0.15); color:var(--cyan);">🏦</div>
+                  <div class="game-details">
+                    <span class="game-player">HeistCrew</span>
+                    <span class="game-desc">successful heist (8 players)</span>
+                  </div>
+                  <span class="game-result win">+8,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings Card -->
+          <div class="card">
             <div class="card-header">
-              <div class="card-title">Minigame-Einstellungen</div>
+              <div class="card-title">Minigame Settings</div>
             </div>
             <div class="card-body">
-              <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px;">
+              <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:20px;">
                 <div class="form-group">
-                  <label class="form-label">Min. Einsatz</label>
+                  <label class="form-label">Min. Bet</label>
                   <input type="number" class="form-input" id="minBet" value="10" min="1">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Max. Einsatz</label>
+                  <label class="form-label">Max. Bet</label>
                   <input type="number" class="form-input" id="maxBet" value="1000" min="1">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Cooldown (Sekunden)</label>
+                  <label class="form-label">Cooldown (sec)</label>
                   <input type="number" class="form-input" id="gameCooldown" value="30" min="0">
                 </div>
+                <div class="form-group">
+                  <label class="form-label">House Edge %</label>
+                  <input type="number" class="form-input" id="houseEdge" value="5" min="0" max="20">
+                </div>
               </div>
-              <button class="btn btn-primary" onclick="saveMinigameSettings()">Einstellungen speichern</button>
+              <button class="btn btn-primary" onclick="saveMinigameSettings()">Save Settings</button>
             </div>
           </div>
         </div>
@@ -1279,23 +1883,216 @@
       <div class="page-content" id="page-events">
         <div class="page-header">
           <h1 class="page-title">Events</h1>
+          <div class="page-actions">
+            <select class="form-input" style="width:auto;" id="eventTimeRange">
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="all">All Time</option>
+            </select>
+            <button class="btn btn-secondary" onclick="exportEvents()">
+              <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Export
+            </button>
+          </div>
         </div>
-        <div style="padding:20px;">
+        <div style="padding:20px; display:flex; flex-direction:column; gap:20px;">
+          <!-- Event Statistics Row -->
+          <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:15px;">
+            <div class="stat-card" style="--stat-color: var(--purple);">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="totalEventsCount">0</span>
+                <span class="stat-label">Total Events</span>
+              </div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--red);">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="followsCount">0</span>
+                <span class="stat-label">Follows</span>
+              </div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--yellow);">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="subsCount">0</span>
+                <span class="stat-label">Subs</span>
+              </div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--orange);">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="raidsCount">0</span>
+                <span class="stat-label">Raids</span>
+              </div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--cyan);">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="bitsCount">0</span>
+                <span class="stat-label">Bits</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Event Activity Chart -->
           <div class="card">
             <div class="card-header">
-              <div class="card-title">Event Log</div>
-              <select class="form-input" style="width:auto;" id="eventFilter">
-                <option value="all">Alle Events</option>
-                <option value="follow">Follows</option>
-                <option value="sub">Subscriptions</option>
-                <option value="raid">Raids</option>
-                <option value="bits">Bits</option>
-              </select>
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;margin-right:8px;"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+                Event Activity
+              </div>
             </div>
-            <div class="card-body" id="eventLogList" style="max-height:500px; overflow:auto;">
-              <div class="empty-state">
-                <div class="empty-state-title">Keine Events</div>
-                <div class="empty-state-desc">Events werden hier protokolliert</div>
+            <div class="card-body">
+              <div id="eventChart" style="display:flex; align-items:flex-end; gap:8px; height:150px; padding:10px 0;">
+                <!-- Chart bars will be generated dynamically -->
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                  <div style="width:100%; background:var(--purple); border-radius:4px 4px 0 0; height:30%;"></div>
+                  <span style="font-size:10px; color:var(--text-muted);">Mon</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                  <div style="width:100%; background:var(--purple); border-radius:4px 4px 0 0; height:50%;"></div>
+                  <span style="font-size:10px; color:var(--text-muted);">Tue</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                  <div style="width:100%; background:var(--purple); border-radius:4px 4px 0 0; height:80%;"></div>
+                  <span style="font-size:10px; color:var(--text-muted);">Wed</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                  <div style="width:100%; background:var(--purple); border-radius:4px 4px 0 0; height:45%;"></div>
+                  <span style="font-size:10px; color:var(--text-muted);">Thu</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                  <div style="width:100%; background:var(--purple); border-radius:4px 4px 0 0; height:90%;"></div>
+                  <span style="font-size:10px; color:var(--text-muted);">Fri</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                  <div style="width:100%; background:var(--purple); border-radius:4px 4px 0 0; height:100%;"></div>
+                  <span style="font-size:10px; color:var(--text-muted);">Sat</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                  <div style="width:100%; background:var(--purple-light); border-radius:4px 4px 0 0; height:60%;"></div>
+                  <span style="font-size:10px; color:var(--text-secondary);">Sun</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Event Log and Top Contributors -->
+          <div style="display:grid; grid-template-columns:2fr 1fr; gap:20px;">
+            <!-- Event Log -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Event Log</div>
+                <select class="form-input" style="width:auto;" id="eventFilter">
+                  <option value="all">All Events</option>
+                  <option value="follow">Follows</option>
+                  <option value="sub">Subscriptions</option>
+                  <option value="raid">Raids</option>
+                  <option value="bits">Bits</option>
+                  <option value="gift">Gift Subs</option>
+                </select>
+              </div>
+              <div class="card-body no-padding" id="eventLogList" style="max-height:400px; overflow:auto;">
+                <!-- Sample events for display -->
+                <div class="event-item">
+                  <div class="event-icon" style="background:rgba(239, 68, 68, 0.15); color:var(--red);">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                  </div>
+                  <div class="event-info">
+                    <span class="event-user">CoolViewer123</span>
+                    <span class="event-text">started following</span>
+                  </div>
+                  <span class="event-time">2 min ago</span>
+                </div>
+                <div class="event-item">
+                  <div class="event-icon" style="background:rgba(234, 179, 8, 0.15); color:var(--yellow);">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  </div>
+                  <div class="event-info">
+                    <span class="event-user">SubMaster99</span>
+                    <span class="event-text">subscribed for 6 months</span>
+                  </div>
+                  <span class="event-time">15 min ago</span>
+                </div>
+                <div class="event-item">
+                  <div class="event-icon" style="background:rgba(6, 182, 212, 0.15); color:var(--cyan);">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                  </div>
+                  <div class="event-info">
+                    <span class="event-user">BitsDonor42</span>
+                    <span class="event-text">cheered 500 bits</span>
+                  </div>
+                  <span class="event-time">1 hour ago</span>
+                </div>
+                <div class="event-item">
+                  <div class="event-icon" style="background:rgba(249, 115, 22, 0.15); color:var(--orange);">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                  </div>
+                  <div class="event-info">
+                    <span class="event-user">RaidLeader</span>
+                    <span class="event-text">raided with 150 viewers</span>
+                  </div>
+                  <span class="event-time">2 hours ago</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Contributors -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;margin-right:8px;"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
+                  Top Contributors
+                </div>
+              </div>
+              <div class="card-body no-padding">
+                <div class="contributor-item">
+                  <span class="contributor-rank gold">1</span>
+                  <div class="contributor-info">
+                    <span class="contributor-name">MegaFan2024</span>
+                    <span class="contributor-stats">12 months sub • 5000 bits</span>
+                  </div>
+                </div>
+                <div class="contributor-item">
+                  <span class="contributor-rank silver">2</span>
+                  <div class="contributor-info">
+                    <span class="contributor-name">LoyalViewer</span>
+                    <span class="contributor-stats">8 months sub • 2500 bits</span>
+                  </div>
+                </div>
+                <div class="contributor-item">
+                  <span class="contributor-rank bronze">3</span>
+                  <div class="contributor-info">
+                    <span class="contributor-name">GenerousGifter</span>
+                    <span class="contributor-stats">25 gift subs</span>
+                  </div>
+                </div>
+                <div class="contributor-item">
+                  <span class="contributor-rank">4</span>
+                  <div class="contributor-info">
+                    <span class="contributor-name">RaidCommander</span>
+                    <span class="contributor-stats">5 raids • 450 viewers</span>
+                  </div>
+                </div>
+                <div class="contributor-item">
+                  <span class="contributor-rank">5</span>
+                  <div class="contributor-info">
+                    <span class="contributor-name">HypeSupporter</span>
+                    <span class="contributor-stats">1500 bits • 3 months</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

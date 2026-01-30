@@ -13,7 +13,7 @@ import { Plugin } from '../base/Plugin';
 import { PluginMeta, Permission } from '../../types/plugins';
 import { getDatabase, DatabaseService } from '../../services/Database';
 import { v4 as uuidv4 } from 'uuid';
-import ytsr from 'ytsr';
+import playdl from 'play-dl';
 import ytdl from 'ytdl-core';
 
 export interface Song {
@@ -384,20 +384,21 @@ export class SongRequestPlugin extends Plugin {
         };
       }
 
-      // Search YouTube
-      const results = await ytsr(query, { limit: 1 });
-      const video = results.items.find(item => item.type === 'video') as any;
+      // Search YouTube using play-dl
+      const results = await playdl.search(query, { limit: 1, source: { youtube: 'video' } });
 
-      if (!video) {
+      if (!results || results.length === 0) {
         return null;
       }
 
+      const video = results[0];
+
       return {
         id: uuidv4(),
-        title: video.title,
+        title: video.title || 'Unknown',
         url: video.url,
-        duration: this.parseDuration(video.duration || '0:00'),
-        thumbnail: video.bestThumbnail?.url,
+        duration: video.durationInSec || 0,
+        thumbnail: video.thumbnails?.[0]?.url,
         requestedBy: '',
         requestedAt: new Date(),
       };

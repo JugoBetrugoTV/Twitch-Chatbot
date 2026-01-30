@@ -8,55 +8,86 @@
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-  <!-- THX-Style Deep Note Intro -->
-  <div id="cinematic-intro" class="thx-intro">
-    <!-- Audio element for deep note sound -->
-    <audio id="deepNoteAudio" preload="auto">
-      <source src="audio/deep-note.mp3" type="audio/mpeg">
-      <source src="audio/deep-note.ogg" type="audio/ogg">
+  <!-- Imperial Star Wars Style Intro -->
+  <div id="cinematic-intro" class="imperial-intro">
+    <!-- Audio -->
+    <audio id="imperialAudio" preload="auto">
+      <source src="audio/imperial.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Background -->
-    <div class="thx-bg"></div>
+    <!-- Star field background -->
+    <div class="imperial-stars" id="imperialStars"></div>
 
-    <!-- Converging lines container -->
-    <div class="thx-lines" id="thxLines"></div>
+    <!-- Hyperspace lines -->
+    <div class="hyperspace" id="hyperspace"></div>
 
-    <!-- Central glow that builds up -->
-    <div class="thx-glow">
-      <div class="glow-core"></div>
-      <div class="glow-outer"></div>
-      <div class="glow-pulse"></div>
-    </div>
-
-    <!-- Logo container -->
-    <div class="thx-logo-container" id="thxLogo">
-      <div class="logo-reveal-mask">
-        <img src="img/logo.svg" class="thx-logo" alt="StreamCore">
+    <!-- Star Wars style text crawl -->
+    <div class="crawl-container" id="crawlContainer">
+      <div class="crawl-content">
+        <p class="crawl-chapter">Episode MMXXVI</p>
+        <h1 class="crawl-title">STREAMCORE</h1>
+        <div class="crawl-text">
+          <p>The streaming galaxy is in turmoil. Content creators across the universe struggle to manage their channels without proper tools.</p>
+          <p>From the depths of development, a powerful new force emerges. STREAMCORE, the ultimate stream command center, rises to bring order to the chaos.</p>
+          <p>JugoBetrugoTV, the legendary developer, has forged this weapon to dominate Twitch and unite all streamers under one banner...</p>
+        </div>
       </div>
-      <div class="logo-glow"></div>
-      <div class="logo-flare"></div>
     </div>
 
-    <!-- Text reveal -->
-    <div class="thx-text" id="thxText">
-      <div class="text-streamcore">
+    <!-- Imperial scanning effect -->
+    <div class="imperial-scan" id="imperialScan"></div>
+
+    <!-- Death Star inspired circular element -->
+    <div class="death-star" id="deathStar">
+      <div class="ds-outer"></div>
+      <div class="ds-trench"></div>
+      <div class="ds-dish">
+        <div class="dish-inner"></div>
+      </div>
+      <div class="ds-superlaser" id="superlaser"></div>
+    </div>
+
+    <!-- Imperial Logo Reveal -->
+    <div class="imperial-logo" id="imperialLogo">
+      <div class="logo-hexagon">
+        <div class="hex-border"></div>
+        <img src="img/logo.svg" class="logo-img" alt="StreamCore">
+      </div>
+      <div class="logo-scanlines"></div>
+    </div>
+
+    <!-- Main Title -->
+    <div class="imperial-title" id="imperialTitle">
+      <div class="title-top-line"></div>
+      <h1 class="title-main">
         <span>S</span><span>T</span><span>R</span><span>E</span><span>A</span><span>M</span><span>C</span><span>O</span><span>R</span><span>E</span>
+      </h1>
+      <div class="title-bottom-line"></div>
+      <p class="title-subtitle">GALACTIC STREAM COMMAND</p>
+      <div class="title-author">
+        <span class="author-label">Developed by</span>
+        <span class="author-name">JugoBetrugoTV</span>
       </div>
-      <div class="text-divider"></div>
-      <div class="text-by">by JugoBetrugoTV</div>
     </div>
 
-    <!-- Subtitle -->
-    <div class="thx-subtitle" id="thxSubtitle">
-      The Audience is Streaming
+    <!-- Imperial Data Display -->
+    <div class="imperial-data" id="imperialData">
+      <div class="data-corner top-left"></div>
+      <div class="data-corner top-right"></div>
+      <div class="data-corner bottom-left"></div>
+      <div class="data-corner bottom-right"></div>
+      <div class="data-line left"></div>
+      <div class="data-line right"></div>
+      <div class="data-text" id="dataText">INITIALIZING COMMAND SYSTEMS...</div>
+      <div class="data-bar">
+        <div class="data-fill" id="dataFill"></div>
+      </div>
     </div>
 
-    <!-- Flash overlay -->
-    <div class="thx-flash" id="thxFlash"></div>
-
-    <!-- Vignette -->
-    <div class="thx-vignette"></div>
+    <!-- Overlays -->
+    <div class="imperial-vignette"></div>
+    <div class="imperial-flash" id="imperialFlash"></div>
+    <div class="imperial-grain"></div>
   </div>
 
   <!-- Input Modal -->
@@ -3803,9 +3834,9 @@
     }
 
     // ========================================
-    // THX-STYLE DEEP NOTE INTRO
+    // IMPERIAL STAR WARS STYLE INTRO
     // ========================================
-    (function initTHXIntro() {
+    (function initImperialIntro() {
       const intro = document.getElementById('cinematic-intro');
       if (!intro) {
         initApp();
@@ -3815,6 +3846,7 @@
       const introStartTime = Date.now();
       let introSkipped = false;
       const timeouts = [];
+      const intervals = [];
 
       function safeTimeout(fn, delay) {
         const id = setTimeout(() => { if (!introSkipped) fn(); }, delay);
@@ -3822,140 +3854,164 @@
         return id;
       }
 
+      function safeInterval(fn, delay) {
+        const id = setInterval(() => { if (!introSkipped) fn(); else clearInterval(id); }, delay);
+        intervals.push(id);
+        return id;
+      }
+
       // Elements
-      const thxLines = document.getElementById('thxLines');
-      const thxLogo = document.getElementById('thxLogo');
-      const thxText = document.getElementById('thxText');
-      const thxSubtitle = document.getElementById('thxSubtitle');
-      const thxFlash = document.getElementById('thxFlash');
-      const glowCore = document.querySelector('.glow-core');
-      const glowOuter = document.querySelector('.glow-outer');
-      const glowPulse = document.querySelector('.glow-pulse');
-      const logoFlare = document.querySelector('.logo-flare');
+      const starsContainer = document.getElementById('imperialStars');
+      const hyperspace = document.getElementById('hyperspace');
+      const crawlContainer = document.getElementById('crawlContainer');
+      const imperialScan = document.getElementById('imperialScan');
+      const deathStar = document.getElementById('deathStar');
+      const superlaser = document.getElementById('superlaser');
+      const imperialLogo = document.getElementById('imperialLogo');
+      const imperialTitle = document.getElementById('imperialTitle');
+      const imperialData = document.getElementById('imperialData');
+      const dataText = document.getElementById('dataText');
+      const dataFill = document.getElementById('dataFill');
+      const imperialFlash = document.getElementById('imperialFlash');
 
       // Try to play audio
-      const audio = document.getElementById('deepNoteAudio');
+      const audio = document.getElementById('imperialAudio');
       if (audio) {
-        audio.volume = 0.7;
-        // Audio will be played on user interaction or automatically if allowed
+        audio.volume = 0.6;
         const playAudio = () => {
-          audio.play().catch(() => {
-            // Audio autoplay blocked, that's fine
-          });
+          audio.play().catch(() => {});
         };
-        // Try immediately
         playAudio();
-        // Also try on first user interaction
         document.addEventListener('click', playAudio, { once: true });
         document.addEventListener('keydown', playAudio, { once: true });
       }
 
-      // Create converging lines
-      const LINE_COUNT = 30;
-      const lines = [];
-      const colors = ['#9147ff', '#a855f7', '#c084fc', '#7c3aed', '#6366f1', '#ec4899'];
+      // Create star field
+      const STAR_COUNT = 200;
+      for (let i = 0; i < STAR_COUNT; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        star.style.setProperty('--size', (Math.random() * 2 + 1) + 'px');
+        starsContainer.appendChild(star);
+      }
 
-      for (let i = 0; i < LINE_COUNT; i++) {
+      // Create hyperspace lines
+      const HYPERSPACE_LINES = 100;
+      for (let i = 0; i < HYPERSPACE_LINES; i++) {
         const line = document.createElement('div');
-        line.className = 'thx-line';
-        line.style.setProperty('--line-color', colors[i % colors.length]);
-
-        // Random scattered position
-        const startX = Math.random() * 100;
-        const startY = Math.random() * 100;
-        const startAngle = Math.random() * 360;
-        const startWidth = 100 + Math.random() * 300;
-
-        line.style.left = startX + '%';
-        line.style.top = startY + '%';
-        line.style.width = startWidth + 'px';
-        line.style.transform = `translate(-50%, -50%) rotate(${startAngle}deg)`;
-
-        // Store target position (center, horizontal)
-        line.dataset.targetX = '50';
-        line.dataset.targetY = '50';
-        line.dataset.targetAngle = '0';
-        line.dataset.startX = startX;
-        line.dataset.startY = startY;
-        line.dataset.startAngle = startAngle;
-
-        thxLines.appendChild(line);
-        lines.push(line);
+        line.className = 'hyperspace-line';
+        const angle = (i / HYPERSPACE_LINES) * 360;
+        line.style.setProperty('--angle', angle + 'deg');
+        line.style.setProperty('--delay', (Math.random() * 0.5) + 's');
+        line.style.setProperty('--length', (Math.random() * 200 + 100) + 'px');
+        hyperspace.appendChild(line);
       }
 
       // Flash effect
-      function triggerFlash() {
-        if (!thxFlash || introSkipped) return;
-        thxFlash.classList.add('active');
-        setTimeout(() => thxFlash.classList.remove('active'), 600);
+      function triggerFlash(intensity = 1) {
+        if (!imperialFlash || introSkipped) return;
+        imperialFlash.style.opacity = intensity;
+        imperialFlash.classList.add('active');
+        setTimeout(() => {
+          imperialFlash.classList.remove('active');
+          imperialFlash.style.opacity = '';
+        }, 400);
       }
 
-      // Phase 1: Show scattered lines (0-1s)
+      // Data text messages
+      const dataMessages = [
+        'INITIALIZING COMMAND SYSTEMS...',
+        'ESTABLISHING GALACTIC CONNECTION...',
+        'LOADING STREAM PROTOCOLS...',
+        'ACTIVATING CHAT MATRIX...',
+        'IMPERIAL SYSTEMS ONLINE'
+      ];
+      let dataIndex = 0;
+
+      // Phase 1: Stars visible, hyperspace builds (0-2s)
       safeTimeout(() => {
-        lines.forEach((line, i) => {
-          setTimeout(() => {
-            line.classList.add('scattered');
-          }, i * 30);
-        });
+        if (starsContainer) starsContainer.classList.add('visible');
+      }, 100);
+
+      // Phase 2: Text crawl appears (0.5-6s)
+      safeTimeout(() => {
+        if (crawlContainer) crawlContainer.classList.add('active');
       }, 500);
 
-      // Phase 2: Lines start converging to center (1-5s)
+      // Phase 3: Hyperspace jump (2-4s)
       safeTimeout(() => {
-        lines.forEach((line, i) => {
-          line.classList.add('converging');
-          // Stagger the convergence slightly
-          setTimeout(() => {
-            line.style.left = '50%';
-            line.style.top = '50%';
-            line.style.transform = 'translate(-50%, -50%) rotate(0deg)';
-            line.style.width = '100vw';
-          }, i * 50);
-        });
-      }, 1000);
+        if (hyperspace) hyperspace.classList.add('active');
+        if (starsContainer) starsContainer.classList.add('hyperspace');
+      }, 2000);
 
-      // Phase 3: Central glow starts building (3s)
+      // Phase 4: Flash and hide hyperspace/crawl (4s)
       safeTimeout(() => {
-        if (glowOuter) glowOuter.classList.add('active');
-      }, 3000);
+        triggerFlash(0.8);
+        if (hyperspace) hyperspace.classList.remove('active');
+        if (crawlContainer) crawlContainer.classList.remove('active');
+        if (starsContainer) starsContainer.classList.remove('hyperspace');
+      }, 4000);
 
-      // Phase 4: Lines fully converged, core glow appears (5s)
+      // Phase 5: Death Star appears (4.5s)
       safeTimeout(() => {
-        if (glowCore) glowCore.classList.add('active');
-        // Hide lines
-        lines.forEach(line => {
-          line.classList.add('converged');
-        });
-      }, 5000);
+        if (deathStar) deathStar.classList.add('visible');
+        if (imperialScan) imperialScan.classList.add('active');
+      }, 4500);
 
-      // Phase 5: Big flash + Logo reveal (5.5s)
+      // Phase 6: Superlaser charges (5.5s)
       safeTimeout(() => {
-        triggerFlash();
-        if (glowCore) glowCore.classList.add('expanded');
-        if (glowPulse) glowPulse.classList.add('active');
+        if (superlaser) superlaser.classList.add('charging');
       }, 5500);
 
-      // Phase 6: Logo appears (6s)
+      // Phase 7: Superlaser fires + big flash (6.5s)
       safeTimeout(() => {
-        if (thxLogo) thxLogo.classList.add('visible');
-        if (logoFlare) {
-          setTimeout(() => logoFlare.classList.add('active'), 300);
-        }
-      }, 6000);
+        if (superlaser) superlaser.classList.add('firing');
+        triggerFlash(1);
+        // Hide Death Star
+        setTimeout(() => {
+          if (deathStar) deathStar.classList.remove('visible');
+          if (imperialScan) imperialScan.classList.remove('active');
+        }, 300);
+      }, 6500);
 
-      // Phase 7: Text appears (7s)
+      // Phase 8: Logo reveal (7s)
       safeTimeout(() => {
-        if (thxText) thxText.classList.add('visible');
+        if (imperialLogo) imperialLogo.classList.add('visible');
       }, 7000);
 
-      // Phase 8: Subtitle appears (8.5s)
+      // Phase 9: Title appears (7.8s)
       safeTimeout(() => {
-        if (thxSubtitle) thxSubtitle.classList.add('visible');
+        if (imperialTitle) imperialTitle.classList.add('visible');
+      }, 7800);
+
+      // Phase 10: Data display (8.5s)
+      safeTimeout(() => {
+        if (imperialData) imperialData.classList.add('visible');
+        // Start data loading animation
+        let progress = 0;
+        const loadInterval = safeInterval(() => {
+          progress += 2;
+          if (dataFill) dataFill.style.width = Math.min(progress, 100) + '%';
+
+          // Change text at intervals
+          if (progress === 20 && dataText) dataText.textContent = dataMessages[1];
+          if (progress === 40 && dataText) dataText.textContent = dataMessages[2];
+          if (progress === 60 && dataText) dataText.textContent = dataMessages[3];
+          if (progress === 100 && dataText) dataText.textContent = dataMessages[4];
+
+          if (progress >= 100) {
+            clearInterval(loadInterval);
+          }
+        }, 30);
       }, 8500);
 
       // Add skip button
       const skipBtn = document.createElement('div');
-      skipBtn.className = 'thx-skip';
-      skipBtn.textContent = 'SKIP';
+      skipBtn.className = 'imperial-skip';
+      skipBtn.textContent = 'SKIP INTRO';
       skipBtn.onclick = skipIntro;
       intro.appendChild(skipBtn);
 
@@ -3965,6 +4021,7 @@
         introSkipped = true;
 
         timeouts.forEach(clearTimeout);
+        intervals.forEach(clearInterval);
 
         if (audio) {
           audio.pause();
@@ -3975,15 +4032,14 @@
         setTimeout(() => {
           intro.remove();
           initApp();
-        }, 1000);
+        }, 800);
       }
 
       // Skip handler
       const skipHandler = (e) => {
         if (e.type === 'keydown' || e.type === 'click') {
-          // Check if clicking skip button
-          if (e.target && e.target.classList && e.target.classList.contains('thx-skip')) {
-            return; // Let the button handle it
+          if (e.target && e.target.classList && e.target.classList.contains('imperial-skip')) {
+            return;
           }
           if (Date.now() - introStartTime > 2000) {
             document.removeEventListener('keydown', skipHandler);
@@ -3998,8 +4054,8 @@
         document.addEventListener('click', skipHandler);
       }, 2000);
 
-      // Auto-finish after 10 seconds
-      safeTimeout(skipIntro, 10000);
+      // Auto-finish after 12 seconds
+      safeTimeout(skipIntro, 12000);
     })();
 
     // ========================================

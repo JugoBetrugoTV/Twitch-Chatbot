@@ -8,11 +8,77 @@
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div id="splashScreen" class="splash-screen">
-    <img src="img/logo.svg" class="splash-logo" alt="StreamCore Logo">
-    <h1 class="splash-text">StreamCore</h1>
-    <p class="splash-status" id="splashStatus">Initialisiere...</p>
+  <!-- Cinematic Intro -->
+  <div id="cinematic-intro" class="cinematic-intro">
+    <!-- Particle field -->
+    <div class="intro-particles" id="introParticles"></div>
+
+    <!-- Light rays -->
+    <div class="intro-rays">
+      <div class="ray ray-1"></div>
+      <div class="ray ray-2"></div>
+      <div class="ray ray-3"></div>
+      <div class="ray ray-4"></div>
+      <div class="ray ray-5"></div>
+    </div>
+
+    <!-- Lens flare -->
+    <div class="intro-flare"></div>
+
+    <!-- Glowing orbs -->
+    <div class="intro-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Main content -->
+    <div class="intro-content">
+      <!-- Logo with epic reveal -->
+      <div class="intro-logo-container">
+        <div class="intro-logo-glow"></div>
+        <img src="img/logo.svg" class="intro-logo" alt="StreamCore Logo">
+        <div class="intro-logo-ring"></div>
+        <div class="intro-logo-ring ring-2"></div>
+      </div>
+
+      <!-- Title with letter animation -->
+      <h1 class="intro-title">
+        <span class="intro-letter" style="--i:0">S</span>
+        <span class="intro-letter" style="--i:1">t</span>
+        <span class="intro-letter" style="--i:2">r</span>
+        <span class="intro-letter" style="--i:3">e</span>
+        <span class="intro-letter" style="--i:4">a</span>
+        <span class="intro-letter" style="--i:5">m</span>
+        <span class="intro-letter" style="--i:6">C</span>
+        <span class="intro-letter" style="--i:7">o</span>
+        <span class="intro-letter" style="--i:8">r</span>
+        <span class="intro-letter" style="--i:9">e</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <div class="intro-subtitle">
+        <span class="intro-by">by</span>
+        <span class="intro-author">JugoBetrugoTV</span>
+      </div>
+
+      <!-- Tagline -->
+      <p class="intro-tagline">Next Generation Stream Control</p>
+
+      <!-- Loading section -->
+      <div class="intro-loading">
+        <div class="intro-progress">
+          <div class="intro-progress-bar" id="introProgressBar"></div>
+        </div>
+        <p class="intro-status" id="introStatus">Initialisiere...</p>
+      </div>
+    </div>
+
+    <!-- Scan line effect -->
+    <div class="intro-scanline"></div>
+
+    <!-- Vignette -->
+    <div class="intro-vignette"></div>
   </div>
 
   <!-- Input Modal -->
@@ -3759,34 +3825,113 @@
     }
 
     // ========================================
-    // SPLASH SCREEN
+    // CINEMATIC INTRO
     // ========================================
-    const splashMessages = [
-      'Initialisiere Plugins...',
-      'Lade Konfiguration...',
-      'Verbinde mit Twitch...',
-      'Lade Befehle...',
-      'Starte Dashboard...'
-    ];
-
-    let splashIndex = 0;
-    const splashInterval = setInterval(() => {
-      const status = document.getElementById('splashStatus');
-      if (status && splashIndex < splashMessages.length) {
-        status.textContent = splashMessages[splashIndex];
-        splashIndex++;
+    (function initCinematicIntro() {
+      const intro = document.getElementById('cinematic-intro');
+      if (!intro) {
+        initApp();
+        return;
       }
-    }, 400);
 
-    setTimeout(() => {
-      clearInterval(splashInterval);
-      const splash = document.getElementById('splashScreen');
-      if (splash) {
-        splash.classList.add('fade-out');
-        setTimeout(() => splash.remove(), 500);
+      // Create floating particles
+      const particlesContainer = document.getElementById('introParticles');
+      if (particlesContainer) {
+        for (let i = 0; i < 80; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'intro-particle';
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.animationDelay = Math.random() * 8 + 's';
+          particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+
+          // Vary particle sizes
+          const size = 1 + Math.random() * 3;
+          particle.style.width = size + 'px';
+          particle.style.height = size + 'px';
+
+          // Vary colors
+          const colors = ['var(--purple-light)', 'var(--purple)', 'var(--pink)', '#fff'];
+          particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+          particle.style.boxShadow = `0 0 ${size * 2}px currentColor`;
+
+          particlesContainer.appendChild(particle);
+        }
       }
-      initApp();
-    }, 2000);
+
+      // Add skip button
+      const skipBtn = document.createElement('div');
+      skipBtn.className = 'intro-skip';
+      skipBtn.textContent = 'Press any key to skip';
+      skipBtn.onclick = skipIntro;
+      intro.appendChild(skipBtn);
+
+      // Loading messages and progress
+      const loadingMessages = [
+        { text: 'Initialisiere Core Systems...', progress: 10 },
+        { text: 'Lade Plugin-Architektur...', progress: 25 },
+        { text: 'Verbinde mit Twitch API...', progress: 40 },
+        { text: 'Synchronisiere Datenbanken...', progress: 55 },
+        { text: 'Lade Benutzer-Konfiguration...', progress: 70 },
+        { text: 'Initialisiere Dashboard...', progress: 85 },
+        { text: 'StreamCore bereit!', progress: 100 }
+      ];
+
+      let messageIndex = 0;
+      const statusEl = document.getElementById('introStatus');
+      const progressBar = document.getElementById('introProgressBar');
+
+      // Start loading sequence after intro animations
+      setTimeout(() => {
+        const loadingInterval = setInterval(() => {
+          if (messageIndex < loadingMessages.length) {
+            const msg = loadingMessages[messageIndex];
+            if (statusEl) statusEl.textContent = msg.text;
+            if (progressBar) progressBar.style.width = msg.progress + '%';
+            messageIndex++;
+          } else {
+            clearInterval(loadingInterval);
+          }
+        }, 400);
+      }, 4000);
+
+      // Skip intro function
+      let introSkipped = false;
+      function skipIntro() {
+        if (introSkipped) return;
+        introSkipped = true;
+
+        intro.classList.add('fade-out');
+        setTimeout(() => {
+          intro.remove();
+          initApp();
+        }, 1000);
+      }
+
+      // Listen for keypress or click to skip
+      const skipHandler = (e) => {
+        if (e.type === 'keydown' || e.type === 'click') {
+          // Only skip after initial animations (2 seconds)
+          if (Date.now() - introStartTime > 2000) {
+            document.removeEventListener('keydown', skipHandler);
+            document.removeEventListener('click', skipHandler);
+            skipIntro();
+          }
+        }
+      };
+
+      const introStartTime = Date.now();
+      setTimeout(() => {
+        document.addEventListener('keydown', skipHandler);
+        document.addEventListener('click', skipHandler);
+      }, 2000);
+
+      // Auto-finish after full sequence (8 seconds total)
+      setTimeout(() => {
+        if (!introSkipped) {
+          skipIntro();
+        }
+      }, 8000);
+    })();
 
     // ========================================
     // STATE

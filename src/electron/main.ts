@@ -844,11 +844,23 @@ function setupIPC() {
       return db.getSetting('tts_settings', {
         enabled: true,
         volume: 80,
+        speed: 1.0,
         voice: 'de-DE',
         readUsernames: true,
+        readAll: false,
+        subOnly: false,
+        vipBypass: false,
+        cost: 0,
+        cooldown: 10,
+        minChars: 1,
+        maxChars: 200,
+        maxQueue: 20,
+        userLimit: 3,
+        filterBadWords: true,
+        skipLinks: true,
       });
     } catch {
-      return { enabled: true, volume: 80, voice: 'de-DE' };
+      return { enabled: true, volume: 80, speed: 1.0, voice: 'de-DE' };
     }
   });
 
@@ -1831,7 +1843,10 @@ function setupIPC() {
         autoStart: false,
         minimizeToTray: true,
         autoConnect: false,
-        checkUpdates: true
+        checkUpdates: true,
+        desktopNotifications: true,
+        soundNotifications: true,
+        notificationVolume: 50,
       });
     } catch {
       return {};
@@ -2020,6 +2035,82 @@ function setupIPC() {
 
   ipcMain.handle('analytics:export', () => {
     return { success: true };
+  });
+
+  // ==========================================
+  // Data Management
+  // ==========================================
+  ipcMain.handle('data:getStats', () => {
+    try {
+      const db = getDatabase();
+      const users = db.query('SELECT COUNT(*) as count FROM users');
+      const commands = db.query('SELECT COUNT(*) as count FROM commands');
+      return {
+        users: users[0]?.count || 0,
+        commands: commands[0]?.count || 0,
+        size: '< 1 MB',
+      };
+    } catch {
+      return { users: 0, commands: 0, size: '< 1 MB' };
+    }
+  });
+
+  ipcMain.handle('data:export', async () => {
+    try {
+      const db = getDatabase();
+      const data = {
+        users: db.query('SELECT * FROM users'),
+        commands: db.getAllCommands(),
+        settings: {
+          general: db.getSetting('general_settings', {}),
+          tts: db.getSetting('tts_settings', {}),
+          currency: db.getSetting('currency_settings', {}),
+          minigames: db.getSetting('minigames_settings', {}),
+        },
+        exportedAt: new Date().toISOString(),
+      };
+      return { success: true, data };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('data:import', (_, data: any) => {
+    try {
+      const db = getDatabase();
+      if (data.settings) {
+        if (data.settings.general) db.setSetting('general_settings', data.settings.general);
+        if (data.settings.tts) db.setSetting('tts_settings', data.settings.tts);
+        if (data.settings.currency) db.setSetting('currency_settings', data.settings.currency);
+      }
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('data:backup', async () => {
+    try {
+      const db = getDatabase();
+      db.save();
+      return { success: true, message: 'Backup created successfully' };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('data:reset', async () => {
+    // This is dangerous - only reset settings, not user data
+    try {
+      const db = getDatabase();
+      db.setSetting('general_settings', {});
+      db.setSetting('tts_settings', {});
+      db.setSetting('currency_settings', {});
+      db.setSetting('minigames_settings', {});
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
   });
 
   // ==========================================

@@ -253,6 +253,15 @@ contextBridge.exposeInMainWorld('api', {
     export: () => ipcRenderer.invoke('analytics:export'),
   },
 
+  // Data Management
+  data: {
+    getStats: () => ipcRenderer.invoke('data:getStats'),
+    export: () => ipcRenderer.invoke('data:export'),
+    import: (data: any) => ipcRenderer.invoke('data:import', data),
+    backup: () => ipcRenderer.invoke('data:backup'),
+    reset: () => ipcRenderer.invoke('data:reset'),
+  },
+
   // Users (extended)
   users: {
     getAll: () => ipcRenderer.invoke('viewers:getAll'),

@@ -1370,6 +1370,232 @@
     .gap-3 { gap: 15px; }
 
     .hidden { display: none !important; }
+
+    /* Notifications */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      border-left: 4px solid var(--accent);
+      box-shadow: var(--shadow);
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+      z-index: 10000;
+      max-width: 350px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification-success { border-left-color: var(--green); }
+    .notification-error { border-left-color: var(--red); }
+    .notification-info { border-left-color: var(--blue); }
+
+    /* Stream Alerts */
+    .stream-alert {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
+      padding: 20px 40px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 10px 40px rgba(145, 71, 255, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 10001;
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .stream-alert.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .alert-icon {
+      font-size: 32px;
+    }
+
+    .alert-text {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    /* Data Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--bg-tertiary);
+    }
+
+    .data-table tr:hover td {
+      background: var(--bg-hover);
+    }
+
+    .data-table code {
+      background: var(--bg-tertiary);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      color: var(--accent);
+    }
+
+    /* Toggle wrapper */
+    .toggle-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toggle-wrapper:last-child {
+      border-bottom: none;
+    }
+
+    .toggle-info {
+      flex: 1;
+    }
+
+    .toggle-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .toggle-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Small toggle */
+    .toggle-sm {
+      transform: scale(0.8);
+    }
+
+    /* Button groups */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+    }
+
+    .badge-success { background: var(--green); color: white; }
+    .badge-danger { background: var(--red); color: white; }
+    .badge-primary { background: var(--purple); color: white; }
+
+    /* Leaderboard */
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .leaderboard-item:last-child {
+      border-bottom: none;
+    }
+
+    .leaderboard-rank {
+      width: 40px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .leaderboard-name {
+      flex: 1;
+    }
+
+    .leaderboard-points {
+      font-weight: 600;
+      color: var(--yellow);
+    }
+
+    /* Chat badges improved */
+    .chat-badge {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-badge svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .chat-badge.broadcaster {
+      background: var(--red);
+      color: white;
+    }
+
+    .chat-badge.mod {
+      background: var(--green);
+      color: white;
+    }
+
+    .chat-badge.vip {
+      background: var(--pink);
+      color: white;
+    }
+
+    .chat-badge.sub {
+      background: var(--purple);
+      color: white;
+    }
+
+    /* Chat link */
+    .chat-link {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    .chat-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Text danger */
+    .text-danger {
+      color: var(--red) !important;
+    }
+
+    /* HR styling */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
   </style>
   <link rel="stylesheet" href="css/enhancements.css">
 </head>
@@ -1793,61 +2019,32 @@
         <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">Point Settings</div>
+              <div class="card-title">Punkte Einstellungen</div>
             </div>
             <div class="card-body">
               <div class="form-group">
-                <label class="form-label">Points Name</label>
-                <input type="text" class="form-input" value="Points" id="pointsName">
+                <label class="form-label">Währungsname</label>
+                <input type="text" class="form-input" value="Punkte" id="loyaltyName">
               </div>
-              <h4 style="margin: 20px 0 15px; color: var(--accent);">Stream Online</h4>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Points per Interval</label>
-                  <input type="number" class="form-input" value="10" id="pointsOnline">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Interval (minutes)</label>
-                  <input type="number" class="form-input" value="5" id="intervalOnline">
-                </div>
+              <div class="form-group">
+                <label class="form-label">Punkte pro Nachricht</label>
+                <input type="number" class="form-input" value="1" id="loyaltyPerMessage">
               </div>
-              <h4 style="margin: 20px 0 15px; color: var(--text-muted);">Stream Offline</h4>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Points per Interval</label>
-                  <input type="number" class="form-input" value="1" id="pointsOffline">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Interval (minutes)</label>
-                  <input type="number" class="form-input" value="10" id="intervalOffline">
-                </div>
+              <div class="form-group">
+                <label class="form-label">Punkte pro Minute (Watch Time)</label>
+                <input type="number" class="form-input" value="1" id="loyaltyPerMinute">
               </div>
+              <button class="btn btn-primary mt-3" onclick="saveLoyaltySettings()">Speichern</button>
             </div>
           </div>
           <div class="card">
             <div class="card-header">
-              <div class="card-title">Multipliers</div>
+              <div class="card-title">Top 10 Leaderboard</div>
             </div>
-            <div class="card-body">
-              <div class="form-row mb-3">
-                <div><strong>User Type</strong></div>
-                <div><strong>Multiplier</strong></div>
-              </div>
-              <div class="form-row mb-2">
-                <div>Regular User</div>
-                <input type="number" class="form-input" value="1.0" step="0.1" style="width:80px;">
-              </div>
-              <div class="form-row mb-2">
-                <div>Subscriber</div>
-                <input type="number" class="form-input" value="1.5" step="0.1" style="width:80px;">
-              </div>
-              <div class="form-row mb-2">
-                <div>VIP</div>
-                <input type="number" class="form-input" value="1.3" step="0.1" style="width:80px;">
-              </div>
-              <div class="form-row mb-2">
-                <div>Moderator</div>
-                <input type="number" class="form-input" value="1.2" step="0.1" style="width:80px;">
+            <div class="card-body" id="loyaltyLeaderboard">
+              <div class="empty-state">
+                <div class="empty-state-title">Noch keine Daten</div>
+                <div class="empty-state-desc">Das Leaderboard wird angezeigt sobald Benutzer Punkte haben</div>
               </div>
             </div>
           </div>
@@ -1860,17 +2057,6 @@
           <h1 class="page-title">Giveaway</h1>
         </div>
         <div style="padding:20px;">
-          <div class="card">
-            <div class="card-body" style="text-align:center; padding:60px;">
-              <svg viewBox="0 0 24 24" fill="currentColor" style="width:80px; height:80px; color:var(--accent); margin-bottom:20px;"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/></svg>
-              <h2 style="margin-bottom:10px;">Start a Giveaway</h2>
-              <p style="color:var(--text-muted); margin-bottom:30px;">Create a giveaway for your viewers</p>
-              <button class="btn btn-primary" style="padding:15px 40px; font-size:16px;">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                New Giveaway
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1918,18 +2104,34 @@
         </div>
       </div>
 
-      <!-- Other pages (timers, moderation, alerts) - simplified placeholders -->
+      <!-- Timers Page -->
       <div class="page-content" id="page-timers">
-        <div class="page-header"><h1 class="page-title">Timers</h1></div>
-        <div style="padding:20px;"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-state-title">Coming Soon</div></div></div></div></div>
+        <div class="page-header">
+          <h1 class="page-title">Timers</h1>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="showAddTimerModal()">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              Neuer Timer
+            </button>
+          </div>
+        </div>
+        <div style="padding:20px;"></div>
       </div>
+
+      <!-- Moderation Page -->
       <div class="page-content" id="page-moderation">
-        <div class="page-header"><h1 class="page-title">Moderation</h1></div>
-        <div style="padding:20px;"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-state-title">Coming Soon</div></div></div></div></div>
+        <div class="page-header">
+          <h1 class="page-title">Moderation</h1>
+        </div>
+        <div style="padding:20px;"></div>
       </div>
+
+      <!-- Alerts Page -->
       <div class="page-content" id="page-alerts">
-        <div class="page-header"><h1 class="page-title">Alerts</h1></div>
-        <div style="padding:20px;"><div class="card"><div class="card-body"><div class="empty-state"><div class="empty-state-title">Coming Soon</div></div></div></div></div>
+        <div class="page-header">
+          <h1 class="page-title">Alerts</h1>
+        </div>
+        <div style="padding:20px;"></div>
       </div>
     </main>
   </div>
@@ -1986,7 +2188,6 @@
       }
     }, 400);
 
-    // Hide splash after 2 seconds
     setTimeout(() => {
       clearInterval(splashInterval);
       const splash = document.getElementById('splashScreen');
@@ -1994,6 +2195,7 @@
         splash.classList.add('fade-out');
         setTimeout(() => splash.remove(), 500);
       }
+      initApp();
     }, 2000);
 
     // ========================================
@@ -2001,9 +2203,56 @@
     // ========================================
     let isConnected = false;
     let chatMessages = [];
+    let onlineUsers = new Set();
+    let allUsers = [];
+    let commands = [];
+    let timers = [];
+    let ttsEnabled = true;
+    let ttsReadAll = false;
+    let giveawayActive = false;
+    let giveawayEntries = [];
     const maxMessages = 200;
 
-    // Navigation
+    // ========================================
+    // INITIALIZATION
+    // ========================================
+    async function initApp() {
+      // Load saved credentials
+      if (window.api) {
+        const creds = await window.api.settings?.getCredentials();
+        if (creds) {
+          document.getElementById('settingBotUsername').value = creds.username || '';
+          document.getElementById('settingChannel').value = creds.channel || '';
+          document.getElementById('settingClientId').value = creds.clientId || '';
+        }
+
+        // Load TTS settings
+        const ttsSettings = await window.api.tts?.getSettings();
+        if (ttsSettings) {
+          ttsEnabled = ttsSettings.enabled !== false;
+          ttsReadAll = ttsSettings.readAll || false;
+          document.getElementById('ttsEnabled').checked = ttsEnabled;
+          document.getElementById('ttsReadAll').checked = ttsReadAll;
+          document.getElementById('ttsVolume').value = ttsSettings.volume || 80;
+          document.getElementById('ttsLanguage').value = ttsSettings.voice || 'de';
+        }
+
+        // Check if bot status
+        const status = await window.api.bot?.getStatus();
+        if (status?.connected) {
+          setConnected({ username: status.username, channel: status.channel });
+        }
+
+        // Load initial data
+        await loadCommands();
+        await loadTimers();
+      }
+      setupEventListeners();
+    }
+
+    // ========================================
+    // NAVIGATION
+    // ========================================
     document.querySelectorAll('.nav-item[data-page]').forEach(item => {
       item.addEventListener('click', () => navigateTo(item.dataset.page));
     });
@@ -2012,7 +2261,7 @@
       tab.addEventListener('click', () => {
         document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        filterUsers();
+        filterUsers(tab.textContent.trim());
       });
     });
 
@@ -2021,9 +2270,20 @@
       document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
       document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
       document.getElementById(`page-${page}`)?.classList.add('active');
+
+      // Refresh page data
+      if (page === 'commands') loadCommands();
+      if (page === 'timers') loadTimers();
+      if (page === 'users') refreshUsers();
+      if (page === 'loyalty') loadLoyalty();
+      if (page === 'moderation') loadModeration();
+      if (page === 'alerts') loadAlerts();
+      if (page === 'giveaway') loadGiveaway();
     }
 
-    // Connection
+    // ========================================
+    // CONNECTION
+    // ========================================
     async function toggleConnection() {
       if (isConnected) {
         await window.api?.bot?.disconnect();
@@ -2039,16 +2299,18 @@
 
         if (!credentials.username || !credentials.oauthToken || !credentials.channel) {
           navigateTo('settings');
+          showNotification('Bitte zuerst die Twitch-Daten eingeben!', 'error');
           return;
         }
 
-        document.getElementById('statusText').textContent = 'Connecting...';
+        document.getElementById('statusText').textContent = 'Verbinde...';
         const result = await window.api?.bot?.connect(credentials);
 
         if (result?.success) {
           setConnected(credentials);
+          showNotification('Erfolgreich verbunden!', 'success');
         } else {
-          alert('Connection failed: ' + (result?.error || 'Unknown error'));
+          showNotification('Verbindung fehlgeschlagen: ' + (result?.error || 'Unbekannter Fehler'), 'error');
           setDisconnected();
         }
       }
@@ -2068,87 +2330,760 @@
       isConnected = false;
       document.getElementById('statusIndicator').classList.remove('online');
       document.getElementById('statusText').textContent = 'Offline';
-      document.getElementById('userName').textContent = 'Not Connected';
+      document.getElementById('userName').textContent = 'Nicht verbunden';
       document.getElementById('userChannel').textContent = '-';
       document.getElementById('userAvatar').textContent = '?';
     }
 
-    // Event Listeners
-    if (window.api) {
+    // ========================================
+    // EVENT LISTENERS
+    // ========================================
+    function setupEventListeners() {
+      if (!window.api) return;
+
       window.api.on('chat:message', (msg) => {
         chatMessages.push(msg);
         if (chatMessages.length > maxMessages) chatMessages.shift();
+
+        // Track user
+        if (msg.user?.username) {
+          onlineUsers.add(msg.user.username);
+          document.getElementById('onlineUsers').textContent = onlineUsers.size;
+        }
+
         renderChat();
-        document.getElementById('statMessages').textContent =
-          parseInt(document.getElementById('statMessages').textContent || 0) + 1;
+
+        // Update stats
+        const statEl = document.getElementById('statMessages');
+        if (statEl) statEl.textContent = parseInt(statEl.textContent || 0) + 1;
+
+        // TTS - read all messages if enabled
+        if (ttsEnabled && ttsReadAll && msg.user && msg.message) {
+          speakTTS(msg.user.displayName || msg.user.username, msg.message);
+        }
       });
 
-      window.api.on('bot:connected', () => setConnected());
-      window.api.on('bot:disconnected', () => setDisconnected());
+      window.api.on('bot:connected', (data) => {
+        setConnected(data);
+      });
+
+      window.api.on('bot:disconnected', () => {
+        setDisconnected();
+      });
+
+      window.api.on('bot:error', (data) => {
+        showNotification(data.message, 'error');
+      });
+
       window.api.on('viewers:updated', (data) => {
         document.getElementById('statViewers').textContent = data.count || 0;
         document.getElementById('onlineUsers').textContent = data.count || 0;
       });
+
       window.api.on('songs:added', refreshSongQueue);
       window.api.on('songs:started', (song) => {
         showPlayer(song);
         refreshSongQueue();
       });
+
       window.api.on('tts:play', async (data) => {
-        try {
-          const audio = document.getElementById('ttsAudio');
-          audio.src = data.audioUrl;
-          audio.volume = document.getElementById('ttsVolume').value / 100;
-          await audio.play();
-          audio.onended = () => window.api?.tts?.playbackComplete();
-        } catch(e) { console.error(e); }
+        speakTTS(data.username, data.message);
+      });
+
+      window.api.on('alert:show', (data) => {
+        showAlert(data.type, data.data);
+      });
+
+      window.api.on('giveaway:entry', (data) => {
+        giveawayEntries.push(data);
+        renderGiveawayEntries();
       });
     }
 
-    // Render Functions
+    // ========================================
+    // TTS (Text-to-Speech) with Web Speech API
+    // ========================================
+    let ttsQueue = [];
+    let ttsSpeaking = false;
+
+    function speakTTS(username, message) {
+      if (!ttsEnabled) return;
+      ttsQueue.push({ username, message });
+      renderTTSQueue();
+      processNextTTS();
+    }
+
+    function processNextTTS() {
+      if (ttsSpeaking || ttsQueue.length === 0) return;
+
+      const item = ttsQueue[0];
+      ttsSpeaking = true;
+
+      const utterance = new SpeechSynthesisUtterance();
+      const lang = document.getElementById('ttsLanguage').value;
+      utterance.lang = lang === 'de' ? 'de-DE' : lang === 'en' ? 'en-US' : lang === 'es' ? 'es-ES' : 'fr-FR';
+      utterance.volume = document.getElementById('ttsVolume').value / 100;
+      utterance.text = `${item.username} sagt: ${item.message}`;
+
+      utterance.onend = () => {
+        ttsQueue.shift();
+        ttsSpeaking = false;
+        renderTTSQueue();
+        processNextTTS();
+      };
+
+      utterance.onerror = () => {
+        ttsQueue.shift();
+        ttsSpeaking = false;
+        renderTTSQueue();
+        processNextTTS();
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function renderTTSQueue() {
+      const container = document.getElementById('ttsQueueFull');
+      if (!container) return;
+
+      if (ttsQueue.length === 0) {
+        container.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+          <div class="empty-state-title">Keine TTS Nachrichten</div>
+          <div class="empty-state-desc">Nachrichten von !tts erscheinen hier</div>
+        </div>`;
+        return;
+      }
+
+      container.innerHTML = ttsQueue.map((item, i) => `
+        <div class="queue-item ${i === 0 && ttsSpeaking ? 'playing' : ''}">
+          <div class="queue-number">${i === 0 && ttsSpeaking ? '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg>' : i + 1}</div>
+          <div class="queue-info">
+            <div class="queue-title">${escapeHtml(item.username)}</div>
+            <div class="queue-meta">${escapeHtml(item.message.substring(0, 50))}${item.message.length > 50 ? '...' : ''}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function toggleTTS() {
+      ttsEnabled = document.getElementById('ttsEnabled').checked;
+      await window.api?.tts?.updateSettings({ enabled: ttsEnabled });
+    }
+
+    async function skipTTS() {
+      speechSynthesis.cancel();
+      if (ttsQueue.length > 0) {
+        ttsQueue.shift();
+        ttsSpeaking = false;
+        renderTTSQueue();
+        processNextTTS();
+      }
+    }
+
+    async function clearTTSQueue() {
+      speechSynthesis.cancel();
+      ttsQueue = [];
+      ttsSpeaking = false;
+      renderTTSQueue();
+    }
+
+    // TTS Read All toggle
+    document.getElementById('ttsReadAll')?.addEventListener('change', async (e) => {
+      ttsReadAll = e.target.checked;
+      await window.api?.tts?.updateSettings({ readAll: ttsReadAll });
+    });
+
+    // ========================================
+    // CHAT RENDERING
+    // ========================================
     function renderChat() {
       const dashChat = document.getElementById('dashboardChat');
       const fullChat = document.getElementById('fullChat');
 
       if (chatMessages.length === 0) {
-        const empty = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg><div class="empty-state-title">No Messages Yet</div></div>`;
-        dashChat.innerHTML = empty;
-        fullChat.innerHTML = empty;
+        const empty = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+          <div class="empty-state-title">Noch keine Nachrichten</div>
+          <div class="empty-state-desc">Nachrichten erscheinen hier sobald du verbunden bist</div>
+        </div>`;
+        if (dashChat) dashChat.innerHTML = empty;
+        if (fullChat) fullChat.innerHTML = empty;
         return;
       }
 
       const html = chatMessages.slice(-50).map(msg => {
+        const user = msg.user || {};
         const badges = [];
-        if (msg.isMod) badges.push('<div class="chat-badge mod"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>');
-        if (msg.isSub) badges.push('<div class="chat-badge sub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>');
-        if (msg.isVip) badges.push('<div class="chat-badge vip"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>');
+
+        if (user.isBroadcaster) badges.push('<div class="chat-badge broadcaster" title="Broadcaster"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>');
+        if (user.isMod) badges.push('<div class="chat-badge mod" title="Moderator"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>');
+        if (user.isVip) badges.push('<div class="chat-badge vip" title="VIP"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>');
+        if (user.isSub) badges.push('<div class="chat-badge sub" title="Subscriber"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>');
+
+        const displayName = user.displayName || user.username || 'Anonymous';
+        const color = user.color || getRandomColor(displayName);
+        const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}) : '';
 
         return `<div class="chat-message">
-          <div class="chat-avatar" style="background:${msg.color || 'var(--accent)'}">${(msg.displayName || '?')[0].toUpperCase()}</div>
+          <div class="chat-avatar" style="background:${color}">${displayName[0].toUpperCase()}</div>
           <div class="chat-content">
             <div class="chat-header">
               <div class="chat-badges">${badges.join('')}</div>
-              <span class="chat-username" style="color:${msg.color || 'var(--accent)'}">${escapeHtml(msg.displayName)}</span>
-              <span class="chat-time">${new Date().toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'})}</span>
+              <span class="chat-username" style="color:${color}">${escapeHtml(displayName)}</span>
+              <span class="chat-time">${time}</span>
             </div>
-            <div class="chat-text">${escapeHtml(msg.message)}</div>
+            <div class="chat-text">${formatMessage(msg.message || '', msg.emotes)}</div>
           </div>
         </div>`;
       }).join('');
 
-      dashChat.innerHTML = html;
-      fullChat.innerHTML = html;
-      dashChat.scrollTop = dashChat.scrollHeight;
-      fullChat.scrollTop = fullChat.scrollHeight;
+      if (dashChat) {
+        dashChat.innerHTML = html;
+        dashChat.scrollTop = dashChat.scrollHeight;
+      }
+      if (fullChat) {
+        fullChat.innerHTML = html;
+        fullChat.scrollTop = fullChat.scrollHeight;
+      }
+    }
+
+    function formatMessage(text, emotes) {
+      let formatted = escapeHtml(text);
+      // Add link detection
+      formatted = formatted.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" class="chat-link" onclick="openExternal(\'$1\'); return false;">$1</a>');
+      return formatted;
+    }
+
+    function getRandomColor(str) {
+      const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'];
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      return colors[Math.abs(hash) % colors.length];
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      if (input.value.trim() && window.api) {
+        window.api.messages?.send(input.value.trim());
+        input.value = '';
+      }
+    }
+
+    function handleChatKeypress(e) {
+      if (e.key === 'Enter') sendChatMessage();
+    }
+
+    function clearChat() {
+      chatMessages = [];
+      renderChat();
+    }
+
+    // ========================================
+    // COMMANDS
+    // ========================================
+    async function loadCommands() {
+      if (!window.api) return;
+      commands = await window.api.commands?.getAll() || [];
+      renderCommands();
+      document.getElementById('statCommands').textContent = commands.length;
+    }
+
+    function renderCommands() {
+      const container = document.querySelector('#page-commands .card-body');
+      if (!container) return;
+
+      if (commands.length === 0) {
+        container.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+          <div class="empty-state-title">Keine Befehle</div>
+          <div class="empty-state-desc">Erstelle deinen ersten Befehl</div>
+          <button class="btn btn-primary mt-3" onclick="showAddCommandModal()">Befehl erstellen</button>
+        </div>`;
+        return;
+      }
+
+      container.innerHTML = `<table class="data-table">
+        <thead><tr><th>Befehl</th><th>Antwort</th><th>Cooldown</th><th>Aktiv</th><th>Aktionen</th></tr></thead>
+        <tbody>${commands.map(cmd => `
+          <tr>
+            <td><code>!${escapeHtml(cmd.name)}</code></td>
+            <td>${escapeHtml((cmd.response || '').substring(0, 50))}${(cmd.response || '').length > 50 ? '...' : ''}</td>
+            <td>${cmd.cooldown || 0}s</td>
+            <td><label class="toggle toggle-sm"><input type="checkbox" ${cmd.enabled ? 'checked' : ''} onchange="toggleCommand('${cmd.name}')"><span class="toggle-slider"></span></label></td>
+            <td>
+              <button class="btn btn-ghost btn-sm" onclick="editCommand('${cmd.name}')">Bearbeiten</button>
+              <button class="btn btn-ghost btn-sm text-danger" onclick="deleteCommand('${cmd.name}')">Löschen</button>
+            </td>
+          </tr>
+        `).join('')}</tbody>
+      </table>`;
+    }
+
+    async function toggleCommand(name) {
+      await window.api?.commands?.toggle(name);
+      await loadCommands();
+    }
+
+    async function deleteCommand(name) {
+      if (confirm(`Befehl "!${name}" wirklich löschen?`)) {
+        await window.api?.commands?.delete(name);
+        await loadCommands();
+        showNotification('Befehl gelöscht', 'success');
+      }
+    }
+
+    function showAddCommandModal() {
+      const name = prompt('Befehlsname (ohne !):');
+      if (!name) return;
+      const response = prompt('Antwort:');
+      if (!response) return;
+
+      window.api?.commands?.add(name, response, { cooldown: 5 }).then(() => {
+        loadCommands();
+        showNotification('Befehl erstellt!', 'success');
+      });
+    }
+
+    function editCommand(name) {
+      const cmd = commands.find(c => c.name === name);
+      if (!cmd) return;
+
+      const newResponse = prompt('Neue Antwort:', cmd.response);
+      if (newResponse === null) return;
+
+      window.api?.commands?.update(name, { response: newResponse }).then(() => {
+        loadCommands();
+        showNotification('Befehl aktualisiert!', 'success');
+      });
+    }
+
+    // ========================================
+    // TIMERS
+    // ========================================
+    async function loadTimers() {
+      if (!window.api) return;
+      timers = await window.api.timers?.getAll() || [];
+      renderTimers();
+    }
+
+    function renderTimers() {
+      const container = document.querySelector('#page-timers > div');
+      if (!container) return;
+
+      if (timers.length === 0) {
+        container.innerHTML = `<div class="card"><div class="card-body">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            <div class="empty-state-title">Keine Timer</div>
+            <div class="empty-state-desc">Timer senden automatisch Nachrichten in den Chat</div>
+            <button class="btn btn-primary mt-3" onclick="showAddTimerModal()">Timer erstellen</button>
+          </div>
+        </div></div>`;
+        return;
+      }
+
+      container.innerHTML = `<div class="card"><div class="card-header">
+        <div class="card-title">Timer</div>
+        <button class="btn btn-primary btn-sm" onclick="showAddTimerModal()">+ Neuer Timer</button>
+      </div><div class="card-body">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Nachrichten</th><th>Intervall</th><th>Aktiv</th><th>Aktionen</th></tr></thead>
+          <tbody>${timers.map(t => `
+            <tr>
+              <td><strong>${escapeHtml(t.name)}</strong></td>
+              <td>${Array.isArray(t.messages) ? t.messages.length : 1} Nachricht(en)</td>
+              <td>${t.interval_minutes || t.intervalMinutes || 5} Min</td>
+              <td><label class="toggle toggle-sm"><input type="checkbox" ${t.enabled ? 'checked' : ''} onchange="toggleTimer('${t.id}')"><span class="toggle-slider"></span></label></td>
+              <td>
+                <button class="btn btn-ghost btn-sm text-danger" onclick="deleteTimer('${t.id}')">Löschen</button>
+              </td>
+            </tr>
+          `).join('')}</tbody>
+        </table>
+      </div></div>`;
+    }
+
+    function showAddTimerModal() {
+      const name = prompt('Timer Name:');
+      if (!name) return;
+      const message = prompt('Nachricht:');
+      if (!message) return;
+      const interval = parseInt(prompt('Intervall (Minuten):', '5')) || 5;
+
+      window.api?.timers?.add(name, [message], interval).then(() => {
+        loadTimers();
+        showNotification('Timer erstellt!', 'success');
+      });
+    }
+
+    async function toggleTimer(id) {
+      await window.api?.timers?.toggle(id);
+      await loadTimers();
+    }
+
+    async function deleteTimer(id) {
+      if (confirm('Timer wirklich löschen?')) {
+        await window.api?.timers?.delete(id);
+        await loadTimers();
+        showNotification('Timer gelöscht', 'success');
+      }
+    }
+
+    // ========================================
+    // USERS
+    // ========================================
+    async function refreshUsers() {
+      if (!window.api) return;
+
+      const online = await window.api.viewers?.getOnline();
+      if (online) {
+        onlineUsers = new Set(online.users || []);
+        document.getElementById('onlineUsers').textContent = onlineUsers.size;
+      }
+
+      allUsers = await window.api.viewers?.getAll() || [];
+      document.getElementById('totalUsers').textContent = allUsers.length;
+      renderUsers(allUsers);
+    }
+
+    function renderUsers(users) {
+      const tbody = document.getElementById('usersTableBody');
+      if (!tbody) return;
+
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted" style="padding:40px;">
+          Noch keine Benutzer - Benutzer erscheinen sobald sie im Chat schreiben
+        </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = users.slice(0, 100).map(u => `
+        <tr>
+          <td>
+            <div class="user-row-name">
+              <div class="user-row-avatar" style="background:${getRandomColor(u.username)}">${(u.display_name || u.username || '?')[0].toUpperCase()}</div>
+              <div class="user-row-info">
+                <div class="user-row-displayname">${escapeHtml(u.display_name || u.username)}</div>
+                <div class="user-row-username">@${escapeHtml(u.username)}</div>
+              </div>
+            </div>
+          </td>
+          <td><strong class="text-accent">${u.points || 0}</strong></td>
+          <td><span class="rank-badge">${u.is_moderator ? 'Mod' : u.is_vip ? 'VIP' : u.is_subscriber ? 'Sub' : 'User'}</span></td>
+          <td>${Math.floor((u.watch_time || 0) / 60)}h ${(u.watch_time || 0) % 60}m</td>
+          <td class="text-muted">${u.last_seen ? new Date(u.last_seen).toLocaleDateString('de-DE') : '-'}</td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="editUserPoints('${u.username}', ${u.points || 0})">Punkte</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterUsers(filter) {
+      let filtered = allUsers;
+      if (filter === 'VIPs') filtered = allUsers.filter(u => u.is_vip);
+      else if (filter === 'Subs') filtered = allUsers.filter(u => u.is_subscriber);
+      else if (filter === 'Mods') filtered = allUsers.filter(u => u.is_moderator);
+      renderUsers(filtered);
+    }
+
+    async function editUserPoints(username, currentPoints) {
+      const newPoints = prompt(`Punkte für ${username}:`, currentPoints);
+      if (newPoints === null) return;
+      await window.api?.viewers?.updatePoints(username, parseInt(newPoints) || 0);
+      await refreshUsers();
+      showNotification('Punkte aktualisiert!', 'success');
+    }
+
+    // ========================================
+    // GIVEAWAY
+    // ========================================
+    async function loadGiveaway() {
+      if (!window.api) return;
+      const status = await window.api.giveaway?.getStatus();
+      giveawayActive = status?.active || false;
+      giveawayEntries = status?.entries || [];
+      renderGiveaway();
+    }
+
+    function renderGiveaway() {
+      const container = document.querySelector('#page-giveaway > div');
+      if (!container) return;
+
+      container.innerHTML = `<div class="card"><div class="card-header">
+        <div class="card-title">Giveaway ${giveawayActive ? '<span class="badge badge-success">Aktiv</span>' : ''}</div>
+      </div><div class="card-body">
+        ${giveawayActive ? `
+          <p><strong>Teilnehmer:</strong> ${giveawayEntries.length}</p>
+          <div class="btn-group mt-3">
+            <button class="btn btn-primary" onclick="drawGiveaway()">Gewinner ziehen</button>
+            <button class="btn btn-danger" onclick="endGiveaway()">Beenden</button>
+          </div>
+          <div class="mt-4" id="giveawayEntriesList">
+            ${giveawayEntries.map(e => `<span class="badge">${escapeHtml(e)}</span>`).join(' ')}
+          </div>
+        ` : `
+          <div class="form-group">
+            <label class="form-label">Preis</label>
+            <input type="text" class="form-input" id="giveawayPrize" placeholder="z.B. 100 Punkte">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dauer (Minuten, optional)</label>
+            <input type="number" class="form-input" id="giveawayDuration" placeholder="5">
+          </div>
+          <button class="btn btn-primary mt-3" onclick="startGiveaway()">Giveaway starten</button>
+        `}
+      </div></div>`;
+    }
+
+    function renderGiveawayEntries() {
+      const el = document.getElementById('giveawayEntriesList');
+      if (el) el.innerHTML = giveawayEntries.map(e => `<span class="badge">${escapeHtml(e)}</span>`).join(' ');
+    }
+
+    async function startGiveaway() {
+      const prize = document.getElementById('giveawayPrize').value;
+      const duration = parseInt(document.getElementById('giveawayDuration').value) || undefined;
+      await window.api?.giveaway?.start(prize, duration);
+      giveawayActive = true;
+      giveawayEntries = [];
+      renderGiveaway();
+      showNotification('Giveaway gestartet! Benutzer können mit !join teilnehmen', 'success');
+    }
+
+    async function endGiveaway() {
+      await window.api?.giveaway?.end();
+      giveawayActive = false;
+      renderGiveaway();
+      showNotification('Giveaway beendet', 'info');
+    }
+
+    async function drawGiveaway() {
+      const result = await window.api?.giveaway?.draw();
+      if (result?.winner) {
+        showNotification(`Gewinner: ${result.winner}!`, 'success');
+      } else {
+        showNotification('Keine Teilnehmer!', 'error');
+      }
+    }
+
+    // ========================================
+    // LOYALTY POINTS
+    // ========================================
+    async function loadLoyalty() {
+      if (!window.api) return;
+      const settings = await window.api.loyalty?.getSettings();
+      const leaderboard = await window.api.loyalty?.getLeaderboard(10);
+      renderLoyalty(settings, leaderboard);
+    }
+
+    function renderLoyalty(settings, leaderboard) {
+      const container = document.querySelector('#page-loyalty > div');
+      if (!container) return;
+
+      // Find existing elements or recreate
+      const settingsCard = container.querySelector('.card:first-child .card-body');
+      if (settingsCard) {
+        const nameInput = settingsCard.querySelector('#loyaltyName');
+        const msgInput = settingsCard.querySelector('#loyaltyPerMessage');
+        const minInput = settingsCard.querySelector('#loyaltyPerMinute');
+        if (nameInput) nameInput.value = settings?.currencyName || 'Punkte';
+        if (msgInput) msgInput.value = settings?.pointsPerMessage || 1;
+        if (minInput) minInput.value = settings?.pointsPerMinute || 1;
+      }
+
+      const leaderboardContainer = container.querySelector('#loyaltyLeaderboard');
+      if (leaderboardContainer && leaderboard) {
+        leaderboardContainer.innerHTML = leaderboard.map((u, i) => `
+          <div class="leaderboard-item">
+            <span class="leaderboard-rank">#${i + 1}</span>
+            <span class="leaderboard-name">${escapeHtml(u.display_name || u.username)}</span>
+            <span class="leaderboard-points">${u.points || 0}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    async function saveLoyaltySettings() {
+      const settings = {
+        currencyName: document.getElementById('loyaltyName')?.value || 'Punkte',
+        pointsPerMessage: parseInt(document.getElementById('loyaltyPerMessage')?.value) || 1,
+        pointsPerMinute: parseInt(document.getElementById('loyaltyPerMinute')?.value) || 1,
+      };
+      await window.api?.loyalty?.updateSettings(settings);
+      showNotification('Einstellungen gespeichert!', 'success');
+    }
+
+    // ========================================
+    // MODERATION
+    // ========================================
+    async function loadModeration() {
+      if (!window.api) return;
+      const settings = await window.api.moderation?.getSettings();
+      const blacklist = await window.api.moderation?.getBlacklist();
+      renderModeration(settings, blacklist);
+    }
+
+    function renderModeration(settings, blacklist) {
+      const container = document.querySelector('#page-moderation > div');
+      if (!container) return;
+
+      container.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="card"><div class="card-header"><div class="card-title">Auto-Moderation</div></div>
+        <div class="card-body">
+          <div class="toggle-wrapper">
+            <div class="toggle-info"><div class="toggle-title">Caps Lock Filter</div><div class="toggle-desc">Nachrichten mit zu vielen Großbuchstaben filtern</div></div>
+            <label class="toggle"><input type="checkbox" id="modCaps" ${settings?.capsLock ? 'checked' : ''}><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-wrapper">
+            <div class="toggle-info"><div class="toggle-title">Link Filter</div><div class="toggle-desc">Links automatisch löschen</div></div>
+            <label class="toggle"><input type="checkbox" id="modLinks" ${settings?.links ? 'checked' : ''}><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-wrapper">
+            <div class="toggle-info"><div class="toggle-title">Spam Filter</div><div class="toggle-desc">Wiederholte Nachrichten filtern</div></div>
+            <label class="toggle"><input type="checkbox" id="modSpam" ${settings?.spam ? 'checked' : ''}><span class="toggle-slider"></span></label>
+          </div>
+          <button class="btn btn-primary mt-3" onclick="saveModerationSettings()">Speichern</button>
+        </div></div>
+
+        <div class="card"><div class="card-header"><div class="card-title">Blacklist</div></div>
+        <div class="card-body">
+          <div class="form-group">
+            <div style="display:flex; gap:10px;">
+              <input type="text" class="form-input" id="blacklistWord" placeholder="Wort hinzufügen...">
+              <button class="btn btn-primary" onclick="addBlacklistWord()">Hinzufügen</button>
+            </div>
+          </div>
+          <div class="mt-3" id="blacklistWords">
+            ${(blacklist || []).map(w => `<span class="badge badge-danger" style="cursor:pointer;" onclick="removeBlacklistWord('${escapeHtml(w.word)}')">${escapeHtml(w.word)} &times;</span>`).join(' ')}
+          </div>
+        </div></div>
+      </div>`;
+    }
+
+    async function saveModerationSettings() {
+      const settings = {
+        capsLock: document.getElementById('modCaps')?.checked,
+        links: document.getElementById('modLinks')?.checked,
+        spam: document.getElementById('modSpam')?.checked,
+      };
+      await window.api?.moderation?.updateSettings(settings);
+      showNotification('Moderations-Einstellungen gespeichert!', 'success');
+    }
+
+    async function addBlacklistWord() {
+      const word = document.getElementById('blacklistWord')?.value?.trim();
+      if (!word) return;
+      await window.api?.moderation?.addBlacklist(word);
+      document.getElementById('blacklistWord').value = '';
+      loadModeration();
+      showNotification('Wort zur Blacklist hinzugefügt', 'success');
+    }
+
+    async function removeBlacklistWord(word) {
+      await window.api?.moderation?.removeBlacklist(word);
+      loadModeration();
+    }
+
+    // ========================================
+    // ALERTS
+    // ========================================
+    async function loadAlerts() {
+      if (!window.api) return;
+      const settings = await window.api.alerts?.getSettings();
+      renderAlerts(settings);
+    }
+
+    function renderAlerts(settings) {
+      const container = document.querySelector('#page-alerts > div');
+      if (!container) return;
+
+      container.innerHTML = `<div class="card"><div class="card-header"><div class="card-title">Alert Einstellungen</div></div>
+      <div class="card-body">
+        <div class="toggle-wrapper">
+          <div class="toggle-info"><div class="toggle-title">Follow Alerts</div><div class="toggle-desc">Benachrichtigung bei neuen Followern</div></div>
+          <label class="toggle"><input type="checkbox" id="alertFollow" ${settings?.followAlert ? 'checked' : ''}><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-wrapper">
+          <div class="toggle-info"><div class="toggle-title">Sub Alerts</div><div class="toggle-desc">Benachrichtigung bei Abonnements</div></div>
+          <label class="toggle"><input type="checkbox" id="alertSub" ${settings?.subAlert ? 'checked' : ''}><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-wrapper">
+          <div class="toggle-info"><div class="toggle-title">Raid Alerts</div><div class="toggle-desc">Benachrichtigung bei Raids</div></div>
+          <label class="toggle"><input type="checkbox" id="alertRaid" ${settings?.raidAlert ? 'checked' : ''}><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-wrapper">
+          <div class="toggle-info"><div class="toggle-title">Cheer/Bits Alerts</div><div class="toggle-desc">Benachrichtigung bei Bits</div></div>
+          <label class="toggle"><input type="checkbox" id="alertCheer" ${settings?.cheerAlert ? 'checked' : ''}><span class="toggle-slider"></span></label>
+        </div>
+        <button class="btn btn-primary mt-3" onclick="saveAlertSettings()">Speichern</button>
+        <hr style="margin:20px 0; border-color:var(--border);">
+        <h4>Test Alerts</h4>
+        <div class="btn-group mt-2">
+          <button class="btn btn-secondary" onclick="testAlert('follow')">Test Follow</button>
+          <button class="btn btn-secondary" onclick="testAlert('subscription')">Test Sub</button>
+          <button class="btn btn-secondary" onclick="testAlert('raid')">Test Raid</button>
+          <button class="btn btn-secondary" onclick="testAlert('cheer')">Test Cheer</button>
+        </div>
+      </div></div>`;
+    }
+
+    async function saveAlertSettings() {
+      const settings = {
+        followAlert: document.getElementById('alertFollow')?.checked,
+        subAlert: document.getElementById('alertSub')?.checked,
+        raidAlert: document.getElementById('alertRaid')?.checked,
+        cheerAlert: document.getElementById('alertCheer')?.checked,
+      };
+      await window.api?.alerts?.updateSettings(settings);
+      showNotification('Alert-Einstellungen gespeichert!', 'success');
+    }
+
+    async function testAlert(type) {
+      await window.api?.alerts?.test(type);
+      showAlert(type, { username: 'TestUser', amount: 100, viewers: 50 });
+    }
+
+    function showAlert(type, data) {
+      const alertEl = document.createElement('div');
+      alertEl.className = 'stream-alert';
+      alertEl.innerHTML = `
+        <div class="alert-icon">${type === 'follow' ? '💜' : type === 'subscription' ? '⭐' : type === 'raid' ? '🎉' : '💎'}</div>
+        <div class="alert-text">
+          <strong>${data.username}</strong>
+          ${type === 'follow' ? 'ist jetzt ein Follower!' :
+            type === 'subscription' ? 'hat abonniert!' :
+            type === 'raid' ? `raidet mit ${data.viewers} Viewern!` :
+            `hat ${data.amount} Bits gegeben!`}
+        </div>
+      `;
+      document.body.appendChild(alertEl);
+      setTimeout(() => alertEl.classList.add('show'), 100);
+      setTimeout(() => {
+        alertEl.classList.remove('show');
+        setTimeout(() => alertEl.remove(), 300);
+      }, 5000);
+    }
+
+    // ========================================
+    // SONG REQUEST
+    // ========================================
+    async function refreshSongQueue() {
+      if (!window.api) return;
+      const data = await window.api.songs?.getQueue();
+      renderSongQueue(data?.queue, data?.current);
+      if (data?.current) showPlayer(data.current);
     }
 
     function renderSongQueue(queue, current) {
       const containers = [document.getElementById('dashboardQueue'), document.getElementById('songQueueFull')];
 
       if (!current && (!queue || queue.length === 0)) {
-        const empty = `<div class="empty-state"><div class="empty-state-title">Queue Empty</div><div class="empty-state-desc">Use !sr to request</div></div>`;
-        containers.forEach(c => c.innerHTML = empty);
-        document.getElementById('queueCount').textContent = '0';
+        const empty = `<div class="empty-state"><div class="empty-state-title">Queue leer</div><div class="empty-state-desc">Benutze !sr um Songs anzufordern</div></div>`;
+        containers.forEach(c => { if (c) c.innerHTML = empty; });
+        const qc = document.getElementById('queueCount');
+        if (qc) qc.textContent = '0';
         return;
       }
 
@@ -2158,7 +3093,7 @@
           <div class="queue-number"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg></div>
           <div class="queue-info">
             <div class="queue-title">${escapeHtml(current.title)}</div>
-            <div class="queue-meta">Requested by ${escapeHtml(current.requestedBy)}</div>
+            <div class="queue-meta">Angefragt von ${escapeHtml(current.requestedBy)}</div>
           </div>
         </div>`;
       }
@@ -2168,23 +3103,28 @@
           <div class="queue-number">${i + 1}</div>
           <div class="queue-info">
             <div class="queue-title">${escapeHtml(song.title)}</div>
-            <div class="queue-meta">Requested by ${escapeHtml(song.requestedBy)}</div>
+            <div class="queue-meta">Angefragt von ${escapeHtml(song.requestedBy)}</div>
           </div>
           <div class="queue-actions">
-            <button class="btn btn-ghost btn-sm btn-icon" onclick="removeSong(${i})"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+            <button class="btn btn-ghost btn-sm btn-icon" onclick="removeSong(${i})">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
           </div>
         </div>`;
       });
 
-      containers.forEach(c => c.innerHTML = html);
-      document.getElementById('queueCount').textContent = (queue?.length || 0).toString();
+      containers.forEach(c => { if (c) c.innerHTML = html; });
+      const qc = document.getElementById('queueCount');
+      if (qc) qc.textContent = (queue?.length || 0).toString();
 
       const badge = document.getElementById('songBadge');
-      if (queue?.length > 0) {
-        badge.textContent = queue.length;
-        badge.style.display = 'block';
-      } else {
-        badge.style.display = 'none';
+      if (badge) {
+        if (queue?.length > 0) {
+          badge.textContent = queue.length;
+          badge.style.display = 'block';
+        } else {
+          badge.style.display = 'none';
+        }
       }
     }
 
@@ -2192,101 +3132,89 @@
       if (song) {
         document.getElementById('playerBar').style.display = 'flex';
         document.getElementById('playerTitle').textContent = song.title;
-        document.getElementById('playerArtist').textContent = 'Requested by ' + song.requestedBy;
+        document.getElementById('playerArtist').textContent = 'Angefragt von ' + song.requestedBy;
       }
     }
 
-    // Actions
+    async function skipSong() { await window.api?.songs?.skip(); refreshSongQueue(); }
+    async function removeSong(i) { await window.api?.songs?.remove(i); refreshSongQueue(); }
+    async function clearSongQueue() { await window.api?.songs?.clear(); refreshSongQueue(); }
+
+    // ========================================
+    // SETTINGS
+    // ========================================
+    async function saveSettings() {
+      const credentials = {
+        username: document.getElementById('settingBotUsername').value,
+        oauthToken: document.getElementById('settingOAuthToken').value,
+        channel: document.getElementById('settingChannel').value,
+        clientId: document.getElementById('settingClientId').value,
+        clientSecret: document.getElementById('settingClientSecret').value,
+      };
+
+      if (!credentials.username || !credentials.channel) {
+        showNotification('Bitte Bot Username und Channel ausfüllen!', 'error');
+        return;
+      }
+
+      const result = await window.api?.settings?.saveCredentials(credentials);
+      if (result?.success) {
+        showNotification('Einstellungen gespeichert!', 'success');
+      } else {
+        showNotification('Fehler beim Speichern: ' + (result?.error || 'Unbekannt'), 'error');
+      }
+    }
+
+    // ========================================
+    // DATA REFRESH
+    // ========================================
     async function refreshData() {
       if (!window.api) return;
       try {
         const stats = await window.api.bot?.getStats();
         if (stats) {
           document.getElementById('statMessages').textContent = stats.messagesReceived || 0;
-          document.getElementById('statCommands').textContent = stats.commandsExecuted || 0;
+          document.getElementById('statCommands').textContent = stats.commands || 0;
           document.getElementById('statSongs').textContent = stats.songsPlayed || 0;
-        }
-        const viewers = await window.api.viewers?.getOnline();
-        if (viewers) {
-          document.getElementById('statViewers').textContent = viewers.count || 0;
-          document.getElementById('onlineUsers').textContent = viewers.count || 0;
+          document.getElementById('statViewers').textContent = stats.onlineUsers || 0;
+          document.getElementById('onlineUsers').textContent = stats.onlineUsers || 0;
         }
         await refreshSongQueue();
-        await refreshUsers();
       } catch(e) { console.error(e); }
     }
 
-    async function refreshSongQueue() {
-      if (!window.api) return;
-      const data = await window.api.songs?.getQueue();
-      renderSongQueue(data?.queue, data?.current);
-      if (data?.current) showPlayer(data.current);
-    }
-
-    async function refreshUsers() {
-      if (!window.api) return;
-      const users = await window.api.viewers?.getAll();
-      document.getElementById('totalUsers').textContent = users?.length || 0;
-
-      if (!users || users.length === 0) return;
-
-      document.getElementById('usersTableBody').innerHTML = users.slice(0, 50).map(u => `
-        <tr>
-          <td>
-            <div class="user-row-name">
-              <div class="user-row-avatar">${(u.displayName || u.username)[0].toUpperCase()}</div>
-              <div class="user-row-info">
-                <div class="user-row-displayname">${escapeHtml(u.displayName || u.username)}</div>
-                <div class="user-row-username">@${escapeHtml(u.username)}</div>
-              </div>
-            </div>
-          </td>
-          <td><strong class="text-accent">${u.points || 0}</strong></td>
-          <td><span class="rank-badge ${u.isModerator ? 'mod' : u.isVip ? 'vip' : ''}">${u.isModerator ? 'Mod' : u.isVip ? 'VIP' : u.isSubscriber ? 'Sub' : 'User'}</span></td>
-          <td>${Math.floor((u.watchTime || 0) / 60)}h ${(u.watchTime || 0) % 60}m</td>
-          <td class="text-muted">${u.lastSeen ? new Date(u.lastSeen).toLocaleDateString('de-DE') : '-'}</td>
-          <td><button class="btn btn-ghost btn-sm">Edit</button></td>
-        </tr>
-      `).join('');
-    }
-
-    async function skipSong() { await window.api?.songs?.skip(); refreshSongQueue(); }
-    async function removeSong(i) { await window.api?.songs?.remove(i); refreshSongQueue(); }
-    async function clearSongQueue() { await window.api?.songs?.clear(); refreshSongQueue(); }
-    async function toggleTTS() { await window.api?.tts?.toggle(); }
-    async function skipTTS() { document.getElementById('ttsAudio').pause(); await window.api?.tts?.skip(); }
-    async function clearTTSQueue() { await window.api?.tts?.clear(); }
-
-    function filterUsers() { /* TODO */ }
-
-    function sendChatMessage() {
-      const input = document.getElementById('chatInput');
-      if (input.value.trim()) {
-        // TODO: Send via API
-        input.value = '';
-      }
-    }
-
-    function handleChatKeypress(e) {
-      if (e.key === 'Enter') sendChatMessage();
-    }
-
-    function saveSettings() {
-      alert('Settings saved!');
-    }
-
-    function openExternal(url) {
-      window.api?.openExternal?.(url);
-    }
-
+    // ========================================
+    // UTILITIES
+    // ========================================
     function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text || '';
       return div.innerHTML;
     }
 
-    // Init
-    setInterval(() => { if (isConnected) refreshData(); }, 60000);
+    function openExternal(url) {
+      window.api?.openExternal?.(url);
+    }
+
+    function showNotification(message, type = 'info') {
+      const notif = document.createElement('div');
+      notif.className = `notification notification-${type}`;
+      notif.textContent = message;
+      document.body.appendChild(notif);
+      setTimeout(() => notif.classList.add('show'), 10);
+      setTimeout(() => {
+        notif.classList.remove('show');
+        setTimeout(() => notif.remove(), 300);
+      }, 3000);
+    }
+
+    // Periodic refresh
+    setInterval(() => { if (isConnected) refreshData(); }, 30000);
+
+    // Window controls
+    document.querySelector('.titlebar-btn.minimize')?.addEventListener('click', () => window.api?.window?.minimize());
+    document.querySelector('.titlebar-btn.maximize')?.addEventListener('click', () => window.api?.window?.maximize());
+    document.querySelector('.titlebar-btn.close')?.addEventListener('click', () => window.api?.window?.close());
   </script>
 </body>
 </html>

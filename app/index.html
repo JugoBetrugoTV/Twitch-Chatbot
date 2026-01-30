@@ -4390,11 +4390,65 @@
     }
 
     async function drawGiveaway() {
+      debug('BUTTON', 'drawGiveaway clicked');
       const result = await window.api?.giveaway?.draw();
       if (result?.winner) {
         showNotification(`Gewinner: ${result.winner}!`, 'success');
+        showAlert('giveaway', { winner: result.winner });
       } else {
         showNotification('Keine Teilnehmer!', 'error');
+      }
+      loadGiveaway();
+    }
+
+    // Alias for button compatibility
+    async function drawGiveawayWinner() {
+      return drawGiveaway();
+    }
+
+    // ========================================
+    // TTS FUNCTIONS
+    // ========================================
+    async function saveTTSSettings() {
+      debug('BUTTON', 'saveTTSSettings clicked');
+      try {
+        const settings = {
+          enabled: getChecked('ttsEnabled'),
+          volume: parseInt(document.getElementById('ttsVolume')?.value) || 50,
+          voice: getVal('ttsVoice') || 'de-DE',
+          rate: parseFloat(document.getElementById('ttsRate')?.value) || 1.0,
+          minBits: parseInt(getVal('ttsMinBits')) || 0,
+          subOnly: getChecked('ttsSubOnly'),
+          maxLength: parseInt(getVal('ttsMaxLength')) || 200
+        };
+        await window.api?.tts?.updateSettings(settings);
+        showNotification('TTS Settings gespeichert!', 'success');
+        debug('SUCCESS', 'TTS settings saved', settings);
+      } catch (err) {
+        debugError('saveTTSSettings', err);
+        showNotification('Fehler beim Speichern', 'error');
+      }
+    }
+
+    async function testTTS() {
+      debug('BUTTON', 'testTTS clicked');
+      try {
+        await window.api?.tts?.add('Test', 'Das ist ein Test der Text-zu-Sprache Funktion.');
+        showNotification('TTS Test gestartet', 'info');
+      } catch (err) {
+        debugError('testTTS', err);
+        showNotification('TTS Test fehlgeschlagen', 'error');
+      }
+    }
+
+    function togglePasswordVisibility(inputId) {
+      debug('BUTTON', `togglePasswordVisibility for ${inputId}`);
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+      } else {
+        input.type = 'password';
       }
     }
 

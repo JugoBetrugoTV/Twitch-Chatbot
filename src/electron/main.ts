@@ -553,11 +553,12 @@ function setupIPC() {
       if (credentials) {
         // Validate credentials
         const username = validateUsername(credentials.username);
-        const oauthToken = validateString(credentials.oauthToken, 'OAuth Token', 10, 100);
+        let oauthToken = validateString(credentials.oauthToken, 'OAuth Token', 10, 100);
         const channel = validateUsername(credentials.channel);
 
+        // Auto-add oauth: prefix if missing
         if (!oauthToken.startsWith('oauth:')) {
-          return { success: false, error: 'OAuth Token muss mit "oauth:" beginnen' };
+          oauthToken = 'oauth:' + oauthToken;
         }
 
         process.env.TWITCH_BOT_USERNAME = username;

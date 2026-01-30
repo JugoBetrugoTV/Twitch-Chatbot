@@ -130,6 +130,140 @@ contextBridge.exposeInMainWorld('api', {
     save: (settings: any) => ipcRenderer.invoke('settings:save', settings),
     getCredentials: () => ipcRenderer.invoke('settings:getCredentials'),
     saveCredentials: (credentials: any) => ipcRenderer.invoke('settings:saveCredentials', credentials),
+    getGeneral: () => ipcRenderer.invoke('settings:getGeneral'),
+    saveGeneral: (settings: any) => ipcRenderer.invoke('settings:saveGeneral', settings),
+    getLocalization: () => ipcRenderer.invoke('settings:getLocalization'),
+    saveLocalization: (settings: any) => ipcRenderer.invoke('settings:saveLocalization', settings),
+    getUsageStats: () => ipcRenderer.invoke('settings:getUsageStats'),
+    getMacros: () => ipcRenderer.invoke('settings:getMacros'),
+    addMacro: (data: { name: string; commands: string[] }) => ipcRenderer.invoke('settings:addMacro', data),
+    deleteMacro: (id: string) => ipcRenderer.invoke('settings:deleteMacro', id),
+    getHotkeys: () => ipcRenderer.invoke('settings:getHotkeys'),
+    addHotkey: (data: { action: string; keys: string }) => ipcRenderer.invoke('settings:addHotkey', data),
+    deleteHotkey: (id: string) => ipcRenderer.invoke('settings:deleteHotkey', id),
+    getStyle: () => ipcRenderer.invoke('settings:getStyle'),
+    saveStyle: (settings: any) => ipcRenderer.invoke('settings:saveStyle', settings),
+    getChangelog: () => ipcRenderer.invoke('settings:getChangelog'),
+  },
+
+  // Quotes
+  quotes: {
+    getAll: () => ipcRenderer.invoke('quotes:getAll'),
+    add: (text: string, author: string, addedBy: string) => ipcRenderer.invoke('quotes:add', text, author, addedBy),
+    delete: (id: number) => ipcRenderer.invoke('quotes:delete', id),
+  },
+
+  // Polls
+  polls: {
+    getAll: () => ipcRenderer.invoke('polls:getAll'),
+    create: (title: string, options: string[], duration: number) => ipcRenderer.invoke('polls:create', title, options, duration),
+    end: (id: string) => ipcRenderer.invoke('polls:end', id),
+  },
+
+  // Counters
+  counters: {
+    getAll: () => ipcRenderer.invoke('counters:getAll'),
+    create: (data: { name: string; value?: number }) => ipcRenderer.invoke('counters:create', data),
+    increment: (id: string) => ipcRenderer.invoke('counters:increment', id),
+    decrement: (id: string) => ipcRenderer.invoke('counters:decrement', id),
+    reset: (id: string) => ipcRenderer.invoke('counters:reset', id),
+    delete: (id: string) => ipcRenderer.invoke('counters:delete', id),
+  },
+
+  // Sounds
+  sounds: {
+    getAll: () => ipcRenderer.invoke('sounds:getAll'),
+    add: (data: { name: string; command: string; path: string; volume?: number }) => ipcRenderer.invoke('sounds:add', data),
+    delete: (id: string) => ipcRenderer.invoke('sounds:delete', id),
+    play: (id: string) => ipcRenderer.invoke('sounds:play', id),
+  },
+
+  // Queue
+  queue: {
+    getAll: () => ipcRenderer.invoke('queue:getAll'),
+    add: (username: string, message?: string) => ipcRenderer.invoke('queue:add', username, message),
+    process: (id: number) => ipcRenderer.invoke('queue:process', id),
+    remove: (id: number) => ipcRenderer.invoke('queue:remove', id),
+    clear: () => ipcRenderer.invoke('queue:clear'),
+  },
+
+  // Currency
+  currency: {
+    getSettings: () => ipcRenderer.invoke('currency:getSettings'),
+    saveSettings: (settings: any) => ipcRenderer.invoke('currency:saveSettings', settings),
+    getLeaderboard: (limit?: number) => ipcRenderer.invoke('currency:getLeaderboard', limit),
+  },
+
+  // Minigames
+  minigames: {
+    getSettings: () => ipcRenderer.invoke('minigames:getSettings'),
+    saveSettings: (settings: any) => ipcRenderer.invoke('minigames:saveSettings', settings),
+  },
+
+  // Betting
+  betting: {
+    getActive: () => ipcRenderer.invoke('betting:getActive'),
+    getHistory: () => ipcRenderer.invoke('betting:getHistory'),
+    create: (data: { title: string; options: string[] }) => ipcRenderer.invoke('betting:create', data),
+    close: (winner: string) => ipcRenderer.invoke('betting:close', winner),
+    cancel: () => ipcRenderer.invoke('betting:cancel'),
+  },
+
+  // Events
+  events: {
+    getAll: (filter?: string) => ipcRenderer.invoke('events:getAll', filter),
+  },
+
+  // Mod Tools
+  modtools: {
+    getSettings: () => ipcRenderer.invoke('modtools:getSettings'),
+    saveSettings: (settings: any) => ipcRenderer.invoke('modtools:saveSettings', settings),
+    getLogs: () => ipcRenderer.invoke('modtools:getLogs'),
+  },
+
+  // Notifications
+  notifications: {
+    getSettings: () => ipcRenderer.invoke('notifications:getSettings'),
+    saveSettings: (settings: any) => ipcRenderer.invoke('notifications:saveSettings', settings),
+  },
+
+  // Discord
+  discord: {
+    getSettings: () => ipcRenderer.invoke('discord:getSettings'),
+    saveSettings: (settings: any) => ipcRenderer.invoke('discord:saveSettings', settings),
+    testWebhook: () => ipcRenderer.invoke('discord:testWebhook'),
+  },
+
+  // Subscribers
+  subscribers: {
+    getAll: () => ipcRenderer.invoke('subscribers:getAll'),
+  },
+
+  // Extra Quotes
+  extraquotes: {
+    getAll: () => ipcRenderer.invoke('extraquotes:getAll'),
+    add: (data: { text: string; author?: string; category?: string }) => ipcRenderer.invoke('extraquotes:add', data),
+    delete: (id: number) => ipcRenderer.invoke('extraquotes:delete', id),
+  },
+
+  // Analytics
+  analytics: {
+    getData: (range?: number) => ipcRenderer.invoke('analytics:getData', range),
+    export: () => ipcRenderer.invoke('analytics:export'),
+  },
+
+  // Users (extended)
+  users: {
+    getAll: () => ipcRenderer.invoke('viewers:getAll'),
+    update: (username: string, updates: any) => ipcRenderer.invoke('users:update', username, updates),
+    delete: (username: string) => ipcRenderer.invoke('users:delete', username),
+  },
+
+  // Integrations
+  integrations: {
+    getSettings: () => ipcRenderer.invoke('integrations:getSettings'),
+    saveSettings: (settings: any) => ipcRenderer.invoke('integrations:saveSettings', settings),
+    testOBS: () => ipcRenderer.invoke('integrations:testOBS'),
   },
 
   // Messages/Chat
@@ -154,6 +288,7 @@ contextBridge.exposeInMainWorld('api', {
       'songs:skipped',
       'songs:ended',
       'songs:queueUpdated',
+      'sounds:play',
       'tts:play',
       'tts:started',
       'tts:ended',
@@ -171,6 +306,9 @@ contextBridge.exposeInMainWorld('api', {
       'points:updated',
       'user:joined',
       'user:left',
+      'counter:updated',
+      'poll:updated',
+      'betting:updated',
     ];
 
     if (allowedChannels.includes(channel)) {

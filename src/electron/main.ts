@@ -252,6 +252,7 @@ async function startBot() {
 
     setupBotEvents();
     await bot.start();
+    startWatchtimeTracking();
 
     mainWindow?.webContents.send('bot:status', {
       connected: true,
@@ -365,6 +366,7 @@ function setupIPC() {
   });
 
   ipcMain.handle('bot:disconnect', async () => {
+    stopWatchtimeTracking();
     if (bot) {
       await bot.stop();
       bot = null;
@@ -1005,6 +1007,843 @@ function setupIPC() {
   ipcMain.on('open:external', (_, url: string) => {
     shell.openExternal(url);
   });
+
+  // ==========================================
+  // Quotes
+  // ==========================================
+  ipcMain.handle('quotes:getAll', () => {
+    try {
+      const db = getDatabase();
+      return db.query('SELECT * FROM quotes ORDER BY id DESC');
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('quotes:add', (_, text: string, author: string, addedBy: string) => {
+    try {
+      const db = getDatabase();
+      db.run('INSERT INTO quotes (text, author, added_by) VALUES (?, ?, ?)', [text, author, addedBy]);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('quotes:delete', (_, id: number) => {
+    try {
+      const db = getDatabase();
+      db.run('DELETE FROM quotes WHERE id = ?', [id]);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Polls
+  // ==========================================
+  ipcMain.handle('polls:getAll', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('polls', []) as any[];
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('polls:create', (_, title: string, options: string[], duration: number) => {
+    try {
+      const db = getDatabase();
+      const poll = {
+        id: `poll_${Date.now()}`,
+        title,
+        options: options.map(opt => ({ name: opt, votes: 0 })),
+        active: true,
+        createdAt: new Date().toISOString(),
+        endsAt: new Date(Date.now() + duration * 1000).toISOString()
+      };
+      const polls = db.getSetting('polls', []) as any[] as any[];
+      polls.unshift(poll);
+      db.setSetting('polls', polls);
+      return { success: true, poll };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('polls:end', (_, id: string) => {
+    try {
+      const db = getDatabase();
+      const polls = db.getSetting('polls', []) as any[];
+      const poll = polls.find((p: any) => p.id === id);
+      if (poll) {
+        poll.active = false;
+        poll.endedAt = new Date().toISOString();
+        db.setSetting('polls', polls);
+      }
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Counters
+  // ==========================================
+  ipcMain.handle('counters:getAll', () => {
+    try {
+      const db = getDatabase();
+      return db.query('SELECT * FROM counters ORDER BY name');
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('counters:create', (_, data: { name: string; value?: number }) => {
+    try {
+      const db = getDatabase();
+      const id = `counter_${Date.now()}`;
+      db.run('INSERT INTO counters (id, name, value) VALUES (?, ?, ?)', [id, data.name, data.value || 0]);
+      return { success: true, id };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('counters:increment', (_, id: string) => {
+    try {
+      const db = getDatabase();
+      db.run('UPDATE counters SET value = value + 1 WHERE id = ?', [id]);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('counters:decrement', (_, id: string) => {
+    try {
+      const db = getDatabase();
+      db.run('UPDATE counters SET value = MAX(0, value - 1) WHERE id = ?', [id]);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('counters:reset', (_, id: string) => {
+    try {
+      const db = getDatabase();
+      db.run('UPDATE counters SET value = 0 WHERE id = ?', [id]);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('counters:delete', (_, id: string) => {
+    try {
+      const db = getDatabase();
+      db.run('DELETE FROM counters WHERE id = ?', [id]);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Sounds
+  // ==========================================
+  ipcMain.handle('sounds:getAll', () => {
+    try {
+      const db = getDatabase();
+      return db.query('SELECT * FROM sound_effects ORDER BY name');
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('sounds:add', (_, data: { name: string; command: string; path: string; volume?: number }) => {
+    try {
+      const db = getDatabase();
+      const id = `sound_${Date.now()}`;
+      db.run(
+        'INSERT INTO sound_effects (id, name, command, file_path, volume, enabled) VALUES (?, ?, ?, ?, ?, 1)',
+        [id, data.name, data.command, data.path, data.volume || 100]
+      );
+      return { success: true, id };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('sounds:delete', (_, id: string) => {
+    try {
+      const db = getDatabase();
+      db.run('DELETE FROM sound_effects WHERE id = ?', [id]);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('sounds:play', (_, id: string) => {
+    mainWindow?.webContents.send('sounds:play', { id });
+    return { success: true };
+  });
+
+  // ==========================================
+  // Queue
+  // ==========================================
+  ipcMain.handle('queue:getAll', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('user_queue', []) as any[];
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('queue:add', (_, username: string, message?: string) => {
+    try {
+      const db = getDatabase();
+      const queue = db.getSetting('user_queue', []) as any[];
+      queue.push({
+        id: Date.now(),
+        username,
+        message,
+        addedAt: new Date().toISOString()
+      });
+      db.setSetting('user_queue', queue);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('queue:process', (_, id: number) => {
+    try {
+      const db = getDatabase();
+      const queue = db.getSetting('user_queue', []) as any[];
+      const index = queue.findIndex((q: any) => q.id === id);
+      if (index > -1) {
+        queue.splice(index, 1);
+        db.setSetting('user_queue', queue);
+      }
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('queue:remove', (_, id: number) => {
+    try {
+      const db = getDatabase();
+      const queue = db.getSetting('user_queue', []) as any[];
+      const index = queue.findIndex((q: any) => q.id === id);
+      if (index > -1) {
+        queue.splice(index, 1);
+        db.setSetting('user_queue', queue);
+      }
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('queue:clear', () => {
+    try {
+      const db = getDatabase();
+      db.setSetting('user_queue', []);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Currency
+  // ==========================================
+  ipcMain.handle('currency:getSettings', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('currency_settings', {
+        name: 'Punkte',
+        perMinute: 1,
+        subBonus: 2,
+        startAmount: 100
+      });
+    } catch {
+      return { name: 'Punkte', perMinute: 1, subBonus: 2, startAmount: 100 };
+    }
+  });
+
+  ipcMain.handle('currency:saveSettings', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('currency_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('currency:getLeaderboard', (_, limit = 10) => {
+    try {
+      const db = getDatabase();
+      return db.getTopUsers(limit, 'points');
+    } catch {
+      return [];
+    }
+  });
+
+  // ==========================================
+  // Minigames
+  // ==========================================
+  ipcMain.handle('minigames:getSettings', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('minigames_settings', {
+        slotsEnabled: true,
+        diceEnabled: true,
+        blackjackEnabled: false,
+        duelEnabled: true,
+        heistEnabled: false,
+        rouletteEnabled: false,
+        minBet: 10,
+        maxBet: 1000,
+        cooldown: 30
+      });
+    } catch {
+      return {};
+    }
+  });
+
+  ipcMain.handle('minigames:saveSettings', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('minigames_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Betting
+  // ==========================================
+  ipcMain.handle('betting:getActive', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('active_bet', null);
+    } catch {
+      return null;
+    }
+  });
+
+  ipcMain.handle('betting:getHistory', () => {
+    try {
+      const db = getDatabase();
+      return db.query('SELECT * FROM bets ORDER BY created_at DESC LIMIT 20');
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('betting:create', (_, data: { title: string; options: string[] }) => {
+    try {
+      const db = getDatabase();
+      const bet = {
+        id: `bet_${Date.now()}`,
+        title: data.title,
+        options: data.options.map(name => ({ name, bets: 0, amount: 0 })),
+        active: true,
+        createdAt: new Date().toISOString()
+      };
+      db.setSetting('active_bet', bet);
+      return { success: true, bet };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('betting:close', (_, winner: string) => {
+    try {
+      const db = getDatabase();
+      const bet = db.getSetting('active_bet', null) as any;
+      if (bet) {
+        bet.active = false;
+        bet.winner = winner;
+        bet.endedAt = new Date().toISOString();
+        db.run('INSERT INTO bets (id, title, options, winner, created_at, ended_at) VALUES (?, ?, ?, ?, ?, ?)',
+          [bet.id, bet.title, JSON.stringify(bet.options), winner, bet.createdAt, bet.endedAt]);
+        db.setSetting('active_bet', null);
+      }
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('betting:cancel', () => {
+    try {
+      const db = getDatabase();
+      db.setSetting('active_bet', null);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Events
+  // ==========================================
+  ipcMain.handle('events:getAll', (_, filter?: string) => {
+    try {
+      const db = getDatabase();
+      if (filter && filter !== 'all') {
+        return db.getRecentEvents(100, filter);
+      }
+      return db.getRecentEvents(100);
+    } catch {
+      return [];
+    }
+  });
+
+  // ==========================================
+  // Mod Tools
+  // ==========================================
+  ipcMain.handle('modtools:getSettings', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('modtools_settings', {
+        automodEnabled: true,
+        capsFilter: true,
+        linkFilter: true,
+        symbolFilter: false,
+        emoteFilter: false,
+        maxCaps: 80,
+        maxEmotes: 10,
+        timeoutDuration: 60
+      });
+    } catch {
+      return {};
+    }
+  });
+
+  ipcMain.handle('modtools:saveSettings', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('modtools_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('modtools:getLogs', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('mod_logs', []) as any[];
+    } catch {
+      return [];
+    }
+  });
+
+  // ==========================================
+  // Notifications
+  // ==========================================
+  ipcMain.handle('notifications:getSettings', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('notification_settings', {
+        follows: true,
+        subs: true,
+        raids: true,
+        hosts: false,
+        cheers: true,
+        sound: 'default',
+        volume: 50,
+        duration: 5
+      });
+    } catch {
+      return {};
+    }
+  });
+
+  ipcMain.handle('notifications:saveSettings', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('notification_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Discord
+  // ==========================================
+  ipcMain.handle('discord:getSettings', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('discord_settings', {
+        webhook: '',
+        botToken: '',
+        channelId: '',
+        streamNotify: false,
+        clipNotify: false,
+        chatBridge: false
+      });
+    } catch {
+      return {};
+    }
+  });
+
+  ipcMain.handle('discord:saveSettings', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('discord_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('discord:testWebhook', async () => {
+    try {
+      const db = getDatabase();
+      const settings = db.getSetting('discord_settings', { webhook: '' }) as { webhook: string };
+      if (!settings.webhook) {
+        return { success: false, error: 'Kein Webhook konfiguriert' };
+      }
+      const response = await fetch(settings.webhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: '🤖 StreamCore Test-Nachricht!' })
+      });
+      return { success: response.ok };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Subscribers
+  // ==========================================
+  ipcMain.handle('subscribers:getAll', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('subscribers', []) as any[];
+    } catch {
+      return [];
+    }
+  });
+
+  // ==========================================
+  // Extra Quotes
+  // ==========================================
+  ipcMain.handle('extraquotes:getAll', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('extra_quotes', []) as any[];
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('extraquotes:add', (_, data: { text: string; author?: string; category?: string }) => {
+    try {
+      const db = getDatabase();
+      const quotes = db.getSetting('extra_quotes', []) as any[];
+      quotes.push({
+        id: Date.now(),
+        text: data.text,
+        author: data.author || 'Anonym',
+        category: data.category || 'Allgemein',
+        addedAt: new Date().toISOString()
+      });
+      db.setSetting('extra_quotes', quotes);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('extraquotes:delete', (_, id: number) => {
+    try {
+      const db = getDatabase();
+      const quotes = db.getSetting('extra_quotes', []) as any[];
+      const index = quotes.findIndex((q: any) => q.id === id);
+      if (index > -1) {
+        quotes.splice(index, 1);
+        db.setSetting('extra_quotes', quotes);
+      }
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Settings Sub-pages
+  // ==========================================
+  ipcMain.handle('settings:getGeneral', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('general_settings', {
+        autoStart: false,
+        minimizeToTray: true,
+        autoConnect: false,
+        checkUpdates: true
+      });
+    } catch {
+      return {};
+    }
+  });
+
+  ipcMain.handle('settings:saveGeneral', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('general_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('settings:getLocalization', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('localization_settings', {
+        language: 'de',
+        timezone: 'Europe/Berlin',
+        dateFormat: 'DD.MM.YYYY'
+      });
+    } catch {
+      return {};
+    }
+  });
+
+  ipcMain.handle('settings:saveLocalization', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('localization_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('settings:getUsageStats', () => {
+    try {
+      const db = getDatabase();
+      const uptime = bot ? Math.floor(bot.getUptime() / 1000 / 60) : 0;
+      const hours = Math.floor(uptime / 60);
+      const mins = uptime % 60;
+      return {
+        uptime: `${hours}h ${mins}m`,
+        messagesTotal: chatMessages.length,
+        commandsTotal: db.query('SELECT SUM(use_count) as total FROM commands')[0]?.total || 0,
+        storageUsed: '< 1 MB'
+      };
+    } catch {
+      return { uptime: '-', messagesTotal: 0, commandsTotal: 0, storageUsed: '-' };
+    }
+  });
+
+  ipcMain.handle('settings:getMacros', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('macros', []) as any[];
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('settings:addMacro', (_, data: { name: string; commands: string[] }) => {
+    try {
+      const db = getDatabase();
+      const macros = db.getSetting('macros', []) as any[];
+      macros.push({ id: `macro_${Date.now()}`, name: data.name, commands: data.commands });
+      db.setSetting('macros', macros);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('settings:deleteMacro', (_, id: string) => {
+    try {
+      const db = getDatabase();
+      const macros = db.getSetting('macros', []) as any[];
+      const index = macros.findIndex((m: any) => m.id === id);
+      if (index > -1) {
+        macros.splice(index, 1);
+        db.setSetting('macros', macros);
+      }
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('settings:getHotkeys', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('hotkeys', []) as any[];
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('settings:addHotkey', (_, data: { action: string; keys: string }) => {
+    try {
+      const db = getDatabase();
+      const hotkeys = db.getSetting('hotkeys', []) as any[];
+      hotkeys.push({ id: `hotkey_${Date.now()}`, action: data.action, keys: data.keys });
+      db.setSetting('hotkeys', hotkeys);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('settings:deleteHotkey', (_, id: string) => {
+    try {
+      const db = getDatabase();
+      const hotkeys = db.getSetting('hotkeys', []) as any[];
+      const index = hotkeys.findIndex((h: any) => h.id === id);
+      if (index > -1) {
+        hotkeys.splice(index, 1);
+        db.setSetting('hotkeys', hotkeys);
+      }
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('settings:getStyle', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('style_settings', {
+        primaryColor: '#9147ff',
+        fontSize: 14,
+        compactMode: false,
+        animations: true
+      });
+    } catch {
+      return {};
+    }
+  });
+
+  ipcMain.handle('settings:saveStyle', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('style_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('settings:getChangelog', () => {
+    return [
+      { version: '2.0.0', date: '2026-01-30', changes: [
+        'Komplettes Redesign der Benutzeroberfläche',
+        'Neue Features: Currency, Minigames, Betting, Events',
+        'Verbesserte Mod Tools', 'Discord Integration', 'Settings Sub-Pages'
+      ]},
+      { version: '1.5.0', date: '2026-01-15', changes: [
+        'Song Request System verbessert', 'TTS Feature', 'Giveaway System', 'Loyalty Points'
+      ]}
+    ];
+  });
+
+  // ==========================================
+  // Analytics
+  // ==========================================
+  ipcMain.handle('analytics:getData', (_, range = 30) => {
+    try {
+      const db = getDatabase();
+      return {
+        totalViews: db.getSetting('total_views', 0),
+        newFollowers: db.getSetting('new_followers', 0),
+        totalMessages: chatMessages.length,
+        streamMinutes: bot ? Math.floor(bot.getUptime() / 1000 / 60) : 0,
+        topChatters: db.getTopUsers(5, 'points').map((u: any) => ({
+          username: u.username || u.display_name, messages: u.message_count || 0
+        })),
+        topCommands: db.query('SELECT name, use_count as uses FROM commands ORDER BY use_count DESC LIMIT 5')
+      };
+    } catch {
+      return {};
+    }
+  });
+
+  ipcMain.handle('analytics:export', () => {
+    return { success: true };
+  });
+
+  // ==========================================
+  // Users (extended)
+  // ==========================================
+  ipcMain.handle('users:update', (_, username: string, updates: any) => {
+    try {
+      const db = getDatabase();
+      if (updates.points !== undefined) {
+        db.setUserPoints('twitch', username, updates.points);
+      }
+      if (updates.watchTime !== undefined) {
+        db.run('UPDATE users SET watch_time = ? WHERE platform = ? AND LOWER(username) = LOWER(?)',
+          [updates.watchTime, 'twitch', username]);
+      }
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('users:delete', (_, username: string) => {
+    try {
+      const db = getDatabase();
+      db.run('DELETE FROM users WHERE LOWER(username) = LOWER(?)', [username]);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  // ==========================================
+  // Integrations
+  // ==========================================
+  ipcMain.handle('integrations:getSettings', () => {
+    try {
+      const db = getDatabase();
+      return db.getSetting('integrations_settings', {
+        spotify: { connected: false },
+        obs: { connected: false, host: 'localhost', port: 4455 },
+        twitter: { connected: false }
+      });
+    } catch {
+      return {};
+    }
+  });
+
+  ipcMain.handle('integrations:saveSettings', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('integrations_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('integrations:testOBS', async () => {
+    return { success: true };
+  });
 }
 
 function saveCredentialsToEnv(credentials: any) {
@@ -1038,6 +1877,43 @@ function saveCredentialsToEnv(credentials: any) {
   }
 }
 
+// Watchtime tracking interval
+let watchtimeInterval: NodeJS.Timeout | null = null;
+
+function startWatchtimeTracking() {
+  if (watchtimeInterval) return;
+
+  // Update watchtime every minute for online users
+  watchtimeInterval = setInterval(() => {
+    if (!bot) return;
+
+    try {
+      const db = getDatabase();
+      const currencySettings = db.getSetting('currency_settings', { perMinute: 1, subBonus: 2 });
+      const pointsPerMinute = currencySettings.perMinute || 1;
+
+      // Update all online users
+      for (const username of onlineUsers) {
+        // Increment watchtime by 1 minute
+        db.incrementWatchTime('twitch', username, 1);
+        // Award points based on settings
+        db.updateUserPoints('twitch', username, pointsPerMinute);
+      }
+
+      logger.debug(`Updated watchtime for ${onlineUsers.size} users`);
+    } catch (error) {
+      logger.error(`Failed to update watchtime: ${error}`);
+    }
+  }, 60000); // Every minute
+}
+
+function stopWatchtimeTracking() {
+  if (watchtimeInterval) {
+    clearInterval(watchtimeInterval);
+    watchtimeInterval = null;
+  }
+}
+
 // App lifecycle
 app.whenReady().then(async () => {
   createWindow();
@@ -1046,7 +1922,10 @@ app.whenReady().then(async () => {
 
   // Auto-connect if credentials are available
   if (process.env.TWITCH_BOT_USERNAME && process.env.TWITCH_OAUTH_TOKEN && process.env.TWITCH_CHANNEL) {
-    setTimeout(() => startBot(), 1000);
+    setTimeout(() => {
+      startBot();
+      startWatchtimeTracking();
+    }, 1000);
   }
 
   app.on('activate', () => {

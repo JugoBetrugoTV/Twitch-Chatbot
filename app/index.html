@@ -2772,10 +2772,15 @@
         const stats = await window.api.bot?.getStats();
         if (stats) {
           document.getElementById('statMessages').textContent = stats.messagesReceived || 0;
-          document.getElementById('statCommands').textContent = stats.commands || 0;
+          // Don't overwrite statCommands - let loadCommands set it to custom commands count
           document.getElementById('statSongs').textContent = stats.songsPlayed || 0;
           document.getElementById('statViewers').textContent = stats.onlineUsers || 0;
           document.getElementById('onlineUsers').textContent = stats.onlineUsers || 0;
+        }
+        // Refresh commands count from database (custom commands only)
+        const cmds = await window.api.commands?.getAll();
+        if (cmds) {
+          document.getElementById('statCommands').textContent = cmds.length;
         }
         await refreshSongQueue();
       } catch(e) { console.error(e); }

@@ -556,7 +556,8 @@ main {
   display: none;
   height: 100%;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .page-content.active {

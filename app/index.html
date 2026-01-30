@@ -202,178 +202,153 @@
     <main class="content">
       <!-- ==================== DASHBOARD PAGE ==================== -->
       <div class="page-content active" id="page-dashboard">
-        <div class="page-header">
-          <h1 class="page-title">Dashboard</h1>
-          <div class="page-actions">
-            <button class="btn btn-secondary" onclick="refreshData()">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-              Refresh
-            </button>
-          </div>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
-            <div class="stat-value" id="statViewers">0</div>
-            <div class="stat-label">Viewers</div>
-          </div>
-          <div class="stat-card purple">
-            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
-            <div class="stat-value" id="statMessages">0</div>
-            <div class="stat-label">Messages</div>
-          </div>
-          <div class="stat-card blue">
-            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg></div>
-            <div class="stat-value" id="statCommands">0</div>
-            <div class="stat-label">Commands</div>
-          </div>
-          <div class="stat-card yellow">
-            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div>
-            <div class="stat-value" id="statSongs">0</div>
-            <div class="stat-label">Songs Played</div>
-          </div>
-          <div class="stat-card green">
-            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
-            <div class="stat-value" id="statFollows">0</div>
-            <div class="stat-label">Follows</div>
-          </div>
-          <div class="stat-card pink">
-            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
-            <div class="stat-value" id="statUptime">0:00</div>
-            <div class="stat-label">Uptime</div>
-          </div>
-        </div>
-
-        <!-- Stream Info Card -->
-        <div class="card" style="margin-bottom:20px;">
-          <div class="card-header">
-            <div class="card-title">
-              <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;margin-right:8px;"><path d="M11.64 5.93h1.43v4.28h-1.43m3.93-4.28H17v4.28h-1.43M7 2L3.43 5.57v12.86h4.28V22l3.58-3.57h2.85L20.57 12V2m-1.43 9.29l-2.85 2.85h-2.86l-2.5 2.5v-2.5H7.71V3.43h11.43Z"/></svg>
-              Stream Info
-            </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span class="badge" id="streamStatusBadge" style="background:rgba(239, 68, 68, 0.15); color:var(--red);">Offline</span>
-            </div>
-          </div>
-          <div class="card-body" style="padding:0;">
-            <div style="display:grid; grid-template-columns:auto 1fr auto; gap:20px; padding:20px; align-items:center;">
-              <!-- Stream Thumbnail -->
-              <div style="width:160px; height:90px; background:var(--bg-tertiary); border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;" id="streamThumbnail">
-                <svg viewBox="0 0 24 24" fill="currentColor" style="width:40px;height:40px;color:var(--text-muted);"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12zM9 8l7 4-7 4z"/></svg>
+        <div class="dashboard-bento">
+          <!-- Stats Row -->
+          <div class="dashboard-stats">
+            <div class="mini-stat">
+              <div class="stat-icon" style="background:linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.1) 100%); border:1px solid rgba(34, 197, 94, 0.25);">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--green);"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
               </div>
-              <!-- Stream Details -->
-              <div style="display:flex; flex-direction:column; gap:8px;">
-                <div style="font-size:16px; font-weight:600; color:var(--text-primary);" id="streamTitle">Not streaming</div>
-                <div style="display:flex; gap:15px; flex-wrap:wrap;">
-                  <div style="display:flex; align-items:center; gap:6px;">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:var(--text-muted);"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2z"/></svg>
-                    <span style="font-size:13px; color:var(--text-secondary);" id="streamGame">-</span>
-                  </div>
-                  <div style="display:flex; align-items:center; gap:6px;">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:var(--text-muted);"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                    <span style="font-size:13px; color:var(--text-secondary);"><span id="streamViewerCount">0</span> viewers</span>
-                  </div>
-                  <div style="display:flex; align-items:center; gap:6px;">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:var(--text-muted);"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                    <span style="font-size:13px; color:var(--text-secondary);" id="streamDuration">-</span>
-                  </div>
-                </div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;" id="streamTags">
-                  <!-- Tags will be populated here -->
-                </div>
-              </div>
-              <!-- Quick Stream Actions -->
-              <div style="display:flex; flex-direction:column; gap:8px;">
-                <button class="btn btn-secondary btn-sm" onclick="updateStreamTitle()">Edit Title</button>
-                <button class="btn btn-secondary btn-sm" onclick="updateStreamGame()">Change Game</button>
-                <button class="btn btn-secondary btn-sm" onclick="createClip()">Create Clip</button>
+              <div class="stat-info">
+                <div class="stat-value" id="statViewers">0</div>
+                <div class="stat-label">Viewers</div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-          <button class="btn btn-secondary" onclick="navigateTo('commands')">
-            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-            Commands
-          </button>
-          <button class="btn btn-secondary" onclick="navigateTo('giveaway')">
-            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/></svg>
-            Giveaway
-          </button>
-          <button class="btn btn-secondary" onclick="navigateTo('songrequest')">
-            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            Songs
-          </button>
-          <button class="btn btn-secondary" onclick="navigateTo('minigames')">
-            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-            Minigames
-          </button>
-          <button class="btn btn-secondary" onclick="toggleTTS()">
-            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;margin-right:6px;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-            <span id="ttsQuickStatus">TTS An</span>
-          </button>
-        </div>
-
-        <div class="dashboard-grid">
-          <div class="dashboard-main">
-            <!-- Chat Preview -->
-            <div class="card chat-panel">
-              <div class="card-header">
-                <div class="card-title">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-                  Live Chat
-                </div>
-                <button class="btn btn-ghost btn-sm" onclick="navigateTo('chat')">View All</button>
+            <div class="mini-stat">
+              <div class="stat-icon" style="background:linear-gradient(135deg, rgba(145, 71, 255, 0.25) 0%, rgba(145, 71, 255, 0.1) 100%); border:1px solid rgba(145, 71, 255, 0.25);">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--purple-light);"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
               </div>
-              <div class="chat-messages" id="dashboardChat">
-                <div class="empty-state">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-                  <div class="empty-state-title">No Messages Yet</div>
-                  <div class="empty-state-desc">Chat messages will appear here when you connect to Twitch</div>
-                </div>
+              <div class="stat-info">
+                <div class="stat-value" id="statMessages">0</div>
+                <div class="stat-label">Messages</div>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <div class="stat-icon" style="background:linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.1) 100%); border:1px solid rgba(59, 130, 246, 0.25);">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--blue);"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value" id="statCommands">0</div>
+                <div class="stat-label">Commands</div>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <div class="stat-icon" style="background:linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(249, 115, 22, 0.1) 100%); border:1px solid rgba(249, 115, 22, 0.25);">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--orange);"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value" id="statSongs">0</div>
+                <div class="stat-label">Songs</div>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <div class="stat-icon" style="background:linear-gradient(135deg, rgba(236, 72, 153, 0.25) 0%, rgba(236, 72, 153, 0.1) 100%); border:1px solid rgba(236, 72, 153, 0.25);">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--pink);"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value" id="statFollows">0</div>
+                <div class="stat-label">Follows</div>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <div class="stat-icon" style="background:linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(6, 182, 212, 0.1) 100%); border:1px solid rgba(6, 182, 212, 0.25);">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--cyan);"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value" id="statUptime">0:00</div>
+                <div class="stat-label">Uptime</div>
               </div>
             </div>
           </div>
 
-          <div class="dashboard-side">
-            <!-- Events -->
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-                  Recent Events
-                </div>
-              </div>
-              <div class="card-body no-padding">
-                <div class="event-list" id="eventList">
-                  <div class="empty-state">
-                    <div class="empty-state-title">No Events</div>
-                    <div class="empty-state-desc">Follows, subs, and bits will appear here</div>
-                  </div>
-                </div>
+          <!-- Stream Info Bar -->
+          <div class="dashboard-stream">
+            <div class="stream-thumb" id="streamThumbnail">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.64 5.93h1.43v4.28h-1.43m3.93-4.28H17v4.28h-1.43M7 2L3.43 5.57v12.86h4.28V22l3.58-3.57h2.85L20.57 12V2m-1.43 9.29l-2.85 2.85h-2.86l-2.5 2.5v-2.5H7.71V3.43h11.43Z"/></svg>
+            </div>
+            <div class="stream-info">
+              <div class="stream-title" id="streamTitle">Not streaming</div>
+              <div class="stream-meta">
+                <span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2z"/></svg><span id="streamGame">-</span></span>
+                <span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span id="streamViewerCount">0</span> viewers</span>
+                <span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="streamDuration">-</span></span>
               </div>
             </div>
+            <span class="stream-status offline" id="streamStatusBadge">Offline</span>
+            <div class="stream-actions">
+              <button class="quick-btn" onclick="updateStreamTitle()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>Title</button>
+              <button class="quick-btn" onclick="updateStreamGame()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2z"/></svg>Game</button>
+              <button class="quick-btn" onclick="refreshData()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>Refresh</button>
+            </div>
+          </div>
 
-            <!-- Song Queue -->
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                  Song Queue
-                </div>
-                <button class="btn btn-ghost btn-sm" onclick="skipSong()">Skip</button>
+          <!-- Chat Card - 2 columns wide -->
+          <div class="bento-card bento-chat">
+            <div class="bento-header">
+              <div class="bento-title">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                Live Chat
               </div>
-              <div class="card-body no-padding">
-                <div id="dashboardQueue">
-                  <div class="empty-state">
-                    <div class="empty-state-title">Queue Empty</div>
-                    <div class="empty-state-desc">Use !sr to request songs</div>
-                  </div>
-                </div>
+              <button class="quick-btn" onclick="navigateTo('chat')">Open</button>
+            </div>
+            <div class="bento-body" id="dashboardChat">
+              <div class="empty-compact">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                <p>Chat messages appear here</p>
               </div>
+            </div>
+          </div>
+
+          <!-- Events Card -->
+          <div class="bento-card bento-events">
+            <div class="bento-header">
+              <div class="bento-title">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                Events
+              </div>
+            </div>
+            <div class="bento-body" id="eventList">
+              <div class="empty-compact">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                <p>Follows, subs & bits here</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Song Queue Card -->
+          <div class="bento-card bento-queue">
+            <div class="bento-header">
+              <div class="bento-title">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                Song Queue
+              </div>
+              <button class="quick-btn" onclick="skipSong()">Skip</button>
+            </div>
+            <div class="bento-body" id="dashboardQueue">
+              <div class="empty-compact">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                <p>Use !sr to request songs</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Card -->
+          <div class="bento-card" style="grid-column: span 2;">
+            <div class="bento-header">
+              <div class="bento-title">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Quick Actions
+              </div>
+            </div>
+            <div class="quick-actions-compact">
+              <button class="quick-btn" onclick="navigateTo('commands')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>Commands</button>
+              <button class="quick-btn" onclick="navigateTo('giveaway')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/></svg>Giveaway</button>
+              <button class="quick-btn" onclick="navigateTo('songrequest')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>Songs</button>
+              <button class="quick-btn" onclick="navigateTo('minigames')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Minigames</button>
+              <button class="quick-btn" onclick="navigateTo('polls')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Polls</button>
+              <button class="quick-btn" onclick="toggleTTS()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg><span id="ttsQuickStatus">TTS</span></button>
+              <button class="quick-btn" onclick="navigateTo('modtools')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>Mod Tools</button>
+              <button class="quick-btn" onclick="navigateTo('users')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Users</button>
             </div>
           </div>
         </div>

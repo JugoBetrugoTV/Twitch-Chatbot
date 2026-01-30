@@ -61,6 +61,10 @@ contextBridge.exposeInMainWorld('api', {
     clear: () => ipcRenderer.invoke('songs:clear'),
     setVolume: (volume: number) => ipcRenderer.invoke('songs:setVolume', volume),
     toggle: () => ipcRenderer.invoke('songs:toggle'),
+    play: () => ipcRenderer.invoke('songs:play'),
+    pause: () => ipcRenderer.invoke('songs:pause'),
+    getSettings: () => ipcRenderer.invoke('songs:getSettings'),
+    saveSettings: (settings: any) => ipcRenderer.invoke('songs:saveSettings', settings),
   },
 
   // TTS
@@ -298,6 +302,10 @@ contextBridge.exposeInMainWorld('api', {
       'songs:skipped',
       'songs:ended',
       'songs:queueUpdated',
+      'songs:playing',
+      'songs:paused',
+      'songs:removed',
+      'songs:cleared',
       'sounds:play',
       'tts:play',
       'tts:started',

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src 'self' data: https: blob:; img-src 'self' data: https:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src 'self' data: https: blob:; img-src 'self' data: https:; frame-src https://www.youtube.com https://www.youtube-nocookie.com;">
   <title>StreamCore - Next-Gen Twitch Bot</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
@@ -3685,6 +3685,7 @@
       if (page === 'moderation') loadModeration();
       if (page === 'alerts') loadAlerts();
       if (page === 'giveaway') loadGiveaway();
+      if (page === 'songrequest') loadSongRequest();
     }
 
     // ========================================
@@ -3786,10 +3787,37 @@
         document.getElementById('onlineUsers').textContent = data.count || 0;
       });
 
-      window.api.on('songs:added', refreshSongQueue);
+      window.api.on('songs:added', () => {
+        debug('INFO', 'Song added event received');
+        refreshSongQueue();
+      });
       window.api.on('songs:started', (song) => {
+        debug('INFO', 'Song started event received', song);
         showPlayer(song);
         refreshSongQueue();
+      });
+      window.api.on('songs:skipped', () => {
+        debug('INFO', 'Song skipped event received');
+        refreshSongQueue();
+      });
+      window.api.on('songs:playing', () => {
+        debug('INFO', 'Song playing event received');
+        isPlaying = true;
+        updatePlayPauseButton();
+      });
+      window.api.on('songs:paused', () => {
+        debug('INFO', 'Song paused event received');
+        isPlaying = false;
+        updatePlayPauseButton();
+      });
+      window.api.on('songs:removed', () => {
+        debug('INFO', 'Song removed event received');
+        refreshSongQueue();
+      });
+      window.api.on('songs:cleared', () => {
+        debug('INFO', 'Songs cleared event received');
+        refreshSongQueue();
+        showPlayer(null);
       });
 
       window.api.on('tts:play', async (data) => {
@@ -4583,9 +4611,21 @@
     // ========================================
     async function refreshSongQueue() {
       if (!window.api) return;
+      debug('API', 'Refreshing song queue...');
       const data = await window.api.songs?.getQueue();
+      debug('INFO', 'Song queue data:', data);
       renderSongQueue(data?.queue, data?.current);
-      if (data?.current) showPlayer(data.current);
+      showPlayer(data?.current || null);
+      // Update volume if available
+      if (data?.volume !== undefined) {
+        const slider = document.getElementById('volumeSlider');
+        const label = document.getElementById('volumeValue');
+        if (slider) slider.value = data.volume;
+        if (label) label.textContent = `${data.volume}%`;
+      }
+      // Update playing state
+      isPlaying = data?.isPlaying || false;
+      updatePlayPauseButton();
     }
 
     function renderSongQueue(queue, current) {
@@ -4645,9 +4685,14 @@
 
     function showPlayer(song) {
       if (song) {
-        document.getElementById('playerBar').style.display = 'flex';
-        document.getElementById('playerTitle').textContent = song.title;
-        document.getElementById('playerArtist').textContent = 'Angefragt von ' + song.requestedBy;
+        const playerBar = document.getElementById('playerBar');
+        if (playerBar) playerBar.style.display = 'flex';
+        setText('playerTitle', song.title);
+        setText('playerArtist', 'Angefragt von ' + song.requestedBy);
+        // Also update the YouTube player
+        updateYouTubePlayer(song);
+      } else {
+        updateYouTubePlayer(null);
       }
     }
 
@@ -4701,11 +4746,26 @@
       if (requesterEl) requesterEl.textContent = `Requested by ${song.requestedBy || 'Unknown'}`;
     }
 
-    function togglePlayPause() {
+    function updatePlayPauseButton() {
+      const btn = document.getElementById('playPauseBtn');
+      if (!btn) return;
+      if (isPlaying) {
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+      } else {
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px;"><path d="M8 5v14l11-7z"/></svg>';
+      }
+    }
+
+    async function togglePlayPause() {
       debug('BUTTON', 'togglePlayPause clicked');
-      // Note: Controlling iframe playback requires YouTube IFrame API
-      // For now, this is a placeholder - full implementation would need YouTube API
-      showNotification('Use the YouTube player controls directly', 'info');
+      if (isPlaying) {
+        await window.api?.songs?.pause();
+        isPlaying = false;
+      } else {
+        await window.api?.songs?.play();
+        isPlaying = true;
+      }
+      updatePlayPauseButton();
     }
 
     function prevSong() {
@@ -4720,14 +4780,45 @@
       // Note: Would need YouTube IFrame API for actual volume control
     }
 
+    async function loadSongRequest() {
+      debug('API', 'Loading song request page...');
+      try {
+        // Load queue and current song
+        await refreshSongQueue();
+
+        // Load settings
+        const settings = await window.api?.songs?.getSettings();
+        debug('INFO', 'Song request settings:', settings);
+        if (settings) {
+          setVal('srMaxQueue', settings.maxQueueSize || 50);
+          setVal('srMaxDuration', Math.floor((settings.maxSongDuration || 600) / 60));
+          setVal('srCost', settings.pointsCost || 0);
+          setVal('srCooldown', settings.cooldown || 60);
+          setChecked('srEnabled', settings.enabled !== false);
+
+          // Set volume
+          const volumeSlider = document.getElementById('volumeSlider');
+          const volumeLabel = document.getElementById('volumeValue');
+          if (volumeSlider) volumeSlider.value = settings.volume || 50;
+          if (volumeLabel) volumeLabel.textContent = `${settings.volume || 50}%`;
+        }
+        debug('SUCCESS', 'Song request page loaded');
+      } catch (err) {
+        debugError('loadSongRequest', err);
+      }
+    }
+
     async function saveSongRequestSettings() {
       debug('BUTTON', 'saveSongRequestSettings clicked');
       try {
         const settings = {
-          maxQueue: parseInt(getVal('srMaxQueue')) || 50,
-          maxDuration: parseInt(getVal('srMaxDuration')) || 10,
-          cost: parseInt(getVal('srCost')) || 0,
-          cooldown: parseInt(getVal('srCooldown')) || 60
+          maxQueueSize: parseInt(getVal('srMaxQueue')) || 50,
+          maxSongDuration: (parseInt(getVal('srMaxDuration')) || 10) * 60,
+          pointsCost: parseInt(getVal('srCost')) || 0,
+          maxRequestsPerUser: 3,
+          subOnly: false,
+          volume: parseInt(document.getElementById('volumeSlider')?.value) || 50,
+          enabled: getChecked('srEnabled')
         };
         await window.api?.songs?.saveSettings(settings);
         showNotification('Song Request Settings saved!', 'success');

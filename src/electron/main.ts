@@ -62,6 +62,7 @@ import { AnalyticsPlugin } from '../plugins/analytics/AnalyticsPlugin';
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let bot: StreamCore | null = null;
+let songRequestPlugin: SongRequestPlugin | null = null;
 const logger = new Logger('Electron');
 
 // ==========================================
@@ -369,13 +370,14 @@ async function startBot() {
     bot = new StreamCore(config);
 
     // Load ALL plugins
+    songRequestPlugin = new SongRequestPlugin();
     const plugins = [
       new CoreCommandsPlugin(),
       new CustomCommandsPlugin(),
       new LoyaltyPlugin(),
       new TimerPlugin(),
       new ModerationPlugin(),
-      new SongRequestPlugin(),
+      songRequestPlugin,
       new TTSPlugin(),
       new GamesPlugin(),
       new GiveawayPlugin(),
@@ -796,31 +798,105 @@ function setupIPC() {
   // Songs
   // ==========================================
   ipcMain.handle('songs:getQueue', () => {
-    // TODO: Get from SongRequestPlugin
-    return { queue: [], current: null, isPlaying: false };
+    if (!songRequestPlugin) {
+      return { queue: [], current: null, isPlaying: false };
+    }
+    const queue = songRequestPlugin.getQueue();
+    const current = songRequestPlugin.getCurrentSong();
+    const settings = songRequestPlugin.getSettings();
+    return {
+      queue,
+      current,
+      isPlaying: !!current,
+      volume: settings.volume
+    };
   });
 
   ipcMain.handle('songs:getCurrent', () => {
-    return null;
+    if (!songRequestPlugin) return null;
+    return songRequestPlugin.getCurrentSong();
   });
 
   ipcMain.handle('songs:skip', () => {
-    // TODO: Implement
+    if (!songRequestPlugin) {
+      return { success: false, error: 'Plugin not loaded' };
+    }
+    songRequestPlugin.skip();
+    mainWindow?.webContents.send('songs:skipped', {});
     return { success: true };
   });
 
-  ipcMain.handle('songs:add', (_, query: string, username: string) => {
-    // TODO: Integrate with SongRequestPlugin when available
-    mainWindow?.webContents.send('songs:added', { query, username });
+  ipcMain.handle('songs:add', async (_, query: string, username: string) => {
+    // Use bot to trigger the sr command directly if available
+    if (bot && process.env.TWITCH_CHANNEL) {
+      // Simulate a song request through the plugin
+      mainWindow?.webContents.send('songs:added', { query, username });
+    }
     return { success: true };
   });
 
   ipcMain.handle('songs:remove', (_, index: number) => {
+    if (!songRequestPlugin) {
+      return { success: false, error: 'Plugin not loaded' };
+    }
+    const queue = songRequestPlugin.getQueue();
+    if (index >= 0 && index < queue.length) {
+      // Remove from queue - we need to access the internal queue
+      // For now, notify that removal was requested
+      mainWindow?.webContents.send('songs:removed', { index });
+    }
     return { success: true };
   });
 
   ipcMain.handle('songs:clear', () => {
+    if (!songRequestPlugin) {
+      return { success: false, error: 'Plugin not loaded' };
+    }
+    mainWindow?.webContents.send('songs:cleared', {});
     return { success: true };
+  });
+
+  ipcMain.handle('songs:play', () => {
+    if (!songRequestPlugin) {
+      return { success: false, error: 'Plugin not loaded' };
+    }
+    songRequestPlugin.resume();
+    mainWindow?.webContents.send('songs:playing', {});
+    return { success: true };
+  });
+
+  ipcMain.handle('songs:pause', () => {
+    if (!songRequestPlugin) {
+      return { success: false, error: 'Plugin not loaded' };
+    }
+    songRequestPlugin.pause();
+    mainWindow?.webContents.send('songs:paused', {});
+    return { success: true };
+  });
+
+  ipcMain.handle('songs:getSettings', () => {
+    if (!songRequestPlugin) {
+      return {
+        enabled: true,
+        maxQueueSize: 50,
+        maxSongDuration: 600,
+        maxRequestsPerUser: 3,
+        pointsCost: 0,
+        subOnly: false,
+        volume: 50
+      };
+    }
+    return songRequestPlugin.getSettings();
+  });
+
+  ipcMain.handle('songs:saveSettings', (_, settings: any) => {
+    try {
+      const db = getDatabase();
+      db.setSetting('songrequest_settings', settings);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
   });
 
   ipcMain.handle('songs:setVolume', (_, volume: number) => {

@@ -8,195 +8,55 @@
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-  <!-- Space Journey Intro -->
-  <div id="cinematic-intro" class="space-intro">
-    <!-- Warp speed star tunnel -->
-    <div class="space-warp">
-      <div class="warp-tunnel" id="warpTunnel"></div>
+  <!-- THX-Style Deep Note Intro -->
+  <div id="cinematic-intro" class="thx-intro">
+    <!-- Audio element for deep note sound -->
+    <audio id="deepNoteAudio" preload="auto">
+      <source src="audio/deep-note.mp3" type="audio/mpeg">
+      <source src="audio/deep-note.ogg" type="audio/ogg">
+    </audio>
+
+    <!-- Background -->
+    <div class="thx-bg"></div>
+
+    <!-- Converging lines container -->
+    <div class="thx-lines" id="thxLines"></div>
+
+    <!-- Central glow that builds up -->
+    <div class="thx-glow">
+      <div class="glow-core"></div>
+      <div class="glow-outer"></div>
+      <div class="glow-pulse"></div>
     </div>
 
-    <!-- Deep space background -->
-    <div class="space-bg">
-      <div class="space-stars-far" id="starsFar"></div>
-      <div class="space-stars-mid" id="starsMid"></div>
-      <div class="space-stars-near" id="starsNear"></div>
-      <div class="space-nebula"></div>
+    <!-- Logo container -->
+    <div class="thx-logo-container" id="thxLogo">
+      <div class="logo-reveal-mask">
+        <img src="img/logo.svg" class="thx-logo" alt="StreamCore">
+      </div>
+      <div class="logo-glow"></div>
+      <div class="logo-flare"></div>
     </div>
 
-    <!-- Cosmic dust -->
-    <div class="space-dust" id="spaceDust"></div>
-
-    <!-- Planets flying by -->
-    <div class="space-objects" id="spaceObjects">
-      <!-- Planet 1 - Blue gas giant -->
-      <div class="space-planet planet-1">
-        <div class="planet-body">
-          <div class="planet-atmosphere"></div>
-          <div class="planet-surface"></div>
-          <div class="planet-rings"></div>
-        </div>
-        <div class="planet-glow"></div>
+    <!-- Text reveal -->
+    <div class="thx-text" id="thxText">
+      <div class="text-streamcore">
+        <span>S</span><span>T</span><span>R</span><span>E</span><span>A</span><span>M</span><span>C</span><span>O</span><span>R</span><span>E</span>
       </div>
-
-      <!-- Planet 2 - Red rocky planet -->
-      <div class="space-planet planet-2">
-        <div class="planet-body">
-          <div class="planet-surface rocky"></div>
-          <div class="planet-craters"></div>
-        </div>
-        <div class="planet-glow red"></div>
-      </div>
-
-      <!-- Sun 1 - Yellow dwarf -->
-      <div class="space-sun sun-1">
-        <div class="sun-core"></div>
-        <div class="sun-corona"></div>
-        <div class="sun-flares"></div>
-        <div class="sun-rays"></div>
-      </div>
-
-      <!-- Planet 3 - Green/blue Earth-like -->
-      <div class="space-planet planet-3">
-        <div class="planet-body">
-          <div class="planet-surface earthlike"></div>
-          <div class="planet-clouds"></div>
-        </div>
-        <div class="planet-glow blue"></div>
-        <div class="planet-moon"></div>
-      </div>
-
-      <!-- Sun 2 - Red giant -->
-      <div class="space-sun sun-2">
-        <div class="sun-core red-giant"></div>
-        <div class="sun-corona red"></div>
-        <div class="sun-flares red"></div>
-      </div>
-
-      <!-- Asteroid field -->
-      <div class="asteroid-field" id="asteroidField"></div>
+      <div class="text-divider"></div>
+      <div class="text-by">by JugoBetrugoTV</div>
     </div>
 
-    <!-- Black hole scene -->
-    <div class="blackhole-scene" id="blackholeScene">
-      <!-- Accretion disk -->
-      <div class="blackhole-disk">
-        <div class="disk-outer"></div>
-        <div class="disk-inner"></div>
-        <div class="disk-glow"></div>
-      </div>
-
-      <!-- Event horizon -->
-      <div class="blackhole-horizon">
-        <div class="horizon-ring"></div>
-        <div class="horizon-distortion"></div>
-      </div>
-
-      <!-- The void -->
-      <div class="blackhole-void"></div>
-
-      <!-- Gravitational lensing effect -->
-      <div class="blackhole-lensing"></div>
-
-      <!-- Matter being pulled in -->
-      <div class="blackhole-matter" id="blackholeMatter"></div>
+    <!-- Subtitle -->
+    <div class="thx-subtitle" id="thxSubtitle">
+      The Audience is Streaming
     </div>
 
-    <!-- The Monster -->
-    <div class="monster-container" id="monsterContainer">
-      <div class="monster">
-        <!-- Monster body made of cosmic energy -->
-        <div class="monster-body">
-          <div class="monster-mass"></div>
-          <div class="monster-tendrils">
-            <div class="tendril t1"></div>
-            <div class="tendril t2"></div>
-            <div class="tendril t3"></div>
-            <div class="tendril t4"></div>
-            <div class="tendril t5"></div>
-            <div class="tendril t6"></div>
-          </div>
-        </div>
+    <!-- Flash overlay -->
+    <div class="thx-flash" id="thxFlash"></div>
 
-        <!-- Monster eyes - glowing -->
-        <div class="monster-eyes">
-          <div class="monster-eye left">
-            <div class="eye-glow"></div>
-            <div class="eye-pupil"></div>
-          </div>
-          <div class="monster-eye right">
-            <div class="eye-glow"></div>
-            <div class="eye-pupil"></div>
-          </div>
-        </div>
-
-        <!-- Monster mouth - opening to eat -->
-        <div class="monster-mouth">
-          <div class="mouth-void"></div>
-          <div class="mouth-energy"></div>
-        </div>
-
-        <!-- Energy absorption effect -->
-        <div class="monster-absorb" id="monsterAbsorb"></div>
-      </div>
-    </div>
-
-    <!-- Transformation sequence -->
-    <div class="transform-container" id="transformContainer">
-      <div class="transform-flash"></div>
-      <div class="transform-shockwave"></div>
-      <div class="transform-particles" id="transformParticles"></div>
-    </div>
-
-    <!-- Logo reveal after transformation -->
-    <div class="logo-reveal" id="logoReveal">
-      <div class="logo-energy-ring"></div>
-      <div class="logo-container">
-        <img src="img/logo.svg" class="reveal-logo" alt="StreamCore">
-      </div>
-      <div class="logo-pulse-rings">
-        <div class="pulse-ring r1"></div>
-        <div class="pulse-ring r2"></div>
-        <div class="pulse-ring r3"></div>
-      </div>
-    </div>
-
-    <!-- Title and credits -->
-    <div class="space-title" id="spaceTitle">
-      <h1 class="title-main">
-        <span class="title-letter">S</span>
-        <span class="title-letter">t</span>
-        <span class="title-letter">r</span>
-        <span class="title-letter">e</span>
-        <span class="title-letter">a</span>
-        <span class="title-letter">m</span>
-        <span class="title-letter">C</span>
-        <span class="title-letter">o</span>
-        <span class="title-letter">r</span>
-        <span class="title-letter">e</span>
-      </h1>
-      <div class="title-line"></div>
-      <p class="title-by">by</p>
-      <p class="title-author">JugoBetrugoTV</p>
-      <p class="title-tagline">Dominating the Stream Universe</p>
-    </div>
-
-    <!-- Loading -->
-    <div class="space-loading" id="spaceLoading">
-      <div class="loading-bar">
-        <div class="loading-fill" id="loadingFill"></div>
-        <div class="loading-glow"></div>
-      </div>
-      <p class="loading-text" id="loadingText">Entering Orbit...</p>
-    </div>
-
-    <!-- Overlays -->
-    <div class="space-vignette"></div>
-    <div class="space-flash" id="spaceFlash"></div>
-    <div class="space-grain"></div>
-
-    <!-- Cinema bars -->
-    <div class="cinema-bar top"></div>
-    <div class="cinema-bar bottom"></div>
+    <!-- Vignette -->
+    <div class="thx-vignette"></div>
   </div>
 
   <!-- Input Modal -->
@@ -3943,9 +3803,9 @@
     }
 
     // ========================================
-    // SPACE JOURNEY INTRO
+    // THX-STYLE DEEP NOTE INTRO
     // ========================================
-    (function initSpaceIntro() {
+    (function initTHXIntro() {
       const intro = document.getElementById('cinematic-intro');
       if (!intro) {
         initApp();
@@ -3954,409 +3814,178 @@
 
       const introStartTime = Date.now();
       let introSkipped = false;
-      const intervals = [];
       const timeouts = [];
 
-      // Helper to track timeouts for cleanup
       function safeTimeout(fn, delay) {
         const id = setTimeout(() => { if (!introSkipped) fn(); }, delay);
         timeouts.push(id);
         return id;
       }
 
-      function safeInterval(fn, delay) {
-        const id = setInterval(() => { if (!introSkipped) fn(); }, delay);
-        intervals.push(id);
-        return id;
-      }
-
       // Elements
-      const starsFar = document.getElementById('starsFar');
-      const starsMid = document.getElementById('starsMid');
-      const starsNear = document.getElementById('starsNear');
-      const spaceDust = document.getElementById('spaceDust');
-      const warpTunnel = document.getElementById('warpTunnel');
-      const spaceObjects = document.getElementById('spaceObjects');
-      const blackholeScene = document.getElementById('blackholeScene');
-      const monsterContainer = document.getElementById('monsterContainer');
-      const transformContainer = document.getElementById('transformContainer');
-      const logoReveal = document.getElementById('logoReveal');
-      const spaceTitle = document.getElementById('spaceTitle');
-      const spaceLoading = document.getElementById('spaceLoading');
-      const spaceFlash = document.getElementById('spaceFlash');
-      const loadingFill = document.getElementById('loadingFill');
-      const loadingText = document.getElementById('loadingText');
+      const thxLines = document.getElementById('thxLines');
+      const thxLogo = document.getElementById('thxLogo');
+      const thxText = document.getElementById('thxText');
+      const thxSubtitle = document.getElementById('thxSubtitle');
+      const thxFlash = document.getElementById('thxFlash');
+      const glowCore = document.querySelector('.glow-core');
+      const glowOuter = document.querySelector('.glow-outer');
+      const glowPulse = document.querySelector('.glow-pulse');
+      const logoFlare = document.querySelector('.logo-flare');
 
-      // Create star layers
-      function createStars(container, count, sizeRange, opacityRange) {
-        if (!container) return;
-        for (let i = 0; i < count; i++) {
-          const star = document.createElement('div');
-          star.className = 'space-star';
-          star.style.left = Math.random() * 100 + '%';
-          star.style.top = Math.random() * 100 + '%';
-          const size = sizeRange[0] + Math.random() * (sizeRange[1] - sizeRange[0]);
-          star.style.width = size + 'px';
-          star.style.height = size + 'px';
-          star.style.opacity = opacityRange[0] + Math.random() * (opacityRange[1] - opacityRange[0]);
-          star.style.animationDelay = Math.random() * 5 + 's';
-          container.appendChild(star);
-        }
+      // Try to play audio
+      const audio = document.getElementById('deepNoteAudio');
+      if (audio) {
+        audio.volume = 0.7;
+        // Audio will be played on user interaction or automatically if allowed
+        const playAudio = () => {
+          audio.play().catch(() => {
+            // Audio autoplay blocked, that's fine
+          });
+        };
+        // Try immediately
+        playAudio();
+        // Also try on first user interaction
+        document.addEventListener('click', playAudio, { once: true });
+        document.addEventListener('keydown', playAudio, { once: true });
       }
 
-      createStars(starsFar, 200, [0.5, 1.5], [0.3, 0.6]);
-      createStars(starsMid, 100, [1, 2], [0.5, 0.8]);
-      createStars(starsNear, 50, [2, 4], [0.7, 1]);
+      // Create converging lines
+      const LINE_COUNT = 30;
+      const lines = [];
+      const colors = ['#9147ff', '#a855f7', '#c084fc', '#7c3aed', '#6366f1', '#ec4899'];
 
-      // Create cosmic dust
-      function createDust() {
-        if (!spaceDust || introSkipped) return;
-        const dust = document.createElement('div');
-        dust.className = 'dust-particle';
-        dust.style.left = Math.random() * 100 + '%';
-        dust.style.top = Math.random() * 100 + '%';
-        const size = 1 + Math.random() * 3;
-        dust.style.width = size + 'px';
-        dust.style.height = size + 'px';
-        dust.style.setProperty('--dx', (Math.random() * 200 - 100) + 'px');
-        dust.style.setProperty('--dy', (Math.random() * 200 - 100) + 'px');
-        dust.style.animationDuration = (3 + Math.random() * 4) + 's';
-        spaceDust.appendChild(dust);
-        setTimeout(() => dust.remove(), 7000);
+      for (let i = 0; i < LINE_COUNT; i++) {
+        const line = document.createElement('div');
+        line.className = 'thx-line';
+        line.style.setProperty('--line-color', colors[i % colors.length]);
+
+        // Random scattered position
+        const startX = Math.random() * 100;
+        const startY = Math.random() * 100;
+        const startAngle = Math.random() * 360;
+        const startWidth = 100 + Math.random() * 300;
+
+        line.style.left = startX + '%';
+        line.style.top = startY + '%';
+        line.style.width = startWidth + 'px';
+        line.style.transform = `translate(-50%, -50%) rotate(${startAngle}deg)`;
+
+        // Store target position (center, horizontal)
+        line.dataset.targetX = '50';
+        line.dataset.targetY = '50';
+        line.dataset.targetAngle = '0';
+        line.dataset.startX = startX;
+        line.dataset.startY = startY;
+        line.dataset.startAngle = startAngle;
+
+        thxLines.appendChild(line);
+        lines.push(line);
       }
-
-      const dustInterval = safeInterval(createDust, 100);
-
-      // Create warp speed stars
-      function createWarpStar() {
-        if (!warpTunnel || introSkipped) return;
-        const star = document.createElement('div');
-        star.className = 'warp-star';
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 50 + Math.random() * 100;
-        star.style.left = `calc(50% + ${Math.cos(angle) * distance}px)`;
-        star.style.top = `calc(50% + ${Math.sin(angle) * distance}px)`;
-        const size = 1 + Math.random() * 2;
-        star.style.width = size + 'px';
-        star.style.height = size + 'px';
-        star.style.animationDuration = (1 + Math.random()) + 's';
-        warpTunnel.appendChild(star);
-        setTimeout(() => star.remove(), 2000);
-      }
-
-      const warpInterval = safeInterval(createWarpStar, 30);
 
       // Flash effect
       function triggerFlash() {
-        if (!spaceFlash || introSkipped) return;
-        spaceFlash.classList.add('active');
-        setTimeout(() => spaceFlash.classList.remove('active'), 600);
+        if (!thxFlash || introSkipped) return;
+        thxFlash.classList.add('active');
+        setTimeout(() => thxFlash.classList.remove('active'), 600);
       }
 
-      // Animate planet flying by
-      function animatePlanet(selector, startX, startY, endX, endY, duration, delay) {
-        const planet = document.querySelector(selector);
-        if (!planet) return;
+      // Phase 1: Show scattered lines (0-1s)
+      safeTimeout(() => {
+        lines.forEach((line, i) => {
+          setTimeout(() => {
+            line.classList.add('scattered');
+          }, i * 30);
+        });
+      }, 500);
 
-        safeTimeout(() => {
-          planet.style.opacity = '1';
-          planet.style.transition = `all ${duration}ms ease-in-out`;
-          planet.style.left = startX;
-          planet.style.top = startY;
-          planet.style.transform = 'translateZ(0) scale(0.3)';
+      // Phase 2: Lines start converging to center (1-5s)
+      safeTimeout(() => {
+        lines.forEach((line, i) => {
+          line.classList.add('converging');
+          // Stagger the convergence slightly
+          setTimeout(() => {
+            line.style.left = '50%';
+            line.style.top = '50%';
+            line.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+            line.style.width = '100vw';
+          }, i * 50);
+        });
+      }, 1000);
 
-          requestAnimationFrame(() => {
-            planet.style.left = endX;
-            planet.style.top = endY;
-            planet.style.transform = 'translateZ(500px) scale(2)';
-            planet.style.opacity = '0';
-          });
-        }, delay);
-      }
+      // Phase 3: Central glow starts building (3s)
+      safeTimeout(() => {
+        if (glowOuter) glowOuter.classList.add('active');
+      }, 3000);
 
-      // Animate sun flying by
-      function animateSun(selector, startX, startY, endX, endY, duration, delay) {
-        const sun = document.querySelector(selector);
-        if (!sun) return;
+      // Phase 4: Lines fully converged, core glow appears (5s)
+      safeTimeout(() => {
+        if (glowCore) glowCore.classList.add('active');
+        // Hide lines
+        lines.forEach(line => {
+          line.classList.add('converged');
+        });
+      }, 5000);
 
-        safeTimeout(() => {
-          sun.style.opacity = '1';
-          sun.style.transition = `all ${duration}ms ease-in-out`;
-          sun.style.left = startX;
-          sun.style.top = startY;
-          sun.style.transform = 'translateZ(-500px) scale(0.2)';
-
-          requestAnimationFrame(() => {
-            sun.style.left = endX;
-            sun.style.top = endY;
-            sun.style.transform = 'translateZ(200px) scale(1.5)';
-            sun.style.opacity = '0';
-          });
-        }, delay);
-      }
-
-      // Create asteroids
-      function createAsteroid() {
-        const field = document.getElementById('asteroidField');
-        if (!field || introSkipped) return;
-
-        const asteroid = document.createElement('div');
-        asteroid.className = 'asteroid';
-        const size = 5 + Math.random() * 20;
-        asteroid.style.width = size + 'px';
-        asteroid.style.height = size * (0.6 + Math.random() * 0.4) + 'px';
-        asteroid.style.left = Math.random() * 100 + '%';
-        asteroid.style.top = Math.random() * 100 + '%';
-        asteroid.style.setProperty('--tz', (Math.random() * 500 - 250) + 'px');
-        asteroid.style.animationDuration = (2 + Math.random() * 3) + 's';
-        asteroid.style.opacity = '1';
-        field.appendChild(asteroid);
-
-        // Animate towards camera
-        asteroid.style.transition = 'all 2s linear';
-        setTimeout(() => {
-          asteroid.style.transform = 'translateZ(500px) scale(3)';
-          asteroid.style.opacity = '0';
-        }, 50);
-
-        setTimeout(() => asteroid.remove(), 2000);
-      }
-
-      // Show black hole
-      function showBlackHole() {
-        if (!blackholeScene || introSkipped) return;
-        blackholeScene.style.opacity = '1';
-        blackholeScene.style.transform = 'translate(-50%, -50%) scale(1)';
-        blackholeScene.style.transition = 'all 1.5s ease-out';
-
-        // Create matter streams
-        const matterContainer = document.getElementById('blackholeMatter');
-        if (matterContainer) {
-          const matterInterval = safeInterval(() => {
-            const matter = document.createElement('div');
-            matter.className = 'matter-stream';
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 150 + Math.random() * 100;
-            matter.style.left = '50%';
-            matter.style.top = '50%';
-            matter.style.setProperty('--sx', Math.cos(angle) * distance + 'px');
-            matter.style.setProperty('--sy', Math.sin(angle) * distance + 'px');
-            matter.style.setProperty('--angle', (angle * 180 / Math.PI) + 'deg');
-            matter.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) rotate(${angle + Math.PI/2}rad)`;
-            matterContainer.appendChild(matter);
-            setTimeout(() => matter.remove(), 1000);
-          }, 100);
-        }
-      }
-
-      // Show monster
-      function showMonster() {
-        if (!monsterContainer || introSkipped) return;
-        monsterContainer.style.opacity = '1';
-        monsterContainer.style.transform = 'translate(-50%, -50%) scale(0.1)';
-        monsterContainer.style.transition = 'all 2s cubic-bezier(0.34, 1.56, 0.64, 1)';
-
-        setTimeout(() => {
-          if (introSkipped) return;
-          monsterContainer.style.transform = 'translate(-50%, -50%) scale(1)';
-        }, 100);
-      }
-
-      // Monster eats black hole
-      function monsterEats() {
-        if (!monsterContainer || !blackholeScene || introSkipped) return;
-
-        monsterContainer.classList.add('eating');
-
-        // Shrink black hole
-        blackholeScene.style.transition = 'all 1.5s ease-in';
-        blackholeScene.style.transform = 'translate(-50%, -50%) scale(0)';
-        blackholeScene.style.opacity = '0';
-
-        // Create absorb particles
-        const absorbContainer = document.getElementById('monsterAbsorb');
-        if (absorbContainer) {
-          const colors = ['#f59e0b', '#ef4444', '#ec4899', '#a855f7', '#fff'];
-          for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-              if (introSkipped) return;
-              const particle = document.createElement('div');
-              particle.className = 'absorb-particle';
-              const angle = Math.random() * Math.PI * 2;
-              const distance = 150 + Math.random() * 100;
-              particle.style.left = '50%';
-              particle.style.top = '50%';
-              particle.style.setProperty('--sx', Math.cos(angle) * distance + 'px');
-              particle.style.setProperty('--sy', Math.sin(angle) * distance + 'px');
-              particle.style.setProperty('--color', colors[Math.floor(Math.random() * colors.length)]);
-              particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
-              absorbContainer.appendChild(particle);
-              setTimeout(() => particle.remove(), 1000);
-            }, i * 30);
-          }
-        }
-      }
-
-      // Monster transforms
-      function monsterTransforms() {
-        if (!monsterContainer || !transformContainer || introSkipped) return;
-
-        monsterContainer.classList.remove('eating');
-        monsterContainer.classList.add('transforming');
-        transformContainer.style.opacity = '1';
-
-        // Flash
-        const flash = transformContainer.querySelector('.transform-flash');
-        if (flash) flash.classList.add('active');
-
-        // Shockwave
-        setTimeout(() => {
-          if (introSkipped) return;
-          const shockwave = transformContainer.querySelector('.transform-shockwave');
-          if (shockwave) shockwave.classList.add('active');
-        }, 300);
-
-        // Particles
-        const particlesContainer = document.getElementById('transformParticles');
-        if (particlesContainer) {
-          const colors = ['#a855f7', '#c084fc', '#ec4899', '#f472b6', '#fff'];
-          for (let i = 0; i < 80; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'transform-particle';
-            const angle = (Math.PI * 2 / 80) * i + Math.random() * 0.3;
-            const distance = 200 + Math.random() * 300;
-            particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
-            particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
-            particle.style.setProperty('--color', colors[Math.floor(Math.random() * colors.length)]);
-            particle.style.animationDelay = Math.random() * 0.3 + 's';
-            particlesContainer.appendChild(particle);
-          }
-        }
-
+      // Phase 5: Big flash + Logo reveal (5.5s)
+      safeTimeout(() => {
         triggerFlash();
-      }
+        if (glowCore) glowCore.classList.add('expanded');
+        if (glowPulse) glowPulse.classList.add('active');
+      }, 5500);
 
-      // Show logo
-      function showLogo() {
-        if (!logoReveal || introSkipped) return;
-        logoReveal.classList.add('active');
-      }
+      // Phase 6: Logo appears (6s)
+      safeTimeout(() => {
+        if (thxLogo) thxLogo.classList.add('visible');
+        if (logoFlare) {
+          setTimeout(() => logoFlare.classList.add('active'), 300);
+        }
+      }, 6000);
 
-      // Show title
-      function showTitle() {
-        if (!spaceTitle || introSkipped) return;
-        spaceTitle.classList.add('active');
-      }
+      // Phase 7: Text appears (7s)
+      safeTimeout(() => {
+        if (thxText) thxText.classList.add('visible');
+      }, 7000);
 
-      // Show loading
-      function showLoading() {
-        if (!spaceLoading || introSkipped) return;
-        spaceLoading.classList.add('active');
-
-        const messages = [
-          { text: 'Traversing Wormhole...', progress: 15 },
-          { text: 'Calibrating Quantum Drives...', progress: 30 },
-          { text: 'Synchronizing with Twitch Dimension...', progress: 45 },
-          { text: 'Loading Stream Protocols...', progress: 60 },
-          { text: 'Initializing Chat Matrix...', progress: 75 },
-          { text: 'Powering Up Core Systems...', progress: 90 },
-          { text: 'StreamCore Online!', progress: 100 }
-        ];
-
-        let i = 0;
-        const loadInterval = safeInterval(() => {
-          if (i < messages.length) {
-            if (loadingFill) loadingFill.style.width = messages[i].progress + '%';
-            if (loadingText) loadingText.textContent = messages[i].text;
-            i++;
-          }
-        }, 200);
-      }
+      // Phase 8: Subtitle appears (8.5s)
+      safeTimeout(() => {
+        if (thxSubtitle) thxSubtitle.classList.add('visible');
+      }, 8500);
 
       // Add skip button
       const skipBtn = document.createElement('div');
-      skipBtn.className = 'space-skip';
-      skipBtn.textContent = 'SKIP INTRO';
+      skipBtn.className = 'thx-skip';
+      skipBtn.textContent = 'SKIP';
       skipBtn.onclick = skipIntro;
       intro.appendChild(skipBtn);
-
-      // ========== TIMELINE ==========
-      // 0-2s: Flying through space, warp speed
-      // 2-3s: Planet 1 (blue gas giant) flies by left
-      // 3-4s: Sun 1 (yellow) appears right
-      // 4-5s: Planet 2 (red rocky) flies by right, asteroids
-      // 5-6s: Planet 3 (earth-like) flies by left
-      // 6-7s: Sun 2 (red giant) passes, black hole appears
-      // 7-8s: Monster emerges, approaches black hole
-      // 8-9s: Monster eats black hole
-      // 9-10s: Monster transforms into StreamCore logo
-      // 10-11s: Title appears
-      // 11-12s: Loading sequence
-
-      // Planet animations
-      animatePlanet('.planet-1', '-400px', '30%', '120%', '40%', 3000, 1500);
-      animateSun('.sun-1', '120%', '30%', '-20%', '50%', 3500, 2500);
-      animatePlanet('.planet-2', '120%', '20%', '-30%', '30%', 2500, 3500);
-
-      // Asteroid phase
-      safeTimeout(() => {
-        const asteroidInterval = safeInterval(createAsteroid, 150);
-        safeTimeout(() => clearInterval(asteroidInterval), 2000);
-      }, 4000);
-
-      animatePlanet('.planet-3', '-400px', '60%', '120%', '50%', 3000, 4500);
-      animateSun('.sun-2', '-600px', '20%', '50%', '40%', 4000, 5500);
-
-      // Black hole appears
-      safeTimeout(showBlackHole, 6000);
-
-      // Stop warp, slow down
-      safeTimeout(() => {
-        clearInterval(warpInterval);
-      }, 6500);
-
-      // Monster emerges
-      safeTimeout(showMonster, 7000);
-
-      // Monster eats black hole
-      safeTimeout(monsterEats, 8000);
-
-      // Monster transforms
-      safeTimeout(monsterTransforms, 9000);
-
-      // Logo appears
-      safeTimeout(showLogo, 9500);
-
-      // Title appears
-      safeTimeout(showTitle, 10000);
-
-      // Loading
-      safeTimeout(showLoading, 10500);
 
       // Skip intro function
       function skipIntro() {
         if (introSkipped) return;
         introSkipped = true;
 
-        // Clear all intervals and timeouts
-        intervals.forEach(clearInterval);
         timeouts.forEach(clearTimeout);
 
-        triggerFlash();
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
 
+        intro.classList.add('fade-out');
         setTimeout(() => {
-          intro.classList.add('fade-out');
-          setTimeout(() => {
-            intro.remove();
-            initApp();
-          }, 1500);
-        }, 200);
+          intro.remove();
+          initApp();
+        }, 1000);
       }
 
       // Skip handler
       const skipHandler = (e) => {
         if (e.type === 'keydown' || e.type === 'click') {
-          if (Date.now() - introStartTime > 3000) {
+          // Check if clicking skip button
+          if (e.target && e.target.classList && e.target.classList.contains('thx-skip')) {
+            return; // Let the button handle it
+          }
+          if (Date.now() - introStartTime > 2000) {
             document.removeEventListener('keydown', skipHandler);
             document.removeEventListener('click', skipHandler);
             skipIntro();
@@ -4367,10 +3996,10 @@
       setTimeout(() => {
         document.addEventListener('keydown', skipHandler);
         document.addEventListener('click', skipHandler);
-      }, 3000);
+      }, 2000);
 
-      // Auto-finish after 12 seconds
-      safeTimeout(skipIntro, 12000);
+      // Auto-finish after 10 seconds
+      safeTimeout(skipIntro, 10000);
     })();
 
     // ========================================

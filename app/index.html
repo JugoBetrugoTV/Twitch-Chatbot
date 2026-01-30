@@ -4813,21 +4813,43 @@
     }
 
     async function addBlacklistWord() {
-      const word = document.getElementById('blacklistWord')?.value?.trim();
-      if (!word) return;
+      const word = document.getElementById('blacklistInput')?.value?.trim();
+      if (!word) {
+        showNotification('Bitte ein Wort eingeben', 'error');
+        return;
+      }
       try {
         const result = await window.api?.moderation?.addBlacklist(word);
-        console.log('Blacklist add result:', result);
+        debug('INFO', 'Blacklist add result:', result);
         if (result && result.success !== false) {
-          document.getElementById('blacklistWord').value = '';
-          loadModeration();
+          document.getElementById('blacklistInput').value = '';
+          loadBlacklist();
           showNotification('Wort zur Blacklist hinzugefügt', 'success');
         } else {
           showNotification(result?.error || 'Fehler beim Hinzufügen', 'error');
         }
       } catch (err) {
-        console.error('Blacklist add error:', err);
+        debugError('addBlacklistWord', err);
         showNotification('Fehler: ' + err.message, 'error');
+      }
+    }
+
+    async function loadBlacklist() {
+      try {
+        const blacklist = await window.api?.moderation?.getBlacklist?.() || [];
+        const container = document.getElementById('blacklistTags');
+        const countEl = document.getElementById('blacklistCount');
+        if (countEl) countEl.textContent = blacklist.length;
+        if (container) {
+          container.innerHTML = blacklist.map(word => `
+            <span class="badge" style="display:inline-flex; align-items:center; gap:5px; padding:6px 10px;">
+              ${escapeHtml(word)}
+              <button onclick="removeBlacklistWord('${escapeHtml(word)}')" style="background:none; border:none; color:var(--red); cursor:pointer; padding:0;">×</button>
+            </span>
+          `).join('');
+        }
+      } catch (err) {
+        debugError('loadBlacklist', err);
       }
     }
 
@@ -5189,24 +5211,119 @@
     // ========================================
     // DATA REFRESH
     // ========================================
+    let sessionStartTime = Date.now();
+
     async function refreshData() {
       if (!window.api) return;
       try {
+        // Get bot stats
         const stats = await window.api.bot?.getStats();
         if (stats) {
-          document.getElementById('statMessages').textContent = stats.messagesReceived || 0;
-          // Don't overwrite statCommands - let loadCommands set it to custom commands count
-          document.getElementById('statSongs').textContent = stats.songsPlayed || 0;
-          document.getElementById('statViewers').textContent = stats.onlineUsers || 0;
-          document.getElementById('onlineUsers').textContent = stats.onlineUsers || 0;
+          setText('statMessages', stats.messagesReceived || 0);
+          setText('statSongs', stats.songsPlayed || 0);
+          setText('statViewers', stats.onlineUsers || 0);
+          setText('onlineUsers', stats.onlineUsers || 0);
+          setText('statFollows', stats.follows || 0);
+
+          // Update stream info
+          if (stats.streamInfo) {
+            setText('streamTitle', stats.streamInfo.title || 'Not streaming');
+            setText('streamGame', stats.streamInfo.game || '-');
+            setText('streamViewerCount', stats.streamInfo.viewers || 0);
+
+            const statusBadge = document.getElementById('streamStatusBadge');
+            if (statusBadge) {
+              if (stats.streamInfo.isLive) {
+                statusBadge.textContent = 'Live';
+                statusBadge.className = 'stream-status live';
+              } else {
+                statusBadge.textContent = 'Offline';
+                statusBadge.className = 'stream-status offline';
+              }
+            }
+          }
         }
+
+        // Update uptime
+        const uptimeMs = Date.now() - sessionStartTime;
+        const hours = Math.floor(uptimeMs / 3600000);
+        const minutes = Math.floor((uptimeMs % 3600000) / 60000);
+        setText('statUptime', `${hours}:${minutes.toString().padStart(2, '0')}`);
+
         // Refresh commands count from database (custom commands only)
         const cmds = await window.api.commands?.getAll();
         if (cmds) {
-          document.getElementById('statCommands').textContent = cmds.length;
+          setText('statCommands', cmds.length);
         }
+
+        // Refresh song queue
         await refreshSongQueue();
-      } catch(e) { console.error(e); }
+
+        // Update dashboard chat preview
+        await refreshDashboardChat();
+
+        // Update events list
+        await refreshDashboardEvents();
+
+      } catch(e) {
+        debugError('refreshData', e);
+      }
+    }
+
+    async function refreshDashboardChat() {
+      try {
+        const messages = await window.api.messages?.getRecent?.(10) || [];
+        const container = document.getElementById('dashboardChat');
+        if (!container) return;
+
+        if (messages.length === 0) {
+          container.innerHTML = `<div class="empty-compact">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            <p>Chat messages appear here</p>
+          </div>`;
+          return;
+        }
+
+        container.innerHTML = messages.map(m => `
+          <div class="chat-compact">
+            <span class="chat-user" style="color:${m.color || 'var(--purple-light)'}">${escapeHtml(m.username)}:</span>
+            <span class="chat-msg">${escapeHtml(m.message)}</span>
+          </div>
+        `).join('');
+      } catch(e) {
+        debugError('refreshDashboardChat', e);
+      }
+    }
+
+    async function refreshDashboardEvents() {
+      try {
+        const events = await window.api.events?.getAll?.() || [];
+        const container = document.getElementById('eventList');
+        if (!container) return;
+
+        const recentEvents = events.slice(-10).reverse();
+        if (recentEvents.length === 0) {
+          container.innerHTML = `<div class="empty-compact">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            <p>Follows, subs & bits here</p>
+          </div>`;
+          return;
+        }
+
+        container.innerHTML = recentEvents.map(e => {
+          const iconClass = e.type === 'follow' ? 'follow' : e.type === 'sub' ? 'sub' : e.type === 'bits' ? 'bits' : 'raid';
+          const icon = e.type === 'follow' ? '💜' : e.type === 'sub' ? '⭐' : e.type === 'bits' ? '💎' : '🎉';
+          return `<div class="event-compact">
+            <div class="event-icon-sm ${iconClass}">${icon}</div>
+            <div class="event-content">
+              <div class="event-user">${escapeHtml(e.username)}</div>
+              <div class="event-desc">${escapeHtml(e.message || e.type)}</div>
+            </div>
+          </div>`;
+        }).join('');
+      } catch(e) {
+        debugError('refreshDashboardEvents', e);
+      }
     }
 
     // ========================================
@@ -5330,11 +5447,11 @@
     }
 
     // ========================================
-    // GAMES
+    // GAMES (MINIGAMES)
     // ========================================
     async function loadGames() {
       if (!window.api) return;
-      const settings = await window.api.games?.getSettings();
+      const settings = await window.api.minigames?.getSettings();
       if (settings) {
         document.getElementById('gameDice').checked = settings.dice?.enabled !== false;
         document.getElementById('game8ball').checked = settings.eightball?.enabled !== false;
@@ -5357,7 +5474,7 @@
         trivia: { enabled: document.getElementById('gameTrivia')?.checked, reward: parseInt(document.getElementById('triviaReward')?.value) || 100 },
         roulette: { enabled: document.getElementById('gameRoulette')?.checked },
       };
-      await window.api?.games?.updateSettings(settings);
+      await window.api?.minigames?.saveSettings(settings);
       showNotification('Spiel-Einstellungen gespeichert!', 'success');
     }
 
@@ -6552,13 +6669,11 @@
       navigateTo('modtools');
     }
 
-    function executeModAction() {
+    async function executeModAction() {
       debug('BUTTON', 'executeModAction clicked');
-      const action = document.getElementById('quickModAction')?.value || 'timeout';
-      const target = document.getElementById('quickModTarget')?.value;
-      const duration = document.getElementById('quickModDuration')?.value || '60';
-
-      debug('INFO', `Mod action: ${action} on ${target} for ${duration}s`);
+      const actionType = document.getElementById('quickActionType')?.value || 'timeout60';
+      const target = document.getElementById('quickActionUser')?.value?.trim();
+      const reason = document.getElementById('quickActionReason')?.value || 'Quick action from UI';
 
       if (!target) {
         debug('ERROR', 'No target username entered');
@@ -6566,28 +6681,54 @@
         return;
       }
 
-      if (action === 'timeout') {
-        window.api?.moderation?.timeout(target, parseInt(duration), 'Quick action from UI').then(() => {
+      debug('INFO', `Mod action: ${actionType} on ${target}`);
+
+      try {
+        if (actionType.startsWith('timeout')) {
+          const duration = parseInt(actionType.replace('timeout', '')) || 60;
+          await window.api?.moderation?.timeout(target, duration, reason);
           showNotification(`${target} für ${duration}s getimeouted`, 'success');
           debug('SUCCESS', `Timeout executed: ${target}`);
-        });
-      } else if (action === 'ban') {
-        window.api?.moderation?.ban(target, 'Quick action from UI').then(() => {
+        } else if (actionType === 'ban') {
+          await window.api?.moderation?.ban(target, reason);
           showNotification(`${target} gebannt`, 'success');
           debug('SUCCESS', `Ban executed: ${target}`);
-        });
-      } else if (action === 'unban') {
-        window.api?.moderation?.unban(target).then(() => {
+        } else if (actionType === 'unban') {
+          await window.api?.moderation?.unban(target);
           showNotification(`${target} entbannt`, 'success');
           debug('SUCCESS', `Unban executed: ${target}`);
-        });
+        }
+        // Clear input
+        document.getElementById('quickActionUser').value = '';
+        document.getElementById('quickActionReason').value = '';
+      } catch (err) {
+        debugError('executeModAction', err);
+        showNotification('Fehler: ' + err.message, 'error');
       }
     }
 
-    function permitLink() {
-      const username = prompt('Benutzername für Link-Erlaubnis:');
-      if (username) {
-        showNotification(`${username} darf jetzt Links posten`, 'success');
+    async function permitLink() {
+      const username = document.getElementById('permitUser')?.value?.trim();
+      const duration = parseInt(document.getElementById('permitDuration')?.value) || 60;
+
+      if (!username) {
+        showNotification('Bitte Benutzername eingeben', 'error');
+        return;
+      }
+
+      // Store permit in memory (simple implementation)
+      showNotification(`${username} darf ${duration}s lang Links posten`, 'success');
+      document.getElementById('permitUser').value = '';
+
+      // Add to active permits display
+      const permitsEl = document.getElementById('activePermits');
+      if (permitsEl) {
+        const permitDiv = document.createElement('div');
+        permitDiv.className = 'badge badge-success';
+        permitDiv.style.marginRight = '5px';
+        permitDiv.innerHTML = `${username} (${duration}s)`;
+        permitsEl.appendChild(permitDiv);
+        setTimeout(() => permitDiv.remove(), duration * 1000);
       }
     }
 

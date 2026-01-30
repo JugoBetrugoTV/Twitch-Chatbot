@@ -203,6 +203,7 @@ contextBridge.exposeInMainWorld('api', {
   minigames: {
     getSettings: () => ipcRenderer.invoke('minigames:getSettings'),
     saveSettings: (settings: any) => ipcRenderer.invoke('minigames:saveSettings', settings),
+    updateSettings: (settings: any) => ipcRenderer.invoke('minigames:saveSettings', settings), // alias
   },
 
   // Betting

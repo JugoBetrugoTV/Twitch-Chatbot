@@ -1076,11 +1076,112 @@ main {
   overflow: hidden;
   backdrop-filter: blur(10px);
   transition: all 0.25s ease;
+  position: relative;
 }
 
 .bento-card:hover {
   border-color: rgba(145, 71, 255, 0.15);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Drag & Drop States for Cards */
+.bento-card[draggable="true"] {
+  cursor: grab;
+}
+
+.bento-card[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.bento-card.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+  border: 2px dashed var(--purple);
+  box-shadow: 0 0 30px rgba(145, 71, 255, 0.3);
+}
+
+.bento-card.drag-over {
+  border-color: var(--purple);
+  box-shadow: 0 0 20px rgba(145, 71, 255, 0.4);
+}
+
+.bento-card.drag-left::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--gradient-purple);
+  border-radius: 2px;
+  animation: pulse-soft 0.8s ease-in-out infinite;
+  z-index: 10;
+}
+
+.bento-card.drag-right::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--gradient-purple);
+  border-radius: 2px;
+  animation: pulse-soft 0.8s ease-in-out infinite;
+  z-index: 10;
+}
+
+.drag-handle {
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Drag & Drop States for Navigation */
+.nav-item[draggable="true"] {
+  cursor: grab;
+  position: relative;
+}
+
+.nav-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.nav-item.dragging {
+  opacity: 0.5;
+  background: rgba(145, 71, 255, 0.2) !important;
+  border: 1px dashed var(--purple);
+  border-radius: 10px;
+}
+
+.nav-item.drag-over {
+  background: rgba(145, 71, 255, 0.1);
+}
+
+.nav-item.drag-above::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background: var(--gradient-purple);
+  border-radius: 2px;
+  animation: pulse-soft 0.8s ease-in-out infinite;
+}
+
+.nav-item.drag-below::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background: var(--gradient-purple);
+  border-radius: 2px;
+  animation: pulse-soft 0.8s ease-in-out infinite;
 }
 
 .bento-header {

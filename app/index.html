@@ -283,8 +283,8 @@
           </div>
 
           <!-- Chat Card - 2 columns wide -->
-          <div class="bento-card bento-chat">
-            <div class="bento-header">
+          <div class="bento-card bento-chat" draggable="true" data-card-id="chat">
+            <div class="bento-header drag-handle">
               <div class="bento-title">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
                 Live Chat
@@ -300,8 +300,8 @@
           </div>
 
           <!-- Events Card -->
-          <div class="bento-card bento-events">
-            <div class="bento-header">
+          <div class="bento-card bento-events" draggable="true" data-card-id="events">
+            <div class="bento-header drag-handle">
               <div class="bento-title">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
                 Events
@@ -316,8 +316,8 @@
           </div>
 
           <!-- Song Queue Card -->
-          <div class="bento-card bento-queue">
-            <div class="bento-header">
+          <div class="bento-card bento-queue" draggable="true" data-card-id="queue">
+            <div class="bento-header drag-handle">
               <div class="bento-title">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
                 Song Queue
@@ -333,8 +333,8 @@
           </div>
 
           <!-- Quick Actions Card -->
-          <div class="bento-card" style="grid-column: span 2;">
-            <div class="bento-header">
+          <div class="bento-card" style="grid-column: span 2;" draggable="true" data-card-id="actions">
+            <div class="bento-header drag-handle">
               <div class="bento-title">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 Quick Actions
@@ -3386,6 +3386,287 @@
         confirmModalResolve = null;
       }
     }
+
+    // ========================================
+    // DRAG & DROP SYSTEM
+    // ========================================
+    const DragDropManager = {
+      draggedElement: null,
+      draggedType: null, // 'card' or 'nav'
+      placeholder: null,
+
+      init() {
+        this.initBentoCards();
+        this.initNavItems();
+        this.loadLayouts();
+        debug('INFO', 'Drag & Drop System initialized');
+      },
+
+      // === BENTO CARDS DRAG & DROP ===
+      initBentoCards() {
+        const cards = document.querySelectorAll('.bento-card[draggable="true"]');
+        cards.forEach(card => {
+          card.addEventListener('dragstart', (e) => this.handleCardDragStart(e, card));
+          card.addEventListener('dragend', (e) => this.handleCardDragEnd(e, card));
+          card.addEventListener('dragover', (e) => this.handleCardDragOver(e, card));
+          card.addEventListener('drop', (e) => this.handleCardDrop(e, card));
+          card.addEventListener('dragenter', (e) => this.handleCardDragEnter(e, card));
+          card.addEventListener('dragleave', (e) => this.handleCardDragLeave(e, card));
+        });
+      },
+
+      handleCardDragStart(e, card) {
+        this.draggedElement = card;
+        this.draggedType = 'card';
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', card.dataset.cardId);
+
+        // Create ghost image
+        const ghost = card.cloneNode(true);
+        ghost.style.opacity = '0.8';
+        ghost.style.position = 'absolute';
+        ghost.style.top = '-9999px';
+        document.body.appendChild(ghost);
+        e.dataTransfer.setDragImage(ghost, e.offsetX, e.offsetY);
+        setTimeout(() => ghost.remove(), 0);
+
+        debug('INFO', `Started dragging card: ${card.dataset.cardId}`);
+      },
+
+      handleCardDragEnd(e, card) {
+        card.classList.remove('dragging');
+        document.querySelectorAll('.bento-card').forEach(c => {
+          c.classList.remove('drag-over', 'drag-left', 'drag-right');
+        });
+        this.draggedElement = null;
+        this.draggedType = null;
+        this.saveCardLayout();
+      },
+
+      handleCardDragOver(e, card) {
+        if (this.draggedType !== 'card' || this.draggedElement === card) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+
+        const rect = card.getBoundingClientRect();
+        const midX = rect.left + rect.width / 2;
+
+        card.classList.remove('drag-left', 'drag-right');
+        if (e.clientX < midX) {
+          card.classList.add('drag-left');
+        } else {
+          card.classList.add('drag-right');
+        }
+      },
+
+      handleCardDragEnter(e, card) {
+        if (this.draggedType !== 'card' || this.draggedElement === card) return;
+        e.preventDefault();
+        card.classList.add('drag-over');
+      },
+
+      handleCardDragLeave(e, card) {
+        // Only remove if actually leaving the card
+        if (!card.contains(e.relatedTarget)) {
+          card.classList.remove('drag-over', 'drag-left', 'drag-right');
+        }
+      },
+
+      handleCardDrop(e, targetCard) {
+        e.preventDefault();
+        if (this.draggedType !== 'card' || !this.draggedElement || this.draggedElement === targetCard) return;
+
+        const container = targetCard.parentElement;
+        const allCards = Array.from(container.querySelectorAll('.bento-card[draggable="true"]'));
+        const draggedIdx = allCards.indexOf(this.draggedElement);
+        const targetIdx = allCards.indexOf(targetCard);
+
+        const rect = targetCard.getBoundingClientRect();
+        const midX = rect.left + rect.width / 2;
+        const insertBefore = e.clientX < midX;
+
+        if (insertBefore) {
+          container.insertBefore(this.draggedElement, targetCard);
+        } else {
+          container.insertBefore(this.draggedElement, targetCard.nextSibling);
+        }
+
+        targetCard.classList.remove('drag-over', 'drag-left', 'drag-right');
+        debug('INFO', `Moved card ${this.draggedElement.dataset.cardId} ${insertBefore ? 'before' : 'after'} ${targetCard.dataset.cardId}`);
+      },
+
+      saveCardLayout() {
+        const container = document.querySelector('.dashboard-bento');
+        if (!container) return;
+
+        const cards = container.querySelectorAll('.bento-card[data-card-id]');
+        const order = Array.from(cards).map(c => c.dataset.cardId);
+        localStorage.setItem('dashboardCardOrder', JSON.stringify(order));
+        debug('INFO', 'Saved card layout', order);
+      },
+
+      loadCardLayout() {
+        const saved = localStorage.getItem('dashboardCardOrder');
+        if (!saved) return;
+
+        try {
+          const order = JSON.parse(saved);
+          const container = document.querySelector('.dashboard-bento');
+          if (!container) return;
+
+          // Get reference elements (stats and stream bar that shouldn't move)
+          const statsRow = container.querySelector('.dashboard-stats');
+          const streamBar = container.querySelector('.dashboard-stream');
+
+          // Sort cards according to saved order
+          order.forEach(cardId => {
+            const card = container.querySelector(`.bento-card[data-card-id="${cardId}"]`);
+            if (card) {
+              container.appendChild(card);
+            }
+          });
+
+          debug('INFO', 'Loaded card layout', order);
+        } catch (e) {
+          debug('ERROR', 'Failed to load card layout', e);
+        }
+      },
+
+      // === NAVIGATION ITEMS DRAG & DROP ===
+      initNavItems() {
+        const navSection = document.querySelector('.nav-section');
+        if (!navSection) return;
+
+        const navItems = navSection.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+          item.setAttribute('draggable', 'true');
+          item.addEventListener('dragstart', (e) => this.handleNavDragStart(e, item));
+          item.addEventListener('dragend', (e) => this.handleNavDragEnd(e, item));
+          item.addEventListener('dragover', (e) => this.handleNavDragOver(e, item));
+          item.addEventListener('drop', (e) => this.handleNavDrop(e, item));
+          item.addEventListener('dragenter', (e) => this.handleNavDragEnter(e, item));
+          item.addEventListener('dragleave', (e) => this.handleNavDragLeave(e, item));
+        });
+      },
+
+      handleNavDragStart(e, item) {
+        this.draggedElement = item;
+        this.draggedType = 'nav';
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', item.dataset.page);
+        debug('INFO', `Started dragging nav: ${item.dataset.page}`);
+      },
+
+      handleNavDragEnd(e, item) {
+        item.classList.remove('dragging');
+        document.querySelectorAll('.nav-item').forEach(n => {
+          n.classList.remove('drag-over', 'drag-above', 'drag-below');
+        });
+        this.draggedElement = null;
+        this.draggedType = null;
+        this.saveNavLayout();
+      },
+
+      handleNavDragOver(e, item) {
+        if (this.draggedType !== 'nav' || this.draggedElement === item) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+
+        item.classList.remove('drag-above', 'drag-below');
+        if (e.clientY < midY) {
+          item.classList.add('drag-above');
+        } else {
+          item.classList.add('drag-below');
+        }
+      },
+
+      handleNavDragEnter(e, item) {
+        if (this.draggedType !== 'nav' || this.draggedElement === item) return;
+        e.preventDefault();
+        item.classList.add('drag-over');
+      },
+
+      handleNavDragLeave(e, item) {
+        if (!item.contains(e.relatedTarget)) {
+          item.classList.remove('drag-over', 'drag-above', 'drag-below');
+        }
+      },
+
+      handleNavDrop(e, targetItem) {
+        e.preventDefault();
+        if (this.draggedType !== 'nav' || !this.draggedElement || this.draggedElement === targetItem) return;
+
+        const container = targetItem.parentElement;
+        const rect = targetItem.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        const insertBefore = e.clientY < midY;
+
+        if (insertBefore) {
+          container.insertBefore(this.draggedElement, targetItem);
+        } else {
+          container.insertBefore(this.draggedElement, targetItem.nextSibling);
+        }
+
+        targetItem.classList.remove('drag-over', 'drag-above', 'drag-below');
+        debug('INFO', `Moved nav ${this.draggedElement.dataset.page} ${insertBefore ? 'before' : 'after'} ${targetItem.dataset.page}`);
+      },
+
+      saveNavLayout() {
+        const navSection = document.querySelector('.nav-section');
+        if (!navSection) return;
+
+        const items = navSection.querySelectorAll('.nav-item');
+        const order = Array.from(items).map(item => item.dataset.page);
+        localStorage.setItem('navOrder', JSON.stringify(order));
+        debug('INFO', 'Saved nav layout', order);
+      },
+
+      loadNavLayout() {
+        const saved = localStorage.getItem('navOrder');
+        if (!saved) return;
+
+        try {
+          const order = JSON.parse(saved);
+          const navSection = document.querySelector('.nav-section');
+          if (!navSection) return;
+
+          const sectionTitle = navSection.querySelector('.nav-section-title');
+
+          order.forEach(page => {
+            const item = navSection.querySelector(`.nav-item[data-page="${page}"]`);
+            if (item) {
+              navSection.appendChild(item);
+            }
+          });
+
+          debug('INFO', 'Loaded nav layout', order);
+        } catch (e) {
+          debug('ERROR', 'Failed to load nav layout', e);
+        }
+      },
+
+      loadLayouts() {
+        this.loadCardLayout();
+        this.loadNavLayout();
+      },
+
+      resetLayouts() {
+        localStorage.removeItem('dashboardCardOrder');
+        localStorage.removeItem('navOrder');
+        debug('INFO', 'Reset all layouts - reload page to see defaults');
+        location.reload();
+      }
+    };
+
+    // Initialize drag & drop on DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      DragDropManager.init();
+    });
 
     // Handle Enter key in input modal
     document.addEventListener('keydown', (e) => {

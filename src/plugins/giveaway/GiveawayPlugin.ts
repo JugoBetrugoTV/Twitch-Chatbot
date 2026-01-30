@@ -261,4 +261,71 @@ export class GiveawayPlugin extends Plugin {
   getEntryCount(): number {
     return this.activeGiveaway?.entries.size || 0;
   }
+
+  getStatus(): { active: boolean; prize: string; entries: string[]; winner: string | null } {
+    if (!this.activeGiveaway) {
+      return { active: false, prize: '', entries: [], winner: null };
+    }
+    return {
+      active: true,
+      prize: this.activeGiveaway.prize,
+      entries: Array.from(this.activeGiveaway.entries),
+      winner: null
+    };
+  }
+
+  getEntries(): string[] {
+    return this.activeGiveaway ? Array.from(this.activeGiveaway.entries) : [];
+  }
+
+  startFromUI(prize: string, duration?: number): { success: boolean } {
+    if (this.activeGiveaway) {
+      return { success: false };
+    }
+
+    this.activeGiveaway = {
+      prize: prize || 'Geheimpreis',
+      keyword: 'enter',
+      entries: new Set(),
+      pointsCost: 0,
+      subOnly: false,
+      maxEntries: 0,
+      createdAt: new Date(),
+    };
+
+    this.log.info(`Giveaway started from UI: ${prize}`);
+    return { success: true };
+  }
+
+  endFromUI(): { success: boolean } {
+    if (!this.activeGiveaway) {
+      return { success: false };
+    }
+    this.activeGiveaway = null;
+    this.log.info('Giveaway ended from UI');
+    return { success: true };
+  }
+
+  drawFromUI(): { success: boolean; winner: string | null } {
+    if (!this.activeGiveaway || this.activeGiveaway.entries.size === 0) {
+      return { success: false, winner: null };
+    }
+
+    const entries = Array.from(this.activeGiveaway.entries);
+    const winnerIndex = Math.floor(Math.random() * entries.length);
+    const winner = entries[winnerIndex];
+
+    // Remove winner from entries (for multi-draw)
+    this.activeGiveaway.entries.delete(winner);
+
+    // Log the win
+    this.db.logEvent('giveaway_win', {
+      winner,
+      prize: this.activeGiveaway.prize,
+      totalEntries: entries.length,
+    });
+
+    this.log.info(`Giveaway winner drawn: ${winner}`);
+    return { success: true, winner };
+  }
 }

@@ -3875,12 +3875,19 @@
         const ttsSettings = await window.api.tts?.getSettings();
         if (ttsSettings) {
           ttsEnabled = ttsSettings.enabled !== false;
-          ttsReadAll = ttsSettings.readAll || false;
-          document.getElementById('ttsEnabled').checked = ttsEnabled;
-          document.getElementById('ttsReadAll').checked = ttsReadAll;
-          document.getElementById('ttsVolume').value = ttsSettings.volume || 80;
-          document.getElementById('ttsLanguage').value = ttsSettings.voice || 'de';
-          debug('INFO', `✓ TTS settings loaded - Enabled: ${ttsEnabled}, ReadAll: ${ttsReadAll}`);
+          ttsReadAll = ttsSettings.readUsername || false;
+          setChecked('ttsEnabled', ttsEnabled);
+          setChecked('ttsReadAll', ttsReadAll);
+          setChecked('ttsReadUsername', ttsSettings.readUsername);
+          setChecked('ttsSubOnly', ttsSettings.subOnly);
+          const volEl = document.getElementById('ttsVolume');
+          if (volEl) volEl.value = ttsSettings.volume || 80;
+          setVal('ttsLanguage', ttsSettings.language || 'de');
+          const speedEl = document.getElementById('ttsSpeed');
+          if (speedEl) speedEl.value = ttsSettings.speed || 1.0;
+          setVal('ttsMaxChars', ttsSettings.maxLength || 200);
+          setVal('ttsPointsCost', ttsSettings.pointsCost || 0);
+          debug('INFO', `✓ TTS settings loaded - Enabled: ${ttsEnabled}`);
         }
 
         // Check if bot status
@@ -4671,11 +4678,12 @@
         const settings = {
           enabled: getChecked('ttsEnabled'),
           volume: parseInt(document.getElementById('ttsVolume')?.value) || 50,
-          voice: getVal('ttsVoice') || 'de-DE',
-          rate: parseFloat(document.getElementById('ttsRate')?.value) || 1.0,
-          minBits: parseInt(getVal('ttsMinBits')) || 0,
+          language: getVal('ttsLanguage') || 'de',
+          speed: parseFloat(document.getElementById('ttsSpeed')?.value) || 1.0,
+          pointsCost: parseInt(getVal('ttsPointsCost')) || 0,
           subOnly: getChecked('ttsSubOnly'),
-          maxLength: parseInt(getVal('ttsMaxLength')) || 200
+          maxLength: parseInt(getVal('ttsMaxChars')) || 200,
+          readUsername: getChecked('ttsReadUsername')
         };
         await window.api?.tts?.updateSettings(settings);
         showNotification('TTS Settings gespeichert!', 'success');
@@ -6832,61 +6840,7 @@
       showNotification('Belohnung bearbeiten wird implementiert...', 'info');
     }
 
-    // Integrations
-    function connectSpotify() {
-      showNotification('Spotify-Verbindung wird implementiert...', 'info');
-    }
-
-    function testOBSConnection() {
-      showNotification('OBS-Verbindung wird getestet...', 'info');
-    }
-
-    function connectTwitter() {
-      showNotification('Twitter-Verbindung wird implementiert...', 'info');
-    }
-
-    // Betting
-    function startNewBet() {
-      const title = prompt('Wett-Titel:');
-      if (!title) return;
-      const optionsStr = prompt('Optionen (kommagetrennt):');
-      if (!optionsStr) return;
-      const options = optionsStr.split(',').map(o => o.trim()).filter(o => o);
-      if (options.length < 2) {
-        showNotification('Mindestens 2 Optionen erforderlich', 'error');
-        return;
-      }
-
-      window.api?.betting?.create({ title, options }).then((result) => {
-        if (result?.success) {
-          loadBetting();
-          showNotification('Wette gestartet!', 'success');
-        } else {
-          showNotification(result?.error || 'Fehler', 'error');
-        }
-      });
-    }
-
-    function closeBet() {
-      const winner = prompt('Gewinner-Option:');
-      if (winner) {
-        window.api?.betting?.close(winner).then((result) => {
-          loadBetting();
-          showNotification('Wette beendet!', 'success');
-        });
-      }
-    }
-
-    function cancelBet() {
-      if (confirm('Wette wirklich abbrechen?')) {
-        window.api?.betting?.cancel().then(() => {
-          loadBetting();
-          showNotification('Wette abgebrochen', 'success');
-        });
-      }
-    }
-
-    // Quotes
+    // Quotes (Betting functions are defined earlier at lines 6091-6137)
     function importQuotes() {
       showNotification('Quote-Import wird implementiert...', 'info');
     }
@@ -6913,7 +6867,8 @@
 
     // Settings functions
     function saveModSettings() {
-      saveModerationSettings();
+      // This is called from the Mod Tools page filter settings button
+      saveModToolsSettings();
     }
 
     async function saveAppSettings() {

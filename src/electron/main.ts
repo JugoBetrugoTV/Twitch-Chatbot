@@ -63,6 +63,8 @@ let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let bot: StreamCore | null = null;
 let songRequestPlugin: SongRequestPlugin | null = null;
+let ttsPlugin: TTSPlugin | null = null;
+let giveawayPlugin: GiveawayPlugin | null = null;
 const logger = new Logger('Electron');
 
 // ==========================================
@@ -371,6 +373,8 @@ async function startBot() {
 
     // Load ALL plugins
     songRequestPlugin = new SongRequestPlugin();
+    ttsPlugin = new TTSPlugin();
+    giveawayPlugin = new GiveawayPlugin();
     const plugins = [
       new CoreCommandsPlugin(),
       new CustomCommandsPlugin(),
@@ -378,9 +382,9 @@ async function startBot() {
       new TimerPlugin(),
       new ModerationPlugin(),
       songRequestPlugin,
-      new TTSPlugin(),
+      ttsPlugin,
       new GamesPlugin(),
-      new GiveawayPlugin(),
+      giveawayPlugin,
       new PollsPlugin(),
       new QuotesPlugin(),
       new QueuePlugin(),
@@ -925,18 +929,39 @@ function setupIPC() {
   // TTS
   // ==========================================
   ipcMain.handle('tts:getQueue', () => {
-    return { queue: [], current: null, enabled: true };
+    if (!ttsPlugin) {
+      return { queue: [], current: null, enabled: false };
+    }
+    const settings = ttsPlugin.getSettings();
+    const queue = ttsPlugin.getQueue();
+    return { queue, current: queue[0] || null, enabled: settings.enabled };
   });
 
   ipcMain.handle('tts:toggle', () => {
-    return { enabled: true };
+    if (!ttsPlugin) {
+      return { enabled: false };
+    }
+    const settings = ttsPlugin.getSettings();
+    const db = getDatabase();
+    const newEnabled = !settings.enabled;
+    db.setSetting('tts_settings', { ...settings, enabled: newEnabled });
+    return { enabled: newEnabled };
   });
 
   ipcMain.handle('tts:skip', () => {
+    if (ttsPlugin) {
+      ttsPlugin.skip();
+      mainWindow?.webContents.send('tts:skip', {});
+    }
     return { success: true };
   });
 
   ipcMain.handle('tts:clear', () => {
+    if (ttsPlugin) {
+      // Clear queue by getting all messages
+      while (ttsPlugin.getNextMessage()) {}
+      mainWindow?.webContents.send('tts:cleared', {});
+    }
     return { success: true };
   });
 
@@ -1013,23 +1038,38 @@ function setupIPC() {
   // Giveaway
   // ==========================================
   ipcMain.handle('giveaway:getStatus', () => {
-    return { active: false, prize: '', entries: [], winner: null };
+    if (!giveawayPlugin) {
+      return { active: false, prize: '', entries: [], winner: null };
+    }
+    return giveawayPlugin.getStatus();
   });
 
   ipcMain.handle('giveaway:start', (_, prize: string, duration?: number) => {
-    return { success: true };
+    if (!giveawayPlugin) {
+      return { success: false };
+    }
+    return giveawayPlugin.startFromUI(prize, duration);
   });
 
   ipcMain.handle('giveaway:end', () => {
-    return { success: true };
+    if (!giveawayPlugin) {
+      return { success: false };
+    }
+    return giveawayPlugin.endFromUI();
   });
 
   ipcMain.handle('giveaway:draw', () => {
-    return { success: true, winner: null };
+    if (!giveawayPlugin) {
+      return { success: false, winner: null };
+    }
+    return giveawayPlugin.drawFromUI();
   });
 
   ipcMain.handle('giveaway:getEntries', () => {
-    return [];
+    if (!giveawayPlugin) {
+      return [];
+    }
+    return giveawayPlugin.getEntries();
   });
 
   // ==========================================

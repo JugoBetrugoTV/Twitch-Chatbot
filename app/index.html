@@ -3206,10 +3206,14 @@
 
     function debug(category, message, data = null) {
       if (!DEBUG_ENABLED) return;
+      // Send to main process (PowerShell) via IPC
+      if (window.api?.log) {
+        window.api.log(category, message, data);
+      }
+      // Also log to DevTools console as fallback
       const timestamp = new Date().toLocaleTimeString('de-DE');
       const color = DEBUG_COLORS[category] || '';
       const prefix = `[${timestamp}] [UI:${category}]`;
-
       if (data !== null && data !== undefined) {
         console.log(`${color}${prefix}${RESET}`, message, data);
       } else {
@@ -3218,6 +3222,10 @@
     }
 
     function debugError(context, error) {
+      // Send to main process (PowerShell)
+      if (window.api?.log) {
+        window.api.log('ERROR', context, error?.message || error);
+      }
       const timestamp = new Date().toLocaleTimeString('de-DE');
       console.error(`\x1b[31m[${timestamp}] [UI:ERROR]\x1b[0m`, context, error);
       if (error?.stack) console.error('Stack:', error.stack);

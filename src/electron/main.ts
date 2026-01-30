@@ -506,6 +506,31 @@ function setupBotEvents() {
 
 function setupIPC() {
   // ==========================================
+  // UI Debug Logging (send to PowerShell/terminal)
+  // ==========================================
+  ipcMain.on('ui:log', (_, category: string, message: string, data?: any) => {
+    const timestamp = new Date().toLocaleTimeString('de-DE');
+    const colors: Record<string, string> = {
+      'API': '\x1b[36m',      // Cyan
+      'BUTTON': '\x1b[33m',   // Yellow
+      'ERROR': '\x1b[31m',    // Red
+      'SUCCESS': '\x1b[32m',  // Green
+      'INFO': '\x1b[34m',     // Blue
+      'WARN': '\x1b[35m',     // Magenta
+      'INIT': '\x1b[96m',     // Bright Cyan
+    };
+    const color = colors[category] || '\x1b[37m';
+    const reset = '\x1b[0m';
+    const prefix = `[${timestamp}] [UI:${category}]`;
+
+    if (data !== null && data !== undefined) {
+      console.log(`${color}${prefix}${reset}`, message, typeof data === 'object' ? JSON.stringify(data) : data);
+    } else {
+      console.log(`${color}${prefix}${reset}`, message);
+    }
+  });
+
+  // ==========================================
   // Window Controls
   // ==========================================
   ipcMain.on('window:minimize', () => mainWindow?.minimize());

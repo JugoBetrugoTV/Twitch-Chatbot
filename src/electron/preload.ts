@@ -336,4 +336,7 @@ contextBridge.exposeInMainWorld('api', {
 
   // External links
   openExternal: (url: string) => ipcRenderer.send('open:external', url),
+
+  // Debug logging (sends to PowerShell/terminal via main process)
+  log: (category: string, message: string, data?: any) => ipcRenderer.send('ui:log', category, message, data),
 });

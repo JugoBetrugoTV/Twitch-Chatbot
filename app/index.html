@@ -171,6 +171,8 @@
           </div>
         </div>
       </div>
+      <!-- Resize Handle -->
+      <div class="sidebar-resize-handle" id="sidebarResizeHandle"></div>
     </aside>
 
     <!-- Main Content -->
@@ -1812,6 +1814,52 @@
     const maxMessages = 200;
 
     // ========================================
+    // SIDEBAR RESIZE
+    // ========================================
+    (function initSidebarResize() {
+      const sidebar = document.querySelector('.sidebar');
+      const handle = document.getElementById('sidebarResizeHandle');
+      if (!sidebar || !handle) return;
+
+      let isResizing = false;
+      let startX = 0;
+      let startWidth = 0;
+
+      handle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        startX = e.clientX;
+        startWidth = sidebar.offsetWidth;
+        handle.classList.add('active');
+        document.body.style.cursor = 'ew-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        const delta = e.clientX - startX;
+        const newWidth = Math.min(400, Math.max(200, startWidth + delta));
+        sidebar.style.width = newWidth + 'px';
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (!isResizing) return;
+        isResizing = false;
+        handle.classList.remove('active');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        // Save width to localStorage
+        localStorage.setItem('sidebarWidth', sidebar.style.width);
+      });
+
+      // Restore saved width
+      const savedWidth = localStorage.getItem('sidebarWidth');
+      if (savedWidth) {
+        sidebar.style.width = savedWidth;
+      }
+    })();
+
+    // ========================================
     // INITIALIZATION
     // ========================================
     async function initApp() {
@@ -3165,6 +3213,8 @@
     function renderSoundFiles(sounds) {
       const container = document.getElementById('soundFilesList');
       if (!container) return;
+      const countEl = document.getElementById('soundCount');
+      if (countEl) countEl.textContent = sounds.length + ' Sounds';
       if (sounds.length === 0) {
         container.innerHTML = '<div class="empty-state"><div class="empty-state-title">Keine Sound-Dateien</div><div class="empty-state-desc">Füge Sound-Dateien hinzu, die via Chat abgespielt werden können</div></div>';
         return;
@@ -3191,6 +3241,39 @@
         await window.api?.sounds?.delete(id);
         loadSoundFiles();
         showNotification('Sound gelöscht', 'success');
+      }
+    }
+
+    async function uploadSound() {
+      // Use Electron file dialog to select audio file
+      const result = await window.api?.sounds?.selectFile();
+      if (!result || !result.success) {
+        if (result && !result.canceled) {
+          showNotification('Fehler beim Hochladen: ' + (result.error || 'Unbekannt'), 'error');
+        }
+        return;
+      }
+
+      // Show modal to configure the sound
+      const command = prompt('Chat-Befehl für diesen Sound (ohne !):', result.name || 'sound');
+      if (!command) return;
+
+      const volumeStr = prompt('Lautstärke (1-100):', '80');
+      const volume = Math.min(100, Math.max(1, parseInt(volumeStr) || 80));
+
+      // Save sound to database
+      const saveResult = await window.api?.sounds?.add({
+        name: result.name || 'Sound',
+        command: command.toLowerCase().replace(/\s+/g, ''),
+        path: result.path,
+        volume: volume
+      });
+
+      if (saveResult?.success) {
+        showNotification('Sound "' + command + '" hinzugefügt!', 'success');
+        loadSoundFiles();
+      } else {
+        showNotification('Fehler beim Speichern: ' + (saveResult?.error || 'Unbekannt'), 'error');
       }
     }
 

@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
-import ytsr from 'ytsr';
-import ytdl from 'ytdl-core';
+import play from 'play-dl';
 import { SongRequest } from '../types';
 import { config } from '../config';
 import { Database } from '../utils/Database';
@@ -48,30 +47,17 @@ export class SongRequestManager extends EventEmitter {
     duration: number;
   } | null> {
     try {
-      const searchResults = await ytsr(query, { limit: 5 });
-      const video = searchResults.items.find(
-        (item): item is ytsr.Video => item.type === 'video' && !!item.duration
-      );
+      const searchResults = await play.search(query, { limit: 5, source: { youtube: 'video' } });
+      const video = searchResults.find(v => v.type === 'video' && v.durationInSec && v.durationInSec > 0);
 
       if (!video) {
         return null;
       }
 
-      // Parse duration string (e.g., "3:45" or "1:23:45")
-      const durationParts = video.duration?.split(':').map(Number) || [0];
-      let durationSeconds = 0;
-      if (durationParts.length === 3) {
-        durationSeconds = durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2];
-      } else if (durationParts.length === 2) {
-        durationSeconds = durationParts[0] * 60 + durationParts[1];
-      } else {
-        durationSeconds = durationParts[0];
-      }
-
       return {
-        title: video.title,
+        title: video.title || 'Unknown Title',
         url: video.url,
-        duration: durationSeconds,
+        duration: video.durationInSec || 0,
       };
     } catch (error) {
       console.error('YouTube search failed:', error);
@@ -85,11 +71,11 @@ export class SongRequestManager extends EventEmitter {
     duration: number;
   } | null> {
     try {
-      const info = await ytdl.getBasicInfo(url);
+      const info = await play.video_basic_info(url);
       return {
-        title: info.videoDetails.title,
-        url: info.videoDetails.video_url,
-        duration: parseInt(info.videoDetails.lengthSeconds, 10),
+        title: info.video_details.title || 'Unknown Title',
+        url: info.video_details.url,
+        duration: info.video_details.durationInSec || 0,
       };
     } catch (error) {
       console.error('Failed to get video info:', error);

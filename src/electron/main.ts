@@ -4,7 +4,7 @@
  * Desktop application for StreamCore Twitch Bot
  */
 
-import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, shell, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import 'dotenv/config';
@@ -1190,6 +1190,40 @@ function setupIPC() {
   ipcMain.handle('sounds:play', (_, id: string) => {
     mainWindow?.webContents.send('sounds:play', { id });
     return { success: true };
+  });
+
+  ipcMain.handle('sounds:selectFile', async () => {
+    if (!mainWindow) return { success: false, error: 'No window' };
+
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Sound-Datei auswählen',
+      filters: [
+        { name: 'Audio', extensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a'] }
+      ],
+      properties: ['openFile']
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return { success: false, canceled: true };
+    }
+
+    const filePath = result.filePaths[0];
+    const fileName = path.basename(filePath);
+
+    // Copy to sounds directory
+    const soundsDir = path.join(process.cwd(), 'sounds');
+    if (!fs.existsSync(soundsDir)) {
+      fs.mkdirSync(soundsDir, { recursive: true });
+    }
+
+    const destPath = path.join(soundsDir, fileName);
+    fs.copyFileSync(filePath, destPath);
+
+    return {
+      success: true,
+      path: destPath,
+      name: fileName.replace(/\.[^/.]+$/, '') // Remove extension for name
+    };
   });
 
   // ==========================================

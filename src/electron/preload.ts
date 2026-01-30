@@ -176,6 +176,7 @@ contextBridge.exposeInMainWorld('api', {
     add: (data: { name: string; command: string; path: string; volume?: number }) => ipcRenderer.invoke('sounds:add', data),
     delete: (id: string) => ipcRenderer.invoke('sounds:delete', id),
     play: (id: string) => ipcRenderer.invoke('sounds:play', id),
+    selectFile: () => ipcRenderer.invoke('sounds:selectFile'),
   },
 
   // Queue

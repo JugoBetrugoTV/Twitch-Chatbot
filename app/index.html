@@ -8,77 +8,145 @@
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-  <!-- Cinematic Intro -->
+  <!-- Epic Cinematic Intro -->
   <div id="cinematic-intro" class="cinematic-intro">
-    <!-- Particle field -->
-    <div class="intro-particles" id="introParticles"></div>
-
-    <!-- Light rays -->
-    <div class="intro-rays">
-      <div class="ray ray-1"></div>
-      <div class="ray ray-2"></div>
-      <div class="ray ray-3"></div>
-      <div class="ray ray-4"></div>
-      <div class="ray ray-5"></div>
+    <!-- Cinematic letterbox bars -->
+    <div class="cinema-bars">
+      <div class="cinema-bar cinema-bar-top"></div>
+      <div class="cinema-bar cinema-bar-bottom"></div>
     </div>
 
-    <!-- Lens flare -->
-    <div class="intro-flare"></div>
+    <!-- Background layers -->
+    <div class="intro-bg-layer intro-nebula"></div>
+    <div class="intro-bg-layer intro-stars" id="introStars"></div>
+    <div class="intro-bg-layer intro-grid"></div>
+
+    <!-- Particle systems -->
+    <div class="intro-particles" id="introParticles"></div>
+    <div class="intro-sparks" id="introSparks"></div>
+
+    <!-- Energy wave -->
+    <div class="intro-energy-wave"></div>
+
+    <!-- Light burst -->
+    <div class="intro-burst"></div>
+
+    <!-- Rotating light beams -->
+    <div class="intro-beams">
+      <div class="beam"></div>
+      <div class="beam"></div>
+      <div class="beam"></div>
+      <div class="beam"></div>
+      <div class="beam"></div>
+      <div class="beam"></div>
+    </div>
+
+    <!-- Lens flares -->
+    <div class="intro-flares">
+      <div class="flare flare-main"></div>
+      <div class="flare flare-secondary"></div>
+      <div class="flare flare-streak"></div>
+    </div>
 
     <!-- Glowing orbs -->
     <div class="intro-orbs">
       <div class="orb orb-1"></div>
       <div class="orb orb-2"></div>
       <div class="orb orb-3"></div>
+      <div class="orb orb-4"></div>
     </div>
 
     <!-- Main content -->
     <div class="intro-content">
       <!-- Logo with epic reveal -->
-      <div class="intro-logo-container">
-        <div class="intro-logo-glow"></div>
-        <img src="img/logo.svg" class="intro-logo" alt="StreamCore Logo">
-        <div class="intro-logo-ring"></div>
-        <div class="intro-logo-ring ring-2"></div>
+      <div class="intro-logo-wrapper">
+        <div class="intro-logo-pulse"></div>
+        <div class="intro-logo-container">
+          <div class="intro-logo-glow"></div>
+          <div class="intro-logo-core"></div>
+          <img src="img/logo.svg" class="intro-logo" alt="StreamCore Logo">
+          <div class="intro-logo-ring ring-1"></div>
+          <div class="intro-logo-ring ring-2"></div>
+          <div class="intro-logo-ring ring-3"></div>
+        </div>
+        <div class="intro-logo-particles" id="logoParticles"></div>
       </div>
 
-      <!-- Title with letter animation -->
-      <h1 class="intro-title">
-        <span class="intro-letter" style="--i:0">S</span>
-        <span class="intro-letter" style="--i:1">t</span>
-        <span class="intro-letter" style="--i:2">r</span>
-        <span class="intro-letter" style="--i:3">e</span>
-        <span class="intro-letter" style="--i:4">a</span>
-        <span class="intro-letter" style="--i:5">m</span>
-        <span class="intro-letter" style="--i:6">C</span>
-        <span class="intro-letter" style="--i:7">o</span>
-        <span class="intro-letter" style="--i:8">r</span>
-        <span class="intro-letter" style="--i:9">e</span>
-      </h1>
+      <!-- Title with epic animation -->
+      <div class="intro-title-wrapper">
+        <div class="intro-title-glow"></div>
+        <h1 class="intro-title">
+          <span class="intro-letter" data-letter="S">S</span>
+          <span class="intro-letter" data-letter="t">t</span>
+          <span class="intro-letter" data-letter="r">r</span>
+          <span class="intro-letter" data-letter="e">e</span>
+          <span class="intro-letter" data-letter="a">a</span>
+          <span class="intro-letter" data-letter="m">m</span>
+          <span class="intro-letter" data-letter="C">C</span>
+          <span class="intro-letter" data-letter="o">o</span>
+          <span class="intro-letter" data-letter="r">r</span>
+          <span class="intro-letter" data-letter="e">e</span>
+        </h1>
+        <div class="intro-title-line"></div>
+      </div>
 
-      <!-- Subtitle -->
+      <!-- Subtitle with reveal -->
       <div class="intro-subtitle">
-        <span class="intro-by">by</span>
-        <span class="intro-author">JugoBetrugoTV</span>
+        <div class="intro-subtitle-line left"></div>
+        <div class="intro-subtitle-content">
+          <span class="intro-by">by</span>
+          <span class="intro-author">
+            <span class="author-letter">J</span>
+            <span class="author-letter">u</span>
+            <span class="author-letter">g</span>
+            <span class="author-letter">o</span>
+            <span class="author-letter">B</span>
+            <span class="author-letter">e</span>
+            <span class="author-letter">t</span>
+            <span class="author-letter">r</span>
+            <span class="author-letter">u</span>
+            <span class="author-letter">g</span>
+            <span class="author-letter">o</span>
+            <span class="author-letter">T</span>
+            <span class="author-letter">V</span>
+          </span>
+        </div>
+        <div class="intro-subtitle-line right"></div>
       </div>
 
       <!-- Tagline -->
-      <p class="intro-tagline">Next Generation Stream Control</p>
+      <p class="intro-tagline">
+        <span class="tagline-word">Next</span>
+        <span class="tagline-word">Generation</span>
+        <span class="tagline-word">Stream</span>
+        <span class="tagline-word">Control</span>
+      </p>
 
       <!-- Loading section -->
       <div class="intro-loading">
         <div class="intro-progress">
+          <div class="intro-progress-glow"></div>
           <div class="intro-progress-bar" id="introProgressBar"></div>
+          <div class="intro-progress-shine"></div>
         </div>
         <p class="intro-status" id="introStatus">Initialisiere...</p>
       </div>
     </div>
 
-    <!-- Scan line effect -->
-    <div class="intro-scanline"></div>
+    <!-- Glitch overlay -->
+    <div class="intro-glitch"></div>
+
+    <!-- Film grain -->
+    <div class="intro-grain"></div>
+
+    <!-- Scan lines -->
+    <div class="intro-scanlines"></div>
 
     <!-- Vignette -->
     <div class="intro-vignette"></div>
+
+    <!-- Flash overlay -->
+    <div class="intro-flash"></div>
   </div>
 
   <!-- Input Modal -->
@@ -3825,7 +3893,7 @@
     }
 
     // ========================================
-    // CINEMATIC INTRO
+    // EPIC CINEMATIC INTRO
     // ========================================
     (function initCinematicIntro() {
       const intro = document.getElementById('cinematic-intro');
@@ -3834,45 +3902,129 @@
         return;
       }
 
+      const introStartTime = Date.now();
+      let introSkipped = false;
+
+      // Create starfield
+      const starsContainer = document.getElementById('introStars');
+      if (starsContainer) {
+        for (let i = 0; i < 150; i++) {
+          const star = document.createElement('div');
+          star.className = 'intro-star';
+          star.style.left = Math.random() * 100 + '%';
+          star.style.top = Math.random() * 100 + '%';
+          star.style.animationDelay = Math.random() * 3 + 's';
+          star.style.animationDuration = (2 + Math.random() * 3) + 's';
+          const size = 1 + Math.random() * 2;
+          star.style.width = size + 'px';
+          star.style.height = size + 'px';
+          starsContainer.appendChild(star);
+        }
+      }
+
       // Create floating particles
       const particlesContainer = document.getElementById('introParticles');
       if (particlesContainer) {
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 100; i++) {
           const particle = document.createElement('div');
-          particle.className = 'intro-particle';
+          particle.className = 'intro-particle floating';
           particle.style.left = Math.random() * 100 + '%';
-          particle.style.animationDelay = Math.random() * 8 + 's';
-          particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+          particle.style.animationDelay = Math.random() * 10 + 's';
+          particle.style.animationDuration = (8 + Math.random() * 6) + 's';
+          particle.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
 
-          // Vary particle sizes
-          const size = 1 + Math.random() * 3;
+          const size = 1 + Math.random() * 4;
           particle.style.width = size + 'px';
           particle.style.height = size + 'px';
 
-          // Vary colors
-          const colors = ['var(--purple-light)', 'var(--purple)', 'var(--pink)', '#fff'];
+          const colors = ['#a855f7', '#c084fc', '#ec4899', '#f472b6', '#fff'];
           particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-          particle.style.boxShadow = `0 0 ${size * 2}px currentColor`;
+          particle.style.boxShadow = `0 0 ${size * 3}px currentColor`;
 
           particlesContainer.appendChild(particle);
         }
       }
 
+      // Trigger shooting particles at intervals
+      const sparksContainer = document.getElementById('introSparks');
+      function createShootingParticle() {
+        if (!particlesContainer || introSkipped) return;
+        const particle = document.createElement('div');
+        particle.className = 'intro-particle shooting';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = '-80px';
+        particlesContainer.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
+      }
+
+      // Create sparks burst
+      function createSparkBurst(x, y, count = 20) {
+        if (!sparksContainer || introSkipped) return;
+        for (let i = 0; i < count; i++) {
+          const spark = document.createElement('div');
+          spark.className = 'intro-spark';
+          spark.style.left = x + 'px';
+          spark.style.top = y + 'px';
+          const angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+          const distance = 50 + Math.random() * 100;
+          spark.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+          spark.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+          sparksContainer.appendChild(spark);
+          setTimeout(() => spark.remove(), 800);
+        }
+      }
+
+      // Create logo particles
+      const logoParticlesContainer = document.getElementById('logoParticles');
+      function createLogoParticles() {
+        if (!logoParticlesContainer) return;
+        for (let i = 0; i < 30; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'logo-particle';
+          const angle = (Math.PI * 2 / 30) * i;
+          const radius = 80 + Math.random() * 40;
+          particle.style.left = 'calc(50% + ' + (Math.cos(angle) * radius) + 'px)';
+          particle.style.top = 'calc(50% + ' + (Math.sin(angle) * radius) + 'px)';
+          particle.style.animation = `particle-float-up ${3 + Math.random() * 2}s ease-out forwards`;
+          particle.style.animationDelay = Math.random() * 0.5 + 's';
+          logoParticlesContainer.appendChild(particle);
+        }
+      }
+
+      // Trigger glitch effect
+      const glitchOverlay = document.querySelector('.intro-glitch');
+      function triggerGlitch() {
+        if (!glitchOverlay || introSkipped) return;
+        glitchOverlay.classList.add('active');
+        setTimeout(() => glitchOverlay.classList.remove('active'), 150);
+      }
+
+      // Trigger flash
+      const flashOverlay = document.querySelector('.intro-flash');
+      function triggerFlash() {
+        if (!flashOverlay || introSkipped) return;
+        flashOverlay.classList.add('active');
+        setTimeout(() => flashOverlay.classList.remove('active'), 500);
+      }
+
       // Add skip button
       const skipBtn = document.createElement('div');
       skipBtn.className = 'intro-skip';
-      skipBtn.textContent = 'Press any key to skip';
+      skipBtn.textContent = 'SKIP INTRO';
       skipBtn.onclick = skipIntro;
       intro.appendChild(skipBtn);
 
-      // Loading messages and progress
+      // Loading messages
       const loadingMessages = [
-        { text: 'Initialisiere Core Systems...', progress: 10 },
-        { text: 'Lade Plugin-Architektur...', progress: 25 },
-        { text: 'Verbinde mit Twitch API...', progress: 40 },
-        { text: 'Synchronisiere Datenbanken...', progress: 55 },
-        { text: 'Lade Benutzer-Konfiguration...', progress: 70 },
-        { text: 'Initialisiere Dashboard...', progress: 85 },
+        { text: 'Initialisiere Core Engine...', progress: 8 },
+        { text: 'Lade Neural-Network Module...', progress: 18 },
+        { text: 'Verbinde mit Twitch API...', progress: 28 },
+        { text: 'Authentifiziere Benutzer...', progress: 38 },
+        { text: 'Synchronisiere Datenbanken...', progress: 50 },
+        { text: 'Lade Plugin-Architektur...', progress: 62 },
+        { text: 'Initialisiere Chat-Engine...', progress: 74 },
+        { text: 'Kalibriere Audio-Systeme...', progress: 84 },
+        { text: 'Finalisiere Dashboard...', progress: 94 },
         { text: 'StreamCore bereit!', progress: 100 }
       ];
 
@@ -3880,10 +4032,32 @@
       const statusEl = document.getElementById('introStatus');
       const progressBar = document.getElementById('introProgressBar');
 
-      // Start loading sequence after intro animations
+      // Shooting particles every 300ms
+      const shootingInterval = setInterval(() => {
+        if (Math.random() > 0.5) createShootingParticle();
+      }, 300);
+
+      // Timeline of events
+      // 2.3s - Logo flash and reveal
+      setTimeout(() => {
+        triggerFlash();
+        createSparkBurst(window.innerWidth / 2, window.innerHeight / 2, 40);
+        createLogoParticles();
+      }, 2300);
+
+      // 2.8s - Glitch effect
+      setTimeout(triggerGlitch, 2800);
+
+      // 4.0s - Title appears with glitch
+      setTimeout(triggerGlitch, 4000);
+
+      // 5.0s - Another glitch
+      setTimeout(triggerGlitch, 5000);
+
+      // 7.5s - Start loading progress
       setTimeout(() => {
         const loadingInterval = setInterval(() => {
-          if (messageIndex < loadingMessages.length) {
+          if (messageIndex < loadingMessages.length && !introSkipped) {
             const msg = loadingMessages[messageIndex];
             if (statusEl) statusEl.textContent = msg.text;
             if (progressBar) progressBar.style.width = msg.progress + '%';
@@ -3891,27 +4065,32 @@
           } else {
             clearInterval(loadingInterval);
           }
-        }, 400);
-      }, 4000);
+        }, 250);
+      }, 7500);
 
       // Skip intro function
-      let introSkipped = false;
       function skipIntro() {
         if (introSkipped) return;
         introSkipped = true;
 
-        intro.classList.add('fade-out');
+        clearInterval(shootingInterval);
+
+        // Final flash before exit
+        triggerFlash();
+
         setTimeout(() => {
-          intro.remove();
-          initApp();
-        }, 1000);
+          intro.classList.add('fade-out');
+          setTimeout(() => {
+            intro.remove();
+            initApp();
+          }, 1500);
+        }, 200);
       }
 
       // Listen for keypress or click to skip
       const skipHandler = (e) => {
         if (e.type === 'keydown' || e.type === 'click') {
-          // Only skip after initial animations (2 seconds)
-          if (Date.now() - introStartTime > 2000) {
+          if (Date.now() - introStartTime > 3000) {
             document.removeEventListener('keydown', skipHandler);
             document.removeEventListener('click', skipHandler);
             skipIntro();
@@ -3919,18 +4098,17 @@
         }
       };
 
-      const introStartTime = Date.now();
       setTimeout(() => {
         document.addEventListener('keydown', skipHandler);
         document.addEventListener('click', skipHandler);
-      }, 2000);
+      }, 3000);
 
-      // Auto-finish after full sequence (8 seconds total)
+      // Auto-finish after 10 seconds
       setTimeout(() => {
         if (!introSkipped) {
           skipIntro();
         }
-      }, 8000);
+      }, 10000);
     })();
 
     // ========================================

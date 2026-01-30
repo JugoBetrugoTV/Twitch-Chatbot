@@ -657,6 +657,36 @@ export class DatabaseService {
     );
   }
 
+  updateTimer(id: string, updates: Partial<{ name: string; messages: string[]; interval_minutes: number; enabled: boolean }>): void {
+    const timer = this.getTimer(id);
+    if (!timer) return;
+
+    const fields: string[] = [];
+    const values: any[] = [];
+
+    if (updates.name !== undefined) {
+      fields.push('name = ?');
+      values.push(updates.name);
+    }
+    if (updates.messages !== undefined) {
+      fields.push('messages = ?');
+      values.push(JSON.stringify(updates.messages));
+    }
+    if (updates.interval_minutes !== undefined) {
+      fields.push('interval_minutes = ?');
+      values.push(updates.interval_minutes);
+    }
+    if (updates.enabled !== undefined) {
+      fields.push('enabled = ?');
+      values.push(updates.enabled ? 1 : 0);
+    }
+
+    if (fields.length > 0) {
+      values.push(id);
+      this.execute(`UPDATE timers SET ${fields.join(', ')} WHERE id = ?`, values);
+    }
+  }
+
   deleteTimer(id: string): void {
     this.execute('DELETE FROM timers WHERE id = ?', [id]);
   }

@@ -64,12 +64,185 @@ let tray: Tray | null = null;
 let bot: StreamCore | null = null;
 const logger = new Logger('Electron');
 
-// Store for chat messages
-let chatMessages: any[] = [];
-const MAX_MESSAGES = 500;
+// ==========================================
+// Chat Message Types & Circular Buffer
+// ==========================================
+interface ChatMessage {
+  user: { username: string; displayName?: string; badges?: Map<string, string> | Record<string, string> };
+  message: string;
+  timestamp: string;
+  channel?: string;
+}
 
-// Store for users
-let onlineUsers: Set<string> = new Set();
+// Efficient circular buffer for chat messages (no array copying)
+class CircularBuffer<T> {
+  private buffer: (T | undefined)[];
+  private head = 0;
+  private count = 0;
+
+  constructor(private capacity: number) {
+    this.buffer = new Array(capacity);
+  }
+
+  push(item: T): void {
+    this.buffer[this.head] = item;
+    this.head = (this.head + 1) % this.capacity;
+    if (this.count < this.capacity) this.count++;
+  }
+
+  getAll(): T[] {
+    const result: T[] = [];
+    const start = this.count < this.capacity ? 0 : this.head;
+    for (let i = 0; i < this.count; i++) {
+      const idx = (start + i) % this.capacity;
+      if (this.buffer[idx] !== undefined) {
+        result.push(this.buffer[idx] as T);
+      }
+    }
+    return result;
+  }
+
+  get length(): number {
+    return this.count;
+  }
+
+  clear(): void {
+    this.buffer = new Array(this.capacity);
+    this.head = 0;
+    this.count = 0;
+  }
+}
+
+const chatMessages = new CircularBuffer<ChatMessage>(500);
+
+// ==========================================
+// Online Users with Auto-Cleanup
+// ==========================================
+const USER_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes inactivity = offline
+const onlineUsers = new Map<string, number>(); // username -> last seen timestamp
+let userCleanupInterval: NodeJS.Timeout | null = null;
+
+function trackUser(username: string): void {
+  onlineUsers.set(username.toLowerCase(), Date.now());
+}
+
+function cleanupOfflineUsers(): void {
+  const now = Date.now();
+  for (const [user, lastSeen] of onlineUsers) {
+    if (now - lastSeen > USER_TIMEOUT_MS) {
+      onlineUsers.delete(user);
+    }
+  }
+}
+
+function startUserCleanup(): void {
+  if (userCleanupInterval) return;
+  userCleanupInterval = setInterval(cleanupOfflineUsers, 5 * 60 * 1000); // Every 5 minutes
+}
+
+function stopUserCleanup(): void {
+  if (userCleanupInterval) {
+    clearInterval(userCleanupInterval);
+    userCleanupInterval = null;
+  }
+}
+
+// ==========================================
+// Input Validation Helpers
+// ==========================================
+function validateString(value: unknown, name: string, minLen = 1, maxLen = 500): string {
+  if (typeof value !== 'string') throw new Error(`${name} muss ein Text sein`);
+  const trimmed = value.trim();
+  if (trimmed.length < minLen) throw new Error(`${name} ist zu kurz (min. ${minLen} Zeichen)`);
+  if (trimmed.length > maxLen) throw new Error(`${name} ist zu lang (max. ${maxLen} Zeichen)`);
+  return trimmed;
+}
+
+function validateNumber(value: unknown, name: string, min?: number, max?: number): number {
+  const num = typeof value === 'number' ? value : parseInt(String(value), 10);
+  if (isNaN(num)) throw new Error(`${name} muss eine Zahl sein`);
+  if (min !== undefined && num < min) throw new Error(`${name} muss mindestens ${min} sein`);
+  if (max !== undefined && num > max) throw new Error(`${name} darf maximal ${max} sein`);
+  return num;
+}
+
+function validateUsername(value: unknown): string {
+  const username = validateString(value, 'Benutzername', 1, 25);
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) throw new Error('Ungültiger Benutzername');
+  return username.toLowerCase();
+}
+
+function validateId(value: unknown): string {
+  const id = validateString(value, 'ID', 1, 100);
+  if (!/^[a-zA-Z0-9_\-]+$/.test(id)) throw new Error('Ungültige ID');
+  return id;
+}
+
+// ==========================================
+// IPC Handler Factory Functions
+// ==========================================
+type IpcResult<T = void> = { success: true; data?: T } | { success: false; error: string };
+
+function createSettingsGetHandler<T>(settingKey: string, defaultValue: T) {
+  return (): T => {
+    try {
+      const db = getDatabase();
+      return db.getSetting(settingKey, defaultValue) as T;
+    } catch {
+      return defaultValue;
+    }
+  };
+}
+
+function createSettingsSaveHandler(settingKey: string) {
+  return (_: unknown, settings: unknown): IpcResult => {
+    try {
+      const db = getDatabase();
+      db.setSetting(settingKey, settings);
+      return { success: true };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      logger.error(`Failed to save ${settingKey}: ${message}`);
+      return { success: false, error: message };
+    }
+  };
+}
+
+function createArrayGetHandler(settingKey: string) {
+  return (): unknown[] => {
+    try {
+      const db = getDatabase();
+      return db.getSetting(settingKey, []) as unknown[];
+    } catch {
+      return [];
+    }
+  };
+}
+
+function createDbQueryHandler(query: string, defaultValue: unknown[] = []) {
+  return (): unknown[] => {
+    try {
+      const db = getDatabase();
+      return db.query(query);
+    } catch {
+      return defaultValue;
+    }
+  };
+}
+
+function createDbDeleteHandler(table: string, idColumn = 'id') {
+  return (_: unknown, id: unknown): IpcResult => {
+    try {
+      const validId = validateId(id);
+      const db = getDatabase();
+      db.run(`DELETE FROM ${table} WHERE ${idColumn} = ?`, [validId]);
+      return { success: true };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      return { success: false, error: message };
+    }
+  };
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -278,18 +451,17 @@ function setupBotEvents() {
 
   // Forward ALL chat messages to renderer
   eventBus.on('chat:message', (message) => {
-    // Store message
+    // Store message in circular buffer (efficient, no array copying)
     chatMessages.push({
-      ...message,
+      user: message.user,
+      message: message.message,
       timestamp: new Date().toISOString(),
+      channel: message.channel,
     });
-    if (chatMessages.length > MAX_MESSAGES) {
-      chatMessages = chatMessages.slice(-MAX_MESSAGES);
-    }
 
-    // Track user
+    // Track user with timestamp for auto-cleanup
     if (message.user?.username) {
-      onlineUsers.add(message.user.username);
+      trackUser(message.user.username);
     }
 
     // Send to renderer
@@ -350,19 +522,38 @@ function setupIPC() {
   // Bot Control
   // ==========================================
   ipcMain.handle('bot:connect', async (_, credentials) => {
-    if (credentials) {
-      process.env.TWITCH_BOT_USERNAME = credentials.username;
-      process.env.TWITCH_OAUTH_TOKEN = credentials.oauthToken;
-      process.env.TWITCH_CHANNEL = credentials.channel;
-      if (credentials.clientId) process.env.TWITCH_CLIENT_ID = credentials.clientId;
-      if (credentials.clientSecret) process.env.TWITCH_CLIENT_SECRET = credentials.clientSecret;
+    try {
+      if (credentials) {
+        // Validate credentials
+        const username = validateUsername(credentials.username);
+        const oauthToken = validateString(credentials.oauthToken, 'OAuth Token', 10, 100);
+        const channel = validateUsername(credentials.channel);
 
-      // Save to .env file
-      saveCredentialsToEnv(credentials);
+        if (!oauthToken.startsWith('oauth:')) {
+          return { success: false, error: 'OAuth Token muss mit "oauth:" beginnen' };
+        }
+
+        process.env.TWITCH_BOT_USERNAME = username;
+        process.env.TWITCH_OAUTH_TOKEN = oauthToken;
+        process.env.TWITCH_CHANNEL = channel;
+        if (credentials.clientId) {
+          process.env.TWITCH_CLIENT_ID = validateString(credentials.clientId, 'Client ID', 10, 50);
+        }
+        if (credentials.clientSecret) {
+          process.env.TWITCH_CLIENT_SECRET = validateString(credentials.clientSecret, 'Client Secret', 10, 50);
+        }
+
+        // Save to .env file
+        saveCredentialsToEnv(credentials);
+      }
+
+      await startBot();
+      return { success: !!bot };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      logger.error(`Bot connect failed: ${message}`);
+      return { success: false, error: message };
     }
-
-    await startBot();
-    return { success: !!bot };
   });
 
   ipcMain.handle('bot:disconnect', async () => {
@@ -457,14 +648,24 @@ function setupIPC() {
     }
   });
 
-  ipcMain.handle('commands:add', (_, name: string, response: string, options?: any) => {
+  ipcMain.handle('commands:add', (_, name: unknown, response: unknown, options?: unknown) => {
     try {
+      // Validate inputs
+      const validName = validateString(name, 'Command-Name', 1, 50);
+      const validResponse = validateString(response, 'Antwort', 1, 500);
+
+      // Command name must be alphanumeric
+      if (!/^[a-zA-Z0-9_]+$/.test(validName)) {
+        return { success: false, error: 'Command-Name darf nur Buchstaben, Zahlen und _ enthalten' };
+      }
+
       const db = getDatabase();
       const id = `cmd_${Date.now()}`;
-      db.createCommand(id, name, response, options);
+      db.createCommand(id, validName.toLowerCase(), validResponse, options || {});
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      return { success: false, error: message };
     }
   });
 
@@ -990,7 +1191,8 @@ function setupIPC() {
   // Messages
   // ==========================================
   ipcMain.handle('messages:getRecent', (_, limit = 100) => {
-    return chatMessages.slice(-limit);
+    const all = chatMessages.getAll();
+    return all.slice(-limit);
   });
 
   ipcMain.handle('messages:send', async (_, message: string) => {
@@ -1926,8 +2128,8 @@ function startWatchtimeTracking() {
       const currencySettings = db.getSetting('currency_settings', { perMinute: 1, subBonus: 2 });
       const pointsPerMinute = currencySettings.perMinute || 1;
 
-      // Update all online users
-      for (const username of onlineUsers) {
+      // Update all online users (iterate over Map keys)
+      for (const username of onlineUsers.keys()) {
         // Increment watchtime by 1 minute
         db.incrementWatchTime('twitch', username, 1);
         // Award points based on settings
@@ -1953,6 +2155,7 @@ app.whenReady().then(async () => {
   createWindow();
   createTray();
   setupIPC();
+  startUserCleanup(); // Start user cleanup interval
 
   // Auto-connect if credentials are available
   if (process.env.TWITCH_BOT_USERNAME && process.env.TWITCH_OAUTH_TOKEN && process.env.TWITCH_CHANNEL) {
@@ -1974,6 +2177,9 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', async () => {
+  stopUserCleanup();
+  stopWatchtimeTracking();
+
   if (bot) {
     await bot.stop();
   }

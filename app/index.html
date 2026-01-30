@@ -15,6 +15,29 @@
     <p class="splash-status" id="splashStatus">Initialisiere...</p>
   </div>
 
+  <!-- Input Modal -->
+  <div id="inputModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10000;align-items:center;justify-content:center;">
+    <div style="background:var(--bg-secondary, #1a1a2e);border-radius:12px;padding:24px;width:400px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid var(--border-color, #333);">
+      <h3 id="inputModalTitle" style="margin:0 0 16px 0;color:var(--text-primary, #fff);font-size:18px;">Eingabe</h3>
+      <input type="text" id="inputModalField" class="form-input" style="width:100%;margin-bottom:16px;padding:10px 12px;background:var(--bg-primary, #0f0f1a);border:1px solid var(--border-color, #333);border-radius:8px;color:var(--text-primary, #fff);font-size:14px;" placeholder="">
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-secondary" onclick="closeInputModal(null)" style="padding:8px 16px;border-radius:6px;cursor:pointer;">Abbrechen</button>
+        <button class="btn btn-primary" onclick="submitInputModal()" style="padding:8px 16px;border-radius:6px;cursor:pointer;background:var(--accent, #9147ff);color:#fff;border:none;">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10000;align-items:center;justify-content:center;">
+    <div style="background:var(--bg-secondary, #1a1a2e);border-radius:12px;padding:24px;width:400px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid var(--border-color, #333);">
+      <h3 id="confirmModalTitle" style="margin:0 0 16px 0;color:var(--text-primary, #fff);font-size:18px;">Bestätigen</h3>
+      <p id="confirmModalMessage" style="color:var(--text-secondary, #aaa);margin-bottom:20px;"></p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-secondary" onclick="closeConfirmModal(false)" style="padding:8px 16px;border-radius:6px;cursor:pointer;">Abbrechen</button>
+        <button class="btn btn-primary" onclick="closeConfirmModal(true)" style="padding:8px 16px;border-radius:6px;cursor:pointer;background:var(--accent, #9147ff);color:#fff;border:none;">OK</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Titlebar -->
   <div class="titlebar">
@@ -3165,6 +3188,89 @@
 
   <script>
     // ========================================
+    // MODAL SYSTEM (replaces prompt/confirm)
+    // ========================================
+    let inputModalResolve = null;
+    let confirmModalResolve = null;
+
+    function showInputModal(title, defaultValue = '') {
+      return new Promise((resolve) => {
+        inputModalResolve = resolve;
+        document.getElementById('inputModalTitle').textContent = title;
+        const field = document.getElementById('inputModalField');
+        field.value = defaultValue || '';
+        field.placeholder = '';
+        document.getElementById('inputModal').style.display = 'flex';
+        setTimeout(() => {
+          field.focus();
+          field.select();
+        }, 50);
+      });
+    }
+
+    function closeInputModal(value) {
+      document.getElementById('inputModal').style.display = 'none';
+      if (inputModalResolve) {
+        inputModalResolve(value);
+        inputModalResolve = null;
+      }
+    }
+
+    function submitInputModal() {
+      const value = document.getElementById('inputModalField').value;
+      closeInputModal(value);
+    }
+
+    function showConfirmModal(message) {
+      return new Promise((resolve) => {
+        confirmModalResolve = resolve;
+        document.getElementById('confirmModalTitle').textContent = 'Bestätigen';
+        document.getElementById('confirmModalMessage').textContent = message;
+        document.getElementById('confirmModal').style.display = 'flex';
+      });
+    }
+
+    function closeConfirmModal(result) {
+      document.getElementById('confirmModal').style.display = 'none';
+      if (confirmModalResolve) {
+        confirmModalResolve(result);
+        confirmModalResolve = null;
+      }
+    }
+
+    // Handle Enter key in input modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && document.getElementById('inputModal').style.display === 'flex') {
+        submitInputModal();
+      }
+      if (e.key === 'Escape') {
+        if (document.getElementById('inputModal').style.display === 'flex') {
+          closeInputModal(null);
+        }
+        if (document.getElementById('confirmModal').style.display === 'flex') {
+          closeConfirmModal(false);
+        }
+      }
+    });
+
+    // Override native prompt and confirm for Electron compatibility
+    // These now return promises, so callers should use async/await
+    window.nativePrompt = window.prompt;
+    window.nativeConfirm = window.confirm;
+    window.prompt = function(message, defaultValue) {
+      // For synchronous compatibility, we show modal but can't truly block
+      // Best approach: caller should be async and await showInputModal
+      console.log('prompt() called:', message);
+      showInputModal(message, defaultValue);
+      return null; // Can't return synchronously, functions should use showInputModal
+    };
+    window.confirm = function(message) {
+      console.log('confirm() called:', message);
+      showConfirmModal(message);
+      return false; // Can't return synchronously, functions should use showConfirmModal
+    };
+
+    // ========================================
     // SPLASH SCREEN
     // ========================================
     const splashMessages = [
@@ -3671,20 +3777,22 @@
     }
 
     async function deleteCommand(name) {
-      if (confirm(`Befehl "!${name}" wirklich löschen?`)) {
+      const confirmed = await showConfirmModal(`Befehl "!${name}" wirklich löschen?`);
+      if (confirmed) {
         await window.api?.commands?.delete(name);
         await loadCommands();
         showNotification('Befehl gelöscht', 'success');
       }
     }
 
-    function showAddCommandModal() {
-      const name = prompt('Befehlsname (ohne !):');
+    async function showAddCommandModal() {
+      const name = await showInputModal('Befehlsname (ohne !):');
       if (!name) return;
-      const response = prompt('Antwort:');
+      const response = await showInputModal('Antwort:');
       if (!response) return;
 
-      window.api?.commands?.add(name, response, { cooldown: 5 }).then((result) => {
+      try {
+        const result = await window.api?.commands?.add(name, response, { cooldown: 5 });
         console.log('Command add result:', result);
         if (result && result.success) {
           loadCommands();
@@ -3692,20 +3800,21 @@
         } else {
           showNotification(result?.error || 'Fehler beim Erstellen', 'error');
         }
-      }).catch((err) => {
+      } catch (err) {
         console.error('Command add error:', err);
         showNotification('Fehler: ' + err.message, 'error');
-      });
+      }
     }
 
-    function editCommand(name) {
+    async function editCommand(name) {
       const cmd = commands.find(c => c.name === name);
       if (!cmd) return;
 
-      const newResponse = prompt('Neue Antwort:', cmd.response);
+      const newResponse = await showInputModal('Neue Antwort:', cmd.response);
       if (newResponse === null) return;
 
-      window.api?.commands?.update(name, { response: newResponse }).then((result) => {
+      try {
+        const result = await window.api?.commands?.update(name, { response: newResponse });
         console.log('Command update result:', result);
         if (result && result.success !== false) {
           loadCommands();
@@ -3713,10 +3822,10 @@
         } else {
           showNotification(result?.error || 'Fehler beim Aktualisieren', 'error');
         }
-      }).catch((err) => {
+      } catch (err) {
         console.error('Command update error:', err);
         showNotification('Fehler: ' + err.message, 'error');
-      });
+      }
     }
 
     // ========================================
@@ -3764,14 +3873,16 @@
       </div></div>`;
     }
 
-    function showAddTimerModal() {
-      const name = prompt('Timer Name:');
+    async function showAddTimerModal() {
+      const name = await showInputModal('Timer Name:');
       if (!name) return;
-      const message = prompt('Nachricht:');
+      const message = await showInputModal('Nachricht:');
       if (!message) return;
-      const interval = parseInt(prompt('Intervall (Minuten):', '5')) || 5;
+      const intervalStr = await showInputModal('Intervall (Minuten):', '5');
+      const interval = parseInt(intervalStr) || 5;
 
-      window.api?.timers?.add(name, [message], interval).then((result) => {
+      try {
+        const result = await window.api?.timers?.add(name, [message], interval);
         console.log('Timer add result:', result);
         if (result && result.success) {
           loadTimers();
@@ -3779,10 +3890,10 @@
         } else {
           showNotification(result?.error || 'Fehler beim Erstellen', 'error');
         }
-      }).catch((err) => {
+      } catch (err) {
         console.error('Timer add error:', err);
         showNotification('Fehler: ' + err.message, 'error');
-      });
+      }
     }
 
     async function toggleTimer(id) {
@@ -3791,26 +3902,29 @@
     }
 
     async function deleteTimer(id) {
-      if (confirm('Timer wirklich löschen?')) {
+      const confirmed = await showConfirmModal('Timer wirklich löschen?');
+      if (confirmed) {
         await window.api?.timers?.delete(id);
         await loadTimers();
         showNotification('Timer gelöscht', 'success');
       }
     }
 
-    function editTimer(id) {
+    async function editTimer(id) {
       const timer = timers.find(t => t.id === id);
       if (!timer) return;
 
-      const newMessage = prompt('Neue Nachricht:', Array.isArray(timer.messages) ? timer.messages[0] : timer.message || '');
+      const newMessage = await showInputModal('Neue Nachricht:', Array.isArray(timer.messages) ? timer.messages[0] : timer.message || '');
       if (newMessage === null) return;
 
-      const newInterval = parseInt(prompt('Neues Intervall (Minuten):', timer.interval_minutes || timer.intervalMinutes || 5)) || 5;
+      const newIntervalStr = await showInputModal('Neues Intervall (Minuten):', String(timer.interval_minutes || timer.intervalMinutes || 5));
+      const newInterval = parseInt(newIntervalStr) || 5;
 
-      window.api?.timers?.update(id, {
-        messages: [newMessage],
-        interval_minutes: newInterval
-      }).then((result) => {
+      try {
+        const result = await window.api?.timers?.update(id, {
+          messages: [newMessage],
+          interval_minutes: newInterval
+        });
         console.log('Timer update result:', result);
         if (result && result.success !== false) {
           loadTimers();
@@ -3818,10 +3932,10 @@
         } else {
           showNotification(result?.error || 'Fehler beim Aktualisieren', 'error');
         }
-      }).catch((err) => {
+      } catch (err) {
         console.error('Timer update error:', err);
         showNotification('Fehler: ' + err.message, 'error');
-      });
+      }
     }
 
     // ========================================
@@ -4362,19 +4476,21 @@
       `;
     }
 
-    function showCreatePollModal() {
-      const question = prompt('Umfrage-Frage:');
+    async function showCreatePollModal() {
+      const question = await showInputModal('Umfrage-Frage:');
       if (!question) return;
-      const optionsStr = prompt('Optionen (kommagetrennt):');
+      const optionsStr = await showInputModal('Optionen (kommagetrennt):');
       if (!optionsStr) return;
       const options = optionsStr.split(',').map(o => o.trim()).filter(o => o);
       if (options.length < 2) {
         showNotification('Mindestens 2 Optionen erforderlich!', 'error');
         return;
       }
-      const duration = parseInt(prompt('Dauer in Sekunden (Standard: 60):', '60')) || 60;
+      const durationStr = await showInputModal('Dauer in Sekunden:', '60');
+      const duration = parseInt(durationStr) || 60;
 
-      window.api?.polls?.create(question, options, duration).then((result) => {
+      try {
+        const result = await window.api?.polls?.create(question, options, duration);
         console.log('Poll create result:', result);
         if (result && result.success !== false) {
           loadPolls();
@@ -4382,10 +4498,10 @@
         } else {
           showNotification(result?.error || 'Fehler beim Erstellen', 'error');
         }
-      }).catch((err) => {
+      } catch (err) {
         console.error('Poll create error:', err);
         showNotification('Fehler: ' + err.message, 'error');
-      });
+      }
     }
 
     async function endPoll() {
@@ -4470,12 +4586,13 @@
       </div>`;
     }
 
-    function showAddQuoteModal() {
-      const text = prompt('Quote Text:');
+    async function showAddQuoteModal() {
+      const text = await showInputModal('Quote Text:');
       if (!text) return;
-      const author = prompt('Autor (optional):') || 'Streamer';
+      const author = await showInputModal('Autor (optional):', 'Streamer');
 
-      window.api?.quotes?.add(text, author, 'UI').then((result) => {
+      try {
+        const result = await window.api?.quotes?.add(text, author || 'Streamer', 'UI');
         console.log('Quote add result:', result);
         if (result && result.success !== false) {
           loadQuotes();
@@ -4483,14 +4600,15 @@
         } else {
           showNotification(result?.error || 'Fehler beim Hinzufügen', 'error');
         }
-      }).catch((err) => {
+      } catch (err) {
         console.error('Quote add error:', err);
         showNotification('Fehler: ' + err.message, 'error');
-      });
+      }
     }
 
     async function deleteQuote(id) {
-      if (confirm('Quote wirklich löschen?')) {
+      const confirmed = await showConfirmModal('Quote wirklich löschen?');
+      if (confirmed) {
         await window.api?.quotes?.delete(id);
         loadQuotes();
         showNotification('Quote gelöscht', 'success');
@@ -4841,14 +4959,15 @@
     }
 
     async function resetCounter(id) {
-      if (confirm('Counter auf 0 zurücksetzen?')) {
+      const confirmed = await showConfirmModal('Counter auf 0 zurücksetzen?');
+      if (confirmed) {
         await window.api?.counters?.reset(id);
         loadCounters();
       }
     }
 
     async function addCounter() {
-      const name = prompt('Counter-Name:');
+      const name = await showInputModal('Counter-Name:');
       if (name) {
         try {
           const result = await window.api?.counters?.create({ name, value: 0 });

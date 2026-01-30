@@ -998,6 +998,16 @@
                 </div>
                 <div class="toggle-wrapper">
                   <div class="toggle-info">
+                    <div class="toggle-title">Read Username</div>
+                    <div class="toggle-desc">Include username before message (e.g. "User says: ...")</div>
+                  </div>
+                  <label class="toggle">
+                    <input type="checkbox" id="ttsReadUsername" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="toggle-wrapper">
+                  <div class="toggle-info">
                     <div class="toggle-title">Subscriber Only</div>
                     <div class="toggle-desc">Only subscribers can use TTS</div>
                   </div>
@@ -4018,7 +4028,8 @@
         // Track user
         if (msg.user?.username) {
           onlineUsers.add(msg.user.username);
-          document.getElementById('onlineUsers').textContent = onlineUsers.size;
+          const onlineEl = document.getElementById('onlineUsersCount');
+          if (onlineEl) onlineEl.textContent = onlineUsers.size;
         }
 
         renderChat();
@@ -4046,8 +4057,10 @@
       });
 
       window.api.on('viewers:updated', (data) => {
-        document.getElementById('statViewers').textContent = data.count || 0;
-        document.getElementById('onlineUsers').textContent = data.count || 0;
+        const statViewersEl = document.getElementById('statViewers');
+        const onlineUsersEl = document.getElementById('onlineUsersCount');
+        if (statViewersEl) statViewersEl.textContent = data.count || 0;
+        if (onlineUsersEl) onlineUsersEl.textContent = data.count || 0;
       });
 
       window.api.on('songs:added', () => {
@@ -4532,7 +4545,8 @@
       const online = await window.api.viewers?.getOnline();
       if (online) {
         onlineUsers = new Set(online.users || []);
-        document.getElementById('onlineUsers').textContent = onlineUsers.size;
+        const onlineEl = document.getElementById('onlineUsersCount');
+        if (onlineEl) onlineEl.textContent = onlineUsers.size;
       }
 
       allUsers = await window.api.viewers?.getAll() || [];
@@ -5230,7 +5244,7 @@
           setText('statMessages', stats.messagesReceived || 0);
           setText('statSongs', stats.songsPlayed || 0);
           setText('statViewers', stats.onlineUsers || 0);
-          setText('onlineUsers', stats.onlineUsers || 0);
+          setText('onlineUsersCount', stats.onlineUsers || 0);
           setText('statFollows', stats.follows || 0);
 
           // Update stream info

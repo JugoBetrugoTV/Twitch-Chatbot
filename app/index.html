@@ -794,15 +794,95 @@
             <button class="btn btn-secondary" onclick="clearSongQueue()">Clear Queue</button>
           </div>
         </div>
-        <div style="padding:20px; display:flex; flex-direction:column; gap:20px; flex:1; overflow:auto;">
-          <div class="card" style="flex:1;">
+        <div style="padding:20px; display:grid; grid-template-columns:1fr 350px; gap:20px; flex:1; overflow:auto;">
+          <!-- YouTube Player Section -->
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <!-- Player Card -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  Now Playing
+                </div>
+              </div>
+              <div class="card-body" style="padding:0;">
+                <!-- YouTube Embed -->
+                <div id="ytPlayerContainer" style="position:relative; width:100%; padding-top:56.25%; background:#000; border-radius:8px 8px 0 0; overflow:hidden;">
+                  <iframe id="ytPlayer"
+                    style="position:absolute; top:0; left:0; width:100%; height:100%; border:none;"
+                    src=""
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                  </iframe>
+                  <div id="ytPlayerPlaceholder" style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:15px; background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:64px; height:64px; color:var(--purple); opacity:0.5;"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                    <div style="color:var(--text-muted); font-size:14px;">No song playing</div>
+                    <div style="color:var(--text-dim); font-size:12px;">Use !sr [song] in chat to request</div>
+                  </div>
+                </div>
+                <!-- Song Info & Controls -->
+                <div style="padding:20px; background:var(--bg-secondary);">
+                  <div id="currentSongInfo" style="margin-bottom:15px;">
+                    <div id="currentSongTitle" style="font-size:16px; font-weight:600; color:var(--text-primary); margin-bottom:5px;">No song playing</div>
+                    <div id="currentSongRequester" style="font-size:13px; color:var(--text-muted);">Waiting for requests...</div>
+                  </div>
+                  <!-- Player Controls -->
+                  <div style="display:flex; align-items:center; gap:15px;">
+                    <button class="btn btn-ghost" onclick="prevSong()" title="Previous">
+                      <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px; height:20px;"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </button>
+                    <button class="btn btn-primary" onclick="togglePlayPause()" id="playPauseBtn" style="width:50px; height:50px; border-radius:50%; padding:0;">
+                      <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px;"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button class="btn btn-ghost" onclick="skipSong()" title="Skip">
+                      <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px; height:20px;"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </button>
+                    <div style="flex:1; display:flex; align-items:center; gap:10px; margin-left:20px;">
+                      <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px; color:var(--text-muted);"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                      <input type="range" id="volumeSlider" min="0" max="100" value="50" style="flex:1; accent-color:var(--purple);" onchange="setVolume(this.value)">
+                      <span id="volumeValue" style="color:var(--text-muted); font-size:12px; min-width:35px;">50%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Song Request Settings -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Settings</div>
+              </div>
+              <div class="card-body">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                  <div class="form-group">
+                    <label class="form-label">Max Queue Size</label>
+                    <input type="number" class="form-input" id="srMaxQueue" value="50" min="1" max="100">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Max Song Duration (min)</label>
+                    <input type="number" class="form-input" id="srMaxDuration" value="10" min="1" max="30">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Point Cost</label>
+                    <input type="number" class="form-input" id="srCost" value="0" min="0">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">User Cooldown (sec)</label>
+                    <input type="number" class="form-input" id="srCooldown" value="60" min="0">
+                  </div>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="saveSongRequestSettings()">Save Settings</button>
+              </div>
+            </div>
+          </div>
+          <!-- Queue Sidebar -->
+          <div class="card" style="display:flex; flex-direction:column; max-height:calc(100vh - 180px);">
             <div class="card-header">
               <div class="card-title">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/></svg>
                 Queue (<span id="queueCount">0</span>)
               </div>
             </div>
-            <div class="card-body no-padding" style="overflow:auto; max-height:400px;" id="songQueueFull">
+            <div class="card-body no-padding" style="overflow:auto; flex:1;" id="songQueueFull">
               <div class="empty-state">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
                 <div class="empty-state-title">Queue is Empty</div>
@@ -4558,6 +4638,9 @@
           badge.style.display = 'none';
         }
       }
+
+      // Update YouTube player with current song
+      updateYouTubePlayer(current);
     }
 
     function showPlayer(song) {
@@ -4568,9 +4651,114 @@
       }
     }
 
-    async function skipSong() { await window.api?.songs?.skip(); refreshSongQueue(); }
-    async function removeSong(i) { await window.api?.songs?.remove(i); refreshSongQueue(); }
-    async function clearSongQueue() { await window.api?.songs?.clear(); refreshSongQueue(); }
+    // ========================================
+    // YOUTUBE PLAYER
+    // ========================================
+    let currentVideoId = null;
+    let isPlaying = false;
+
+    function extractYouTubeId(url) {
+      if (!url) return null;
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\?\/]+)/,
+        /^([a-zA-Z0-9_-]{11})$/
+      ];
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match) return match[1];
+      }
+      return null;
+    }
+
+    function updateYouTubePlayer(song) {
+      const player = document.getElementById('ytPlayer');
+      const placeholder = document.getElementById('ytPlayerPlaceholder');
+      const titleEl = document.getElementById('currentSongTitle');
+      const requesterEl = document.getElementById('currentSongRequester');
+
+      if (!song || !song.url) {
+        if (player) player.src = '';
+        if (placeholder) placeholder.style.display = 'flex';
+        if (titleEl) titleEl.textContent = 'No song playing';
+        if (requesterEl) requesterEl.textContent = 'Waiting for requests...';
+        currentVideoId = null;
+        isPlaying = false;
+        return;
+      }
+
+      const videoId = extractYouTubeId(song.url);
+      if (videoId && videoId !== currentVideoId) {
+        currentVideoId = videoId;
+        if (player) {
+          player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+        }
+        if (placeholder) placeholder.style.display = 'none';
+        isPlaying = true;
+        debug('INFO', `Playing YouTube video: ${videoId}`);
+      }
+
+      if (titleEl) titleEl.textContent = song.title || 'Unknown';
+      if (requesterEl) requesterEl.textContent = `Requested by ${song.requestedBy || 'Unknown'}`;
+    }
+
+    function togglePlayPause() {
+      debug('BUTTON', 'togglePlayPause clicked');
+      // Note: Controlling iframe playback requires YouTube IFrame API
+      // For now, this is a placeholder - full implementation would need YouTube API
+      showNotification('Use the YouTube player controls directly', 'info');
+    }
+
+    function prevSong() {
+      debug('BUTTON', 'prevSong clicked');
+      showNotification('Previous song not available', 'info');
+    }
+
+    function setVolume(value) {
+      debug('INFO', `Volume set to: ${value}%`);
+      const volumeLabel = document.getElementById('volumeValue');
+      if (volumeLabel) volumeLabel.textContent = `${value}%`;
+      // Note: Would need YouTube IFrame API for actual volume control
+    }
+
+    async function saveSongRequestSettings() {
+      debug('BUTTON', 'saveSongRequestSettings clicked');
+      try {
+        const settings = {
+          maxQueue: parseInt(getVal('srMaxQueue')) || 50,
+          maxDuration: parseInt(getVal('srMaxDuration')) || 10,
+          cost: parseInt(getVal('srCost')) || 0,
+          cooldown: parseInt(getVal('srCooldown')) || 60
+        };
+        await window.api?.songs?.saveSettings(settings);
+        showNotification('Song Request Settings saved!', 'success');
+        debug('SUCCESS', 'Song request settings saved');
+      } catch (err) {
+        debugError('saveSongRequestSettings', err);
+        showNotification('Error saving settings', 'error');
+      }
+    }
+
+    async function skipSong() {
+      debug('BUTTON', 'skipSong clicked');
+      await window.api?.songs?.skip();
+      refreshSongQueue();
+    }
+
+    async function removeSong(i) {
+      debug('BUTTON', `removeSong clicked: ${i}`);
+      await window.api?.songs?.remove(i);
+      refreshSongQueue();
+    }
+
+    async function clearSongQueue() {
+      debug('BUTTON', 'clearSongQueue clicked');
+      const confirmed = await showConfirmModal('Clear the entire song queue?');
+      if (confirmed) {
+        await window.api?.songs?.clear();
+        refreshSongQueue();
+        showNotification('Queue cleared', 'success');
+      }
+    }
 
     // ========================================
     // SETTINGS
@@ -5274,6 +5462,21 @@
           setVal('minBet', settings.minBet || 10);
           setVal('maxBet', settings.maxBet || 1000);
           setVal('gameCooldown', settings.cooldown || 30);
+
+          // Load stats if available
+          setText('totalGamesPlayed', settings.totalGames || 0);
+          setText('totalWagered', settings.totalWagered || 0);
+          setText('biggestWin', settings.biggestWin || 0);
+          setText('winRate', (settings.winRate || 0) + '%');
+          setText('slotsPlayed', settings.slotsPlayed || 0);
+          setText('slotsJackpots', settings.slotsJackpots || 0);
+          setText('dicePlayed', settings.dicePlayed || 0);
+          setText('diceWinRate', (settings.diceWinRate || 0) + '%');
+          setText('duelsPlayed', settings.duelsPlayed || 0);
+          setText('duelsPot', settings.duelsPot || 0);
+          setText('rouletteSpins', settings.rouletteSpins || 0);
+          setText('rouletteBigWins', settings.rouletteBigWins || 0);
+
           debug('SUCCESS', 'Minigame settings loaded');
         }
       } catch (err) {
@@ -5415,13 +5618,27 @@
       debug('INFO', 'Loading events...');
       if (!window.api) return;
       try {
-        const filter = getVal('eventFilter') || 'all';
+        const filter = getVal('eventTimeRange') || 'all';
         const data = await window.api.events?.getAll(filter);
         renderEvents(data || []);
+        updateEventStats(data || []);
         debug('SUCCESS', `${(data || []).length} events loaded`);
       } catch (err) {
         debugError('loadEvents', err);
       }
+    }
+
+    function updateEventStats(events) {
+      const follows = events.filter(e => e.type === 'follow').length;
+      const subs = events.filter(e => e.type === 'subscription' || e.type === 'sub').length;
+      const raids = events.filter(e => e.type === 'raid').length;
+      const bits = events.filter(e => e.type === 'cheer' || e.type === 'bits').length;
+
+      setText('totalEventsCount', events.length);
+      setText('followsCount', follows);
+      setText('subsCount', subs);
+      setText('raidsCount', raids);
+      setText('bitsCount', bits);
     }
 
     function renderEvents(events) {
@@ -5461,7 +5678,7 @@
       return texts[type] || 'Event';
     }
 
-    document.getElementById('eventFilter')?.addEventListener('change', loadEvents);
+    document.getElementById('eventTimeRange')?.addEventListener('change', loadEvents);
 
     // ========================================
     // MOD TOOLS
@@ -5703,9 +5920,9 @@
         const data = await window.api.settings?.getUsageStats();
         if (data) {
           setText('usageUptime', data.uptime || '-');
-          setText('usageMessagesTotal', data.messagesTotal || 0);
-          setText('usageCommandsTotal', data.commandsTotal || 0);
-          setText('usageStorageUsed', data.storageUsed || '-');
+          setText('usageMessages', data.messagesTotal || 0);
+          setText('usageCommands', data.commandsTotal || 0);
+          setText('usageMemory', data.memoryUsage || '0 MB');
           debug('SUCCESS', 'Usage stats loaded');
         }
       } catch (err) {

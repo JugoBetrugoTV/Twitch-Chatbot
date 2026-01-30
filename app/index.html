@@ -3188,6 +3188,56 @@
 
   <script>
     // ========================================
+    // DEBUG LOGGING SYSTEM (must be first!)
+    // ========================================
+    const DEBUG_ENABLED = true;
+    const DEBUG_COLORS = {
+      'API': '\x1b[36m',      // Cyan
+      'BUTTON': '\x1b[33m',   // Yellow
+      'ERROR': '\x1b[31m',    // Red
+      'SUCCESS': '\x1b[32m',  // Green
+      'INFO': '\x1b[34m',     // Blue
+      'WARN': '\x1b[35m',     // Magenta
+      'PROMPT': '\x1b[90m',   // Gray
+      'CONFIRM': '\x1b[90m',  // Gray
+      'MODAL': '\x1b[90m',    // Gray
+    };
+    const RESET = '\x1b[0m';
+
+    function debug(category, message, data = null) {
+      if (!DEBUG_ENABLED) return;
+      const timestamp = new Date().toLocaleTimeString('de-DE');
+      const color = DEBUG_COLORS[category] || '';
+      const prefix = `[${timestamp}] [UI:${category}]`;
+
+      if (data !== null && data !== undefined) {
+        console.log(`${color}${prefix}${RESET}`, message, data);
+      } else {
+        console.log(`${color}${prefix}${RESET}`, message);
+      }
+    }
+
+    function debugError(context, error) {
+      const timestamp = new Date().toLocaleTimeString('de-DE');
+      console.error(`\x1b[31m[${timestamp}] [UI:ERROR]\x1b[0m`, context, error);
+      if (error?.stack) console.error('Stack:', error.stack);
+    }
+
+    // Global error handler
+    window.onerror = function(message, source, lineno, colno, error) {
+      debugError('Uncaught Error', { message, source, lineno, colno, error });
+      return false;
+    };
+
+    window.onunhandledrejection = function(event) {
+      debugError('Unhandled Promise Rejection', event.reason);
+    };
+
+    debug('INFO', '========================================');
+    debug('INFO', 'StreamCore Debug System Active');
+    debug('INFO', '========================================');
+
+    // ========================================
     // MODAL SYSTEM (replaces prompt/confirm)
     // ========================================
     let inputModalResolve = null;
@@ -3271,41 +3321,8 @@
     };
 
     // ========================================
-    // DEBUG LOGGING SYSTEM
+    // API LOGGING WRAPPER
     // ========================================
-    const DEBUG_ENABLED = true;
-    const DEBUG_COLORS = {
-      'API': '\x1b[36m',      // Cyan
-      'BUTTON': '\x1b[33m',   // Yellow
-      'ERROR': '\x1b[31m',    // Red
-      'SUCCESS': '\x1b[32m',  // Green
-      'INFO': '\x1b[34m',     // Blue
-      'WARN': '\x1b[35m',     // Magenta
-      'PROMPT': '\x1b[90m',   // Gray
-      'CONFIRM': '\x1b[90m',  // Gray
-      'MODAL': '\x1b[90m',    // Gray
-    };
-    const RESET = '\x1b[0m';
-
-    function debug(category, message, data = null) {
-      if (!DEBUG_ENABLED) return;
-      const timestamp = new Date().toLocaleTimeString('de-DE');
-      const color = DEBUG_COLORS[category] || '';
-      const prefix = `[${timestamp}] [UI:${category}]`;
-
-      if (data !== null && data !== undefined) {
-        console.log(`${color}${prefix}${RESET}`, message, data);
-      } else {
-        console.log(`${color}${prefix}${RESET}`, message);
-      }
-    }
-
-    function debugError(context, error) {
-      const timestamp = new Date().toLocaleTimeString('de-DE');
-      console.error(`\x1b[31m[${timestamp}] [UI:ERROR]\x1b[0m`, context, error);
-      console.error('Stack:', error?.stack || 'No stack trace');
-    }
-
     // Wrap window.api to add logging
     function wrapApiWithLogging(api, path = 'api') {
       if (!api || typeof api !== 'object') return api;
@@ -3350,22 +3367,6 @@
         debug('INFO', 'Available API methods:', Object.keys(window.api));
       }
     }
-
-    // Global error handler
-    window.onerror = function(message, source, lineno, colno, error) {
-      debugError('Uncaught Error', { message, source, lineno, colno, error });
-      return false;
-    };
-
-    window.onunhandledrejection = function(event) {
-      debugError('Unhandled Promise Rejection', event.reason);
-    };
-
-    // Log when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-      debug('INFO', '✓ DOM loaded');
-      initApiLogging();
-    });
 
     // ========================================
     // SPLASH SCREEN

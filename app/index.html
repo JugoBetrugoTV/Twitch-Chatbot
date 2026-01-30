@@ -3684,9 +3684,17 @@
       const response = prompt('Antwort:');
       if (!response) return;
 
-      window.api?.commands?.add(name, response, { cooldown: 5 }).then(() => {
-        loadCommands();
-        showNotification('Befehl erstellt!', 'success');
+      window.api?.commands?.add(name, response, { cooldown: 5 }).then((result) => {
+        console.log('Command add result:', result);
+        if (result && result.success) {
+          loadCommands();
+          showNotification('Befehl erstellt!', 'success');
+        } else {
+          showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+        }
+      }).catch((err) => {
+        console.error('Command add error:', err);
+        showNotification('Fehler: ' + err.message, 'error');
       });
     }
 
@@ -3756,9 +3764,17 @@
       if (!message) return;
       const interval = parseInt(prompt('Intervall (Minuten):', '5')) || 5;
 
-      window.api?.timers?.add(name, [message], interval).then(() => {
-        loadTimers();
-        showNotification('Timer erstellt!', 'success');
+      window.api?.timers?.add(name, [message], interval).then((result) => {
+        console.log('Timer add result:', result);
+        if (result && result.success) {
+          loadTimers();
+          showNotification('Timer erstellt!', 'success');
+        } else {
+          showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+        }
+      }).catch((err) => {
+        console.error('Timer add error:', err);
+        showNotification('Fehler: ' + err.message, 'error');
       });
     }
 
@@ -4020,10 +4036,20 @@
     async function addBlacklistWord() {
       const word = document.getElementById('blacklistWord')?.value?.trim();
       if (!word) return;
-      await window.api?.moderation?.addBlacklist(word);
-      document.getElementById('blacklistWord').value = '';
-      loadModeration();
-      showNotification('Wort zur Blacklist hinzugefügt', 'success');
+      try {
+        const result = await window.api?.moderation?.addBlacklist(word);
+        console.log('Blacklist add result:', result);
+        if (result && result.success !== false) {
+          document.getElementById('blacklistWord').value = '';
+          loadModeration();
+          showNotification('Wort zur Blacklist hinzugefügt', 'success');
+        } else {
+          showNotification(result?.error || 'Fehler beim Hinzufügen', 'error');
+        }
+      } catch (err) {
+        console.error('Blacklist add error:', err);
+        showNotification('Fehler: ' + err.message, 'error');
+      }
     }
 
     async function removeBlacklistWord(word) {
@@ -4408,9 +4434,17 @@
       if (!text) return;
       const author = prompt('Autor (optional):') || 'Streamer';
 
-      window.api?.quotes?.add(text, author).then(() => {
-        loadQuotes();
-        showNotification('Quote hinzugefügt!', 'success');
+      window.api?.quotes?.add(text, author, 'UI').then((result) => {
+        console.log('Quote add result:', result);
+        if (result && result.success !== false) {
+          loadQuotes();
+          showNotification('Quote hinzugefügt!', 'success');
+        } else {
+          showNotification(result?.error || 'Fehler beim Hinzufügen', 'error');
+        }
+      }).catch((err) => {
+        console.error('Quote add error:', err);
+        showNotification('Fehler: ' + err.message, 'error');
       });
     }
 
@@ -4772,12 +4806,22 @@
       }
     }
 
-    function addCounter() {
+    async function addCounter() {
       const name = prompt('Counter-Name:');
       if (name) {
-        window.api?.counters?.create({ name, value: 0 });
-        loadCounters();
-        showNotification('Counter erstellt', 'success');
+        try {
+          const result = await window.api?.counters?.create({ name, value: 0 });
+          console.log('Counter create result:', result);
+          if (result && result.success !== false) {
+            loadCounters();
+            showNotification('Counter erstellt', 'success');
+          } else {
+            showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+          }
+        } catch (err) {
+          console.error('Counter create error:', err);
+          showNotification('Fehler: ' + err.message, 'error');
+        }
       }
     }
 
@@ -5194,14 +5238,24 @@
       `).join('');
     }
 
-    function addMacro() {
+    async function addMacro() {
       const name = prompt('Macro-Name (ohne !):');
       if (name) {
         const commands = prompt('Befehle (ein Befehl pro Zeile, mit ; trennen):');
         if (commands) {
-          window.api?.settings?.addMacro({ name, commands: commands.split(';').map(c => c.trim()) });
-          loadSettingsMacros();
-          showNotification('Macro erstellt', 'success');
+          try {
+            const result = await window.api?.settings?.addMacro({ name, commands: commands.split(';').map(c => c.trim()) });
+            console.log('Macro add result:', result);
+            if (result && result.success !== false) {
+              loadSettingsMacros();
+              showNotification('Macro erstellt', 'success');
+            } else {
+              showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+            }
+          } catch (err) {
+            console.error('Macro add error:', err);
+            showNotification('Fehler: ' + err.message, 'error');
+          }
         }
       }
     }
@@ -5236,14 +5290,24 @@
       `).join('');
     }
 
-    function addHotkey() {
+    async function addHotkey() {
       const action = prompt('Aktion (z.B. "Toggle TTS"):');
       if (action) {
         const keys = prompt('Tastenkombination (z.B. "Ctrl+Shift+T"):');
         if (keys) {
-          window.api?.settings?.addHotkey({ action, keys });
-          loadSettingsHotkeys();
-          showNotification('Hotkey erstellt', 'success');
+          try {
+            const result = await window.api?.settings?.addHotkey({ action, keys });
+            console.log('Hotkey add result:', result);
+            if (result && result.success !== false) {
+              loadSettingsHotkeys();
+              showNotification('Hotkey erstellt', 'success');
+            } else {
+              showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+            }
+          } catch (err) {
+            console.error('Hotkey add error:', err);
+            showNotification('Fehler: ' + err.message, 'error');
+          }
         }
       }
     }

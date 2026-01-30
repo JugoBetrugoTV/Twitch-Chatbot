@@ -3260,15 +3260,112 @@
     window.prompt = function(message, defaultValue) {
       // For synchronous compatibility, we show modal but can't truly block
       // Best approach: caller should be async and await showInputModal
-      console.log('prompt() called:', message);
+      debug('PROMPT', message);
       showInputModal(message, defaultValue);
       return null; // Can't return synchronously, functions should use showInputModal
     };
     window.confirm = function(message) {
-      console.log('confirm() called:', message);
+      debug('CONFIRM', message);
       showConfirmModal(message);
       return false; // Can't return synchronously, functions should use showConfirmModal
     };
+
+    // ========================================
+    // DEBUG LOGGING SYSTEM
+    // ========================================
+    const DEBUG_ENABLED = true;
+    const DEBUG_COLORS = {
+      'API': '\x1b[36m',      // Cyan
+      'BUTTON': '\x1b[33m',   // Yellow
+      'ERROR': '\x1b[31m',    // Red
+      'SUCCESS': '\x1b[32m',  // Green
+      'INFO': '\x1b[34m',     // Blue
+      'WARN': '\x1b[35m',     // Magenta
+      'PROMPT': '\x1b[90m',   // Gray
+      'CONFIRM': '\x1b[90m',  // Gray
+      'MODAL': '\x1b[90m',    // Gray
+    };
+    const RESET = '\x1b[0m';
+
+    function debug(category, message, data = null) {
+      if (!DEBUG_ENABLED) return;
+      const timestamp = new Date().toLocaleTimeString('de-DE');
+      const color = DEBUG_COLORS[category] || '';
+      const prefix = `[${timestamp}] [UI:${category}]`;
+
+      if (data !== null && data !== undefined) {
+        console.log(`${color}${prefix}${RESET}`, message, data);
+      } else {
+        console.log(`${color}${prefix}${RESET}`, message);
+      }
+    }
+
+    function debugError(context, error) {
+      const timestamp = new Date().toLocaleTimeString('de-DE');
+      console.error(`\x1b[31m[${timestamp}] [UI:ERROR]\x1b[0m`, context, error);
+      console.error('Stack:', error?.stack || 'No stack trace');
+    }
+
+    // Wrap window.api to add logging
+    function wrapApiWithLogging(api, path = 'api') {
+      if (!api || typeof api !== 'object') return api;
+
+      const wrapped = {};
+      for (const key of Object.keys(api)) {
+        const value = api[key];
+        const fullPath = `${path}.${key}`;
+
+        if (typeof value === 'function') {
+          wrapped[key] = async function(...args) {
+            debug('API', `→ ${fullPath}()`, args.length > 0 ? args : undefined);
+            try {
+              const result = await value.apply(this, args);
+              if (result?.success === false) {
+                debug('WARN', `← ${fullPath}() returned error:`, result.error || result);
+              } else {
+                debug('API', `← ${fullPath}() OK`, result);
+              }
+              return result;
+            } catch (err) {
+              debugError(`${fullPath}() failed`, err);
+              throw err;
+            }
+          };
+        } else if (typeof value === 'object' && value !== null) {
+          wrapped[key] = wrapApiWithLogging(value, fullPath);
+        } else {
+          wrapped[key] = value;
+        }
+      }
+      return wrapped;
+    }
+
+    // Apply API logging wrapper when API is ready
+    let originalApi = null;
+    function initApiLogging() {
+      if (window.api && !originalApi) {
+        originalApi = window.api;
+        window.api = wrapApiWithLogging(originalApi);
+        debug('INFO', '✓ API logging initialized');
+        debug('INFO', 'Available API methods:', Object.keys(window.api));
+      }
+    }
+
+    // Global error handler
+    window.onerror = function(message, source, lineno, colno, error) {
+      debugError('Uncaught Error', { message, source, lineno, colno, error });
+      return false;
+    };
+
+    window.onunhandledrejection = function(event) {
+      debugError('Unhandled Promise Rejection', event.reason);
+    };
+
+    // Log when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      debug('INFO', '✓ DOM loaded');
+      initApiLogging();
+    });
 
     // ========================================
     // SPLASH SCREEN
@@ -3365,16 +3462,35 @@
     // INITIALIZATION
     // ========================================
     async function initApp() {
-      // Load saved credentials
-      if (window.api) {
+      debug('INFO', '========================================');
+      debug('INFO', '🚀 StreamCore UI Initializing...');
+      debug('INFO', '========================================');
+
+      // Initialize API logging
+      initApiLogging();
+
+      if (!window.api) {
+        debug('ERROR', '❌ window.api is not available! Preload script may have failed.');
+        return;
+      }
+
+      debug('INFO', '✓ window.api available');
+
+      try {
+        // Load saved credentials
+        debug('INFO', 'Loading credentials...');
         const creds = await window.api.settings?.getCredentials();
         if (creds) {
           document.getElementById('settingBotUsername').value = creds.username || '';
           document.getElementById('settingChannel').value = creds.channel || '';
           document.getElementById('settingClientId').value = creds.clientId || '';
+          debug('INFO', `✓ Credentials loaded - User: ${creds.username || '(not set)'}, Channel: ${creds.channel || '(not set)'}`);
+        } else {
+          debug('WARN', '⚠ No credentials found - Please configure in Settings');
         }
 
         // Load TTS settings
+        debug('INFO', 'Loading TTS settings...');
         const ttsSettings = await window.api.tts?.getSettings();
         if (ttsSettings) {
           ttsEnabled = ttsSettings.enabled !== false;
@@ -3383,19 +3499,36 @@
           document.getElementById('ttsReadAll').checked = ttsReadAll;
           document.getElementById('ttsVolume').value = ttsSettings.volume || 80;
           document.getElementById('ttsLanguage').value = ttsSettings.voice || 'de';
+          debug('INFO', `✓ TTS settings loaded - Enabled: ${ttsEnabled}, ReadAll: ${ttsReadAll}`);
         }
 
         // Check if bot status
+        debug('INFO', 'Checking bot connection status...');
         const status = await window.api.bot?.getStatus();
         if (status?.connected) {
           setConnected({ username: status.username, channel: status.channel });
+          debug('SUCCESS', `✓ Bot already connected as ${status.username} to #${status.channel}`);
+        } else {
+          debug('INFO', 'Bot not connected - Click "Verbinden" to connect');
         }
 
         // Load initial data
+        debug('INFO', 'Loading commands...');
         await loadCommands();
+        debug('INFO', `✓ ${commands.length} commands loaded`);
+
+        debug('INFO', 'Loading timers...');
         await loadTimers();
+        debug('INFO', `✓ ${timers.length} timers loaded`);
+
+      } catch (err) {
+        debugError('initApp', err);
       }
+
       setupEventListeners();
+      debug('INFO', '========================================');
+      debug('SUCCESS', '✓ StreamCore UI Ready!');
+      debug('INFO', '========================================');
     }
 
     // ========================================
@@ -3772,43 +3905,63 @@
     }
 
     async function toggleCommand(name) {
+      debug('BUTTON', `toggleCommand clicked: ${name}`);
       await window.api?.commands?.toggle(name);
       await loadCommands();
     }
 
     async function deleteCommand(name) {
+      debug('BUTTON', `deleteCommand clicked: ${name}`);
       const confirmed = await showConfirmModal(`Befehl "!${name}" wirklich löschen?`);
       if (confirmed) {
         await window.api?.commands?.delete(name);
         await loadCommands();
         showNotification('Befehl gelöscht', 'success');
+        debug('SUCCESS', `Command deleted: ${name}`);
+      } else {
+        debug('INFO', 'Delete cancelled by user');
       }
     }
 
     async function showAddCommandModal() {
+      debug('BUTTON', 'showAddCommandModal clicked');
       const name = await showInputModal('Befehlsname (ohne !):');
-      if (!name) return;
+      if (!name) {
+        debug('INFO', 'Command creation cancelled - no name entered');
+        return;
+      }
+      debug('INFO', `Command name entered: ${name}`);
+
       const response = await showInputModal('Antwort:');
-      if (!response) return;
+      if (!response) {
+        debug('INFO', 'Command creation cancelled - no response entered');
+        return;
+      }
+      debug('INFO', `Command response entered: ${response.substring(0, 50)}...`);
 
       try {
         const result = await window.api?.commands?.add(name, response, { cooldown: 5 });
-        console.log('Command add result:', result);
         if (result && result.success) {
           loadCommands();
           showNotification('Befehl erstellt!', 'success');
+          debug('SUCCESS', `Command created: !${name}`);
         } else {
           showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+          debug('ERROR', 'Command creation failed:', result);
         }
       } catch (err) {
-        console.error('Command add error:', err);
+        debugError('showAddCommandModal', err);
         showNotification('Fehler: ' + err.message, 'error');
       }
     }
 
     async function editCommand(name) {
+      debug('BUTTON', `editCommand clicked: ${name}`);
       const cmd = commands.find(c => c.name === name);
-      if (!cmd) return;
+      if (!cmd) {
+        debug('ERROR', `Command not found: ${name}`);
+        return;
+      }
 
       const newResponse = await showInputModal('Neue Antwort:', cmd.response);
       if (newResponse === null) return;
@@ -3874,45 +4027,61 @@
     }
 
     async function showAddTimerModal() {
+      debug('BUTTON', 'showAddTimerModal clicked');
       const name = await showInputModal('Timer Name:');
-      if (!name) return;
+      if (!name) {
+        debug('INFO', 'Timer creation cancelled - no name');
+        return;
+      }
       const message = await showInputModal('Nachricht:');
-      if (!message) return;
+      if (!message) {
+        debug('INFO', 'Timer creation cancelled - no message');
+        return;
+      }
       const intervalStr = await showInputModal('Intervall (Minuten):', '5');
       const interval = parseInt(intervalStr) || 5;
+      debug('INFO', `Creating timer: ${name}, interval: ${interval}min`);
 
       try {
         const result = await window.api?.timers?.add(name, [message], interval);
-        console.log('Timer add result:', result);
         if (result && result.success) {
           loadTimers();
           showNotification('Timer erstellt!', 'success');
+          debug('SUCCESS', `Timer created: ${name}`);
         } else {
           showNotification(result?.error || 'Fehler beim Erstellen', 'error');
+          debug('ERROR', 'Timer creation failed:', result);
         }
       } catch (err) {
-        console.error('Timer add error:', err);
+        debugError('showAddTimerModal', err);
         showNotification('Fehler: ' + err.message, 'error');
       }
     }
 
     async function toggleTimer(id) {
+      debug('BUTTON', `toggleTimer clicked: ${id}`);
       await window.api?.timers?.toggle(id);
       await loadTimers();
     }
 
     async function deleteTimer(id) {
+      debug('BUTTON', `deleteTimer clicked: ${id}`);
       const confirmed = await showConfirmModal('Timer wirklich löschen?');
       if (confirmed) {
         await window.api?.timers?.delete(id);
         await loadTimers();
         showNotification('Timer gelöscht', 'success');
+        debug('SUCCESS', `Timer deleted: ${id}`);
       }
     }
 
     async function editTimer(id) {
+      debug('BUTTON', `editTimer clicked: ${id}`);
       const timer = timers.find(t => t.id === id);
-      if (!timer) return;
+      if (!timer) {
+        debug('ERROR', `Timer not found: ${id}`);
+        return;
+      }
 
       const newMessage = await showInputModal('Neue Nachricht:', Array.isArray(timer.messages) ? timer.messages[0] : timer.message || '');
       if (newMessage === null) return;
@@ -5521,25 +5690,34 @@
     }
 
     // ========================================
-    // MISSING FUNCTIONS - STUBS
+    // PLACEHOLDER FUNCTIONS (NOT YET IMPLEMENTED)
     // ========================================
+    // These functions show a notification that the feature is coming soon
+    // Debug logging helps identify which button was clicked
 
     // Events page
     function exportEvents() {
+      debug('BUTTON', 'exportEvents clicked');
+      debug('WARN', '⚠ exportEvents is not yet implemented');
       showNotification('Export-Funktion wird implementiert...', 'info');
     }
 
     // Mod Tools page
     function viewModLogs() {
+      debug('BUTTON', 'viewModLogs clicked');
       navigateTo('modtools');
     }
 
     function executeModAction() {
+      debug('BUTTON', 'executeModAction clicked');
       const action = document.getElementById('quickModAction')?.value || 'timeout';
       const target = document.getElementById('quickModTarget')?.value;
       const duration = document.getElementById('quickModDuration')?.value || '60';
 
+      debug('INFO', `Mod action: ${action} on ${target} for ${duration}s`);
+
       if (!target) {
+        debug('ERROR', 'No target username entered');
         showNotification('Bitte Benutzername eingeben', 'error');
         return;
       }
@@ -5547,14 +5725,17 @@
       if (action === 'timeout') {
         window.api?.moderation?.timeout(target, parseInt(duration), 'Quick action from UI').then(() => {
           showNotification(`${target} für ${duration}s getimeouted`, 'success');
+          debug('SUCCESS', `Timeout executed: ${target}`);
         });
       } else if (action === 'ban') {
         window.api?.moderation?.ban(target, 'Quick action from UI').then(() => {
           showNotification(`${target} gebannt`, 'success');
+          debug('SUCCESS', `Ban executed: ${target}`);
         });
       } else if (action === 'unban') {
         window.api?.moderation?.unban(target).then(() => {
           showNotification(`${target} entbannt`, 'success');
+          debug('SUCCESS', `Unban executed: ${target}`);
         });
       }
     }

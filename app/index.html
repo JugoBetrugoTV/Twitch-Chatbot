@@ -8,86 +8,100 @@
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-  <!-- Imperial Star Wars Style Intro -->
-  <div id="cinematic-intro" class="imperial-intro">
+  <!-- Fallout Style Intro -->
+  <div id="cinematic-intro" class="fallout-intro">
     <!-- Audio -->
-    <audio id="imperialAudio" preload="auto">
-      <source src="audio/imperial.mp3" type="audio/mpeg">
+    <audio id="falloutAudio" preload="auto">
+      <source src="audio/fallout.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Star field background -->
-    <div class="imperial-stars" id="imperialStars"></div>
+    <!-- CRT Monitor Frame -->
+    <div class="crt-frame">
+      <div class="crt-screen">
+        <!-- Static noise -->
+        <div class="static-noise" id="staticNoise"></div>
 
-    <!-- Hyperspace lines -->
-    <div class="hyperspace" id="hyperspace"></div>
-
-    <!-- Star Wars style text crawl -->
-    <div class="crawl-container" id="crawlContainer">
-      <div class="crawl-content">
-        <p class="crawl-chapter">Episode MMXXVI</p>
-        <h1 class="crawl-title">STREAMCORE</h1>
-        <div class="crawl-text">
-          <p>The streaming galaxy is in turmoil. Content creators across the universe struggle to manage their channels without proper tools.</p>
-          <p>From the depths of development, a powerful new force emerges. STREAMCORE, the ultimate stream command center, rises to bring order to the chaos.</p>
-          <p>JugoBetrugoTV, the legendary developer, has forged this weapon to dominate Twitch and unite all streamers under one banner...</p>
+        <!-- Please Stand By Screen -->
+        <div class="standby-screen" id="standbyScreen">
+          <div class="standby-pattern">
+            <div class="color-bars">
+              <div class="bar bar-1"></div>
+              <div class="bar bar-2"></div>
+              <div class="bar bar-3"></div>
+              <div class="bar bar-4"></div>
+              <div class="bar bar-5"></div>
+              <div class="bar bar-6"></div>
+              <div class="bar bar-7"></div>
+            </div>
+            <div class="standby-text">PLEASE STAND BY</div>
+            <div class="indian-head">
+              <svg viewBox="0 0 100 100" fill="currentColor">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="2"/>
+                <path d="M50 20 L55 35 L70 35 L58 45 L63 60 L50 50 L37 60 L42 45 L30 35 L45 35 Z"/>
+              </svg>
+            </div>
+          </div>
         </div>
+
+        <!-- Vault-Tec Boot Screen -->
+        <div class="vault-boot" id="vaultBoot">
+          <div class="vault-logo">
+            <div class="vault-gear">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="4"/>
+                <text x="50" y="58" text-anchor="middle" font-size="24" font-weight="bold" fill="currentColor">SC</text>
+              </svg>
+            </div>
+            <div class="vault-text">STREAM-TEC</div>
+          </div>
+          <div class="boot-text" id="bootText">
+            <div class="boot-line">STREAM-TEC INDUSTRIES (TM) TERMINAL</div>
+            <div class="boot-line">COPYRIGHT 2026 STREAM-TEC INDUSTRIES</div>
+            <div class="boot-line">&nbsp;</div>
+          </div>
+        </div>
+
+        <!-- Main Terminal Screen -->
+        <div class="terminal-screen" id="terminalScreen">
+          <div class="terminal-header">
+            <span class="terminal-title">STREAMCORE TERMINAL v2.0.77</span>
+            <span class="terminal-status" id="terminalStatus">INITIALIZING...</span>
+          </div>
+          <div class="terminal-content" id="terminalContent">
+            <div class="terminal-line typed" id="line1">> LOADING ARCHIVE...</div>
+          </div>
+          <div class="terminal-logo" id="terminalLogo">
+            <pre class="ascii-logo">
+   _____ _______ _____  ______          __  __  _____ ____  _____  ______
+  / ____|__   __|  __ \|  ____|   /\   |  \/  |/ ____/ __ \|  __ \|  ____|
+ | (___    | |  | |__) | |__     /  \  | \  / | |   | |  | | |__) | |__
+  \___ \   | |  |  _  /|  __|   / /\ \ | |\/| | |   | |  | |  _  /|  __|
+  ____) |  | |  | | \ \| |____ / ____ \| |  | | |___| |__| | | \ \| |____
+ |_____/   |_|  |_|  \_\______/_/    \_\_|  |_|\_____\____/|_|  \_\______|
+            </pre>
+            <div class="logo-subtitle">NEXT-GEN TWITCH COMMAND CENTER</div>
+            <div class="logo-author">[ DEVELOPED BY JUGOBETRUGOTV ]</div>
+          </div>
+          <div class="terminal-footer">
+            <div class="progress-container">
+              <div class="progress-label" id="progressLabel">LOADING MODULES...</div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+              </div>
+              <div class="progress-percent" id="progressPercent">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scanlines overlay -->
+        <div class="crt-scanlines"></div>
+        <!-- CRT flicker -->
+        <div class="crt-flicker"></div>
+        <!-- Vignette -->
+        <div class="crt-vignette"></div>
       </div>
     </div>
-
-    <!-- Imperial scanning effect -->
-    <div class="imperial-scan" id="imperialScan"></div>
-
-    <!-- Death Star inspired circular element -->
-    <div class="death-star" id="deathStar">
-      <div class="ds-outer"></div>
-      <div class="ds-trench"></div>
-      <div class="ds-dish">
-        <div class="dish-inner"></div>
-      </div>
-      <div class="ds-superlaser" id="superlaser"></div>
-    </div>
-
-    <!-- Imperial Logo Reveal -->
-    <div class="imperial-logo" id="imperialLogo">
-      <div class="logo-hexagon">
-        <div class="hex-border"></div>
-        <img src="img/logo.svg" class="logo-img" alt="StreamCore">
-      </div>
-      <div class="logo-scanlines"></div>
-    </div>
-
-    <!-- Main Title -->
-    <div class="imperial-title" id="imperialTitle">
-      <div class="title-top-line"></div>
-      <h1 class="title-main">
-        <span>S</span><span>T</span><span>R</span><span>E</span><span>A</span><span>M</span><span>C</span><span>O</span><span>R</span><span>E</span>
-      </h1>
-      <div class="title-bottom-line"></div>
-      <p class="title-subtitle">GALACTIC STREAM COMMAND</p>
-      <div class="title-author">
-        <span class="author-label">Developed by</span>
-        <span class="author-name">JugoBetrugoTV</span>
-      </div>
-    </div>
-
-    <!-- Imperial Data Display -->
-    <div class="imperial-data" id="imperialData">
-      <div class="data-corner top-left"></div>
-      <div class="data-corner top-right"></div>
-      <div class="data-corner bottom-left"></div>
-      <div class="data-corner bottom-right"></div>
-      <div class="data-line left"></div>
-      <div class="data-line right"></div>
-      <div class="data-text" id="dataText">INITIALIZING COMMAND SYSTEMS...</div>
-      <div class="data-bar">
-        <div class="data-fill" id="dataFill"></div>
-      </div>
-    </div>
-
-    <!-- Overlays -->
-    <div class="imperial-vignette"></div>
-    <div class="imperial-flash" id="imperialFlash"></div>
-    <div class="imperial-grain"></div>
   </div>
 
   <!-- Input Modal -->
@@ -3834,9 +3848,9 @@
     }
 
     // ========================================
-    // IMPERIAL STAR WARS STYLE INTRO
+    // FALLOUT STYLE INTRO
     // ========================================
-    (function initImperialIntro() {
+    (function initFalloutIntro() {
       const intro = document.getElementById('cinematic-intro');
       if (!intro) {
         initApp();
@@ -3861,23 +3875,22 @@
       }
 
       // Elements
-      const starsContainer = document.getElementById('imperialStars');
-      const hyperspace = document.getElementById('hyperspace');
-      const crawlContainer = document.getElementById('crawlContainer');
-      const imperialScan = document.getElementById('imperialScan');
-      const deathStar = document.getElementById('deathStar');
-      const superlaser = document.getElementById('superlaser');
-      const imperialLogo = document.getElementById('imperialLogo');
-      const imperialTitle = document.getElementById('imperialTitle');
-      const imperialData = document.getElementById('imperialData');
-      const dataText = document.getElementById('dataText');
-      const dataFill = document.getElementById('dataFill');
-      const imperialFlash = document.getElementById('imperialFlash');
+      const staticNoise = document.getElementById('staticNoise');
+      const standbyScreen = document.getElementById('standbyScreen');
+      const vaultBoot = document.getElementById('vaultBoot');
+      const bootText = document.getElementById('bootText');
+      const terminalScreen = document.getElementById('terminalScreen');
+      const terminalContent = document.getElementById('terminalContent');
+      const terminalLogo = document.getElementById('terminalLogo');
+      const terminalStatus = document.getElementById('terminalStatus');
+      const progressFill = document.getElementById('progressFill');
+      const progressLabel = document.getElementById('progressLabel');
+      const progressPercent = document.getElementById('progressPercent');
 
       // Try to play audio
-      const audio = document.getElementById('imperialAudio');
+      const audio = document.getElementById('falloutAudio');
       if (audio) {
-        audio.volume = 0.6;
+        audio.volume = 0.5;
         const playAudio = () => {
           audio.play().catch(() => {});
         };
@@ -3886,132 +3899,199 @@
         document.addEventListener('keydown', playAudio, { once: true });
       }
 
-      // Create star field
-      const STAR_COUNT = 200;
-      for (let i = 0; i < STAR_COUNT; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.animationDelay = Math.random() * 3 + 's';
-        star.style.setProperty('--size', (Math.random() * 2 + 1) + 'px');
-        starsContainer.appendChild(star);
+      // Generate static noise
+      function createStaticNoise() {
+        if (!staticNoise || introSkipped) return;
+        const canvas = document.createElement('canvas');
+        canvas.width = 200;
+        canvas.height = 200;
+        const ctx = canvas.getContext('2d');
+
+        function drawNoise() {
+          if (introSkipped) return;
+          const imageData = ctx.createImageData(200, 200);
+          for (let i = 0; i < imageData.data.length; i += 4) {
+            const val = Math.random() * 255;
+            imageData.data[i] = val;
+            imageData.data[i + 1] = val;
+            imageData.data[i + 2] = val;
+            imageData.data[i + 3] = 40;
+          }
+          ctx.putImageData(imageData, 0, 0);
+          staticNoise.style.backgroundImage = `url(${canvas.toDataURL()})`;
+          requestAnimationFrame(drawNoise);
+        }
+        drawNoise();
+      }
+      createStaticNoise();
+
+      // Typing effect
+      function typeText(element, text, speed = 50) {
+        return new Promise(resolve => {
+          if (!element || introSkipped) { resolve(); return; }
+          let i = 0;
+          element.textContent = '';
+          element.classList.add('typing');
+          const interval = setInterval(() => {
+            if (introSkipped) { clearInterval(interval); resolve(); return; }
+            if (i < text.length) {
+              element.textContent += text.charAt(i);
+              i++;
+            } else {
+              clearInterval(interval);
+              element.classList.remove('typing');
+              resolve();
+            }
+          }, speed);
+          intervals.push(interval);
+        });
       }
 
-      // Create hyperspace lines
-      const HYPERSPACE_LINES = 100;
-      for (let i = 0; i < HYPERSPACE_LINES; i++) {
-        const line = document.createElement('div');
-        line.className = 'hyperspace-line';
-        const angle = (i / HYPERSPACE_LINES) * 360;
-        line.style.setProperty('--angle', angle + 'deg');
-        line.style.setProperty('--delay', (Math.random() * 0.5) + 's');
-        line.style.setProperty('--length', (Math.random() * 200 + 100) + 'px');
-        hyperspace.appendChild(line);
+      // Add terminal line
+      function addTerminalLine(text, delay = 0) {
+        return new Promise(resolve => {
+          safeTimeout(() => {
+            if (!terminalContent || introSkipped) { resolve(); return; }
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.textContent = text;
+            terminalContent.appendChild(line);
+            resolve();
+          }, delay);
+        });
       }
 
-      // Flash effect
-      function triggerFlash(intensity = 1) {
-        if (!imperialFlash || introSkipped) return;
-        imperialFlash.style.opacity = intensity;
-        imperialFlash.classList.add('active');
-        setTimeout(() => {
-          imperialFlash.classList.remove('active');
-          imperialFlash.style.opacity = '';
-        }, 400);
-      }
-
-      // Data text messages
-      const dataMessages = [
-        'INITIALIZING COMMAND SYSTEMS...',
-        'ESTABLISHING GALACTIC CONNECTION...',
-        'LOADING STREAM PROTOCOLS...',
-        'ACTIVATING CHAT MATRIX...',
-        'IMPERIAL SYSTEMS ONLINE'
+      // Boot messages
+      const bootMessages = [
+        'STREAM-TEC INDUSTRIES (TM) TERMINAL',
+        'COPYRIGHT 2026 STREAM-TEC INDUSTRIES',
+        '',
+        'RBIOS-4.02.08.00 52EE5.E7.E8',
+        '64MB SYSTEM RAM',
+        '',
+        'STREAM-TEC EXTENDED ROM V1.0',
+        'COPYRIGHT 2026 STREAM-TEC IND.',
+        '',
+        'INITIALIZING STREAM-TEC BOOT AGENT V2.0.77'
       ];
-      let dataIndex = 0;
 
-      // Phase 1: Stars visible, hyperspace builds (0-2s)
+      // Terminal messages
+      const terminalMessages = [
+        { text: '> LOADING ARCHIVE...', delay: 200 },
+        { text: '> STREAM-TEC BOOT SEQUENCE INITIALIZED', delay: 400 },
+        { text: '> ACCESSING TWITCH API PROTOCOLS...', delay: 300 },
+        { text: '> CHAT MATRIX: [ONLINE]', delay: 250 },
+        { text: '> COMMAND MODULE: [ONLINE]', delay: 200 },
+        { text: '> AUDIO SYSTEMS: [ONLINE]', delay: 200 },
+        { text: '> USER DATABASE: [SYNCED]', delay: 300 },
+        { text: '> ALL SYSTEMS NOMINAL', delay: 400 }
+      ];
+
+      // Progress messages
+      const progressMessages = [
+        { percent: 10, label: 'LOADING CORE MODULES...' },
+        { percent: 25, label: 'INITIALIZING CHAT ENGINE...' },
+        { percent: 40, label: 'CONNECTING TO TWITCH...' },
+        { percent: 55, label: 'LOADING COMMANDS...' },
+        { percent: 70, label: 'SYNCING USER DATA...' },
+        { percent: 85, label: 'PREPARING INTERFACE...' },
+        { percent: 100, label: 'BOOT SEQUENCE COMPLETE' }
+      ];
+
+      // Phase 1: Static and standby screen (0-2.5s)
       safeTimeout(() => {
-        if (starsContainer) starsContainer.classList.add('visible');
+        if (staticNoise) staticNoise.classList.add('active');
+        if (standbyScreen) standbyScreen.classList.add('visible');
       }, 100);
 
-      // Phase 2: Text crawl appears (0.5-6s)
+      // Phase 2: Static burst, transition to vault boot (2.5s)
       safeTimeout(() => {
-        if (crawlContainer) crawlContainer.classList.add('active');
-      }, 500);
+        if (staticNoise) staticNoise.classList.add('burst');
+        safeTimeout(() => {
+          if (standbyScreen) standbyScreen.classList.remove('visible');
+          if (staticNoise) staticNoise.classList.remove('burst');
+        }, 300);
+      }, 2500);
 
-      // Phase 3: Hyperspace jump (2-4s)
+      // Phase 3: Vault-Tec boot screen (3s)
       safeTimeout(() => {
-        if (hyperspace) hyperspace.classList.add('active');
-        if (starsContainer) starsContainer.classList.add('hyperspace');
-      }, 2000);
+        if (vaultBoot) vaultBoot.classList.add('visible');
 
-      // Phase 4: Flash and hide hyperspace/crawl (4s)
-      safeTimeout(() => {
-        triggerFlash(0.8);
-        if (hyperspace) hyperspace.classList.remove('active');
-        if (crawlContainer) crawlContainer.classList.remove('active');
-        if (starsContainer) starsContainer.classList.remove('hyperspace');
-      }, 4000);
+        // Type boot messages
+        let bootDelay = 0;
+        bootMessages.forEach((msg, i) => {
+          safeTimeout(() => {
+            if (!bootText || introSkipped) return;
+            const line = document.createElement('div');
+            line.className = 'boot-line';
+            line.textContent = msg;
+            bootText.appendChild(line);
+          }, bootDelay);
+          bootDelay += msg ? 150 : 80;
+        });
+      }, 3000);
 
-      // Phase 5: Death Star appears (4.5s)
+      // Phase 4: Transition to terminal (5s)
       safeTimeout(() => {
-        if (deathStar) deathStar.classList.add('visible');
-        if (imperialScan) imperialScan.classList.add('active');
-      }, 4500);
+        if (staticNoise) staticNoise.classList.add('burst');
+        safeTimeout(() => {
+          if (vaultBoot) vaultBoot.classList.remove('visible');
+          if (staticNoise) staticNoise.classList.remove('burst');
+          if (terminalScreen) terminalScreen.classList.add('visible');
+        }, 300);
+      }, 5000);
 
-      // Phase 6: Superlaser charges (5.5s)
+      // Phase 5: Terminal boot sequence (5.5s)
       safeTimeout(() => {
-        if (superlaser) superlaser.classList.add('charging');
+        if (terminalStatus) terminalStatus.textContent = 'BOOTING...';
+
+        let msgDelay = 0;
+        terminalMessages.forEach((msg, i) => {
+          safeTimeout(() => {
+            if (!terminalContent || introSkipped) return;
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.textContent = msg.text;
+            terminalContent.appendChild(line);
+            terminalContent.scrollTop = terminalContent.scrollHeight;
+          }, msgDelay);
+          msgDelay += msg.delay;
+        });
       }, 5500);
 
-      // Phase 7: Superlaser fires + big flash (6.5s)
+      // Phase 6: Show logo (7s)
       safeTimeout(() => {
-        if (superlaser) superlaser.classList.add('firing');
-        triggerFlash(1);
-        // Hide Death Star
-        setTimeout(() => {
-          if (deathStar) deathStar.classList.remove('visible');
-          if (imperialScan) imperialScan.classList.remove('active');
-        }, 300);
-      }, 6500);
-
-      // Phase 8: Logo reveal (7s)
-      safeTimeout(() => {
-        if (imperialLogo) imperialLogo.classList.add('visible');
+        if (terminalLogo) terminalLogo.classList.add('visible');
+        if (terminalStatus) terminalStatus.textContent = 'LOADING...';
       }, 7000);
 
-      // Phase 9: Title appears (7.8s)
+      // Phase 7: Progress bar (7.5s)
       safeTimeout(() => {
-        if (imperialTitle) imperialTitle.classList.add('visible');
-      }, 7800);
-
-      // Phase 10: Data display (8.5s)
-      safeTimeout(() => {
-        if (imperialData) imperialData.classList.add('visible');
-        // Start data loading animation
         let progress = 0;
         const loadInterval = safeInterval(() => {
           progress += 2;
-          if (dataFill) dataFill.style.width = Math.min(progress, 100) + '%';
+          const currentProgress = Math.min(progress, 100);
 
-          // Change text at intervals
-          if (progress === 20 && dataText) dataText.textContent = dataMessages[1];
-          if (progress === 40 && dataText) dataText.textContent = dataMessages[2];
-          if (progress === 60 && dataText) dataText.textContent = dataMessages[3];
-          if (progress === 100 && dataText) dataText.textContent = dataMessages[4];
+          if (progressFill) progressFill.style.width = currentProgress + '%';
+          if (progressPercent) progressPercent.textContent = currentProgress + '%';
+
+          // Update label at milestones
+          const milestone = progressMessages.find(m => m.percent === currentProgress);
+          if (milestone && progressLabel) {
+            progressLabel.textContent = milestone.label;
+          }
 
           if (progress >= 100) {
             clearInterval(loadInterval);
+            if (terminalStatus) terminalStatus.textContent = 'READY';
           }
-        }, 30);
-      }, 8500);
+        }, 40);
+      }, 7500);
 
       // Add skip button
       const skipBtn = document.createElement('div');
-      skipBtn.className = 'imperial-skip';
-      skipBtn.textContent = 'SKIP INTRO';
+      skipBtn.className = 'fallout-skip';
+      skipBtn.textContent = '[ SKIP ]';
       skipBtn.onclick = skipIntro;
       intro.appendChild(skipBtn);
 
@@ -4038,7 +4118,7 @@
       // Skip handler
       const skipHandler = (e) => {
         if (e.type === 'keydown' || e.type === 'click') {
-          if (e.target && e.target.classList && e.target.classList.contains('imperial-skip')) {
+          if (e.target && e.target.classList && e.target.classList.contains('fallout-skip')) {
             return;
           }
           if (Date.now() - introStartTime > 2000) {

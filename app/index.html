@@ -875,16 +875,16 @@
                   <iframe id="ytPlayer"
                     class="yt-iframe"
                     src=""
-                    allow="accelerometer; autoplay *; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen>
                   </iframe>
                   <div id="ytPlayerPlaceholder" class="yt-placeholder">
                     <div class="yt-placeholder-content">
                       <svg viewBox="0 0 24 24" fill="currentColor" class="yt-icon"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                      <div class="yt-text-primary">> NO AUDIO FILE LOADED_</div>
-                      <div class="yt-text-secondary">> USE !SR [SONG] TO REQUEST</div>
+                      <div class="yt-text-primary">No song playing</div>
+                      <div class="yt-text-secondary">Use !sr [song] in chat to request</div>
                     </div>
-                    <div class="yt-scanlines"></div>
                   </div>
                 </div>
                 <!-- Song Info & Controls -->
@@ -5442,8 +5442,8 @@
       if (videoId && videoId !== currentVideoId) {
         currentVideoId = videoId;
         if (player) {
-          // Use origin parameter for Electron compatibility and allow autoplay
-          player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&origin=file://&rel=0&modestbranding=1&playsinline=1`;
+          // Simple embed URL - works better in Electron
+          player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
         }
         if (placeholder) placeholder.style.display = 'none';
         isPlaying = true;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src 'self' data: https: blob:; img-src 'self' data: https:; frame-src https://www.youtube.com https://www.youtube-nocookie.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com; style-src 'self' 'unsafe-inline'; media-src 'self' data: https: blob:; img-src 'self' data: https:; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com; connect-src 'self' https://www.youtube.com https://youtube.com;">
   <title>StreamCore - Next-Gen Twitch Bot</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
@@ -871,17 +871,20 @@
               </div>
               <div class="card-body" style="padding:0;">
                 <!-- YouTube Embed -->
-                <div id="ytPlayerContainer" style="position:relative; width:100%; padding-top:56.25%; background:#000; border-radius:8px 8px 0 0; overflow:hidden;">
+                <div id="ytPlayerContainer" class="yt-container">
                   <iframe id="ytPlayer"
-                    style="position:absolute; top:0; left:0; width:100%; height:100%; border:none;"
+                    class="yt-iframe"
                     src=""
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allow="accelerometer; autoplay *; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowfullscreen>
                   </iframe>
-                  <div id="ytPlayerPlaceholder" style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:15px; background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:64px; height:64px; color:var(--purple); opacity:0.5;"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                    <div style="color:var(--text-muted); font-size:14px;">No song playing</div>
-                    <div style="color:var(--text-dim); font-size:12px;">Use !sr [song] in chat to request</div>
+                  <div id="ytPlayerPlaceholder" class="yt-placeholder">
+                    <div class="yt-placeholder-content">
+                      <svg viewBox="0 0 24 24" fill="currentColor" class="yt-icon"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                      <div class="yt-text-primary">> NO AUDIO FILE LOADED_</div>
+                      <div class="yt-text-secondary">> USE !SR [SONG] TO REQUEST</div>
+                    </div>
+                    <div class="yt-scanlines"></div>
                   </div>
                 </div>
                 <!-- Song Info & Controls -->
@@ -5439,7 +5442,8 @@
       if (videoId && videoId !== currentVideoId) {
         currentVideoId = videoId;
         if (player) {
-          player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+          // Use origin parameter for Electron compatibility and allow autoplay
+          player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&origin=file://&rel=0&modestbranding=1&playsinline=1`;
         }
         if (placeholder) placeholder.style.display = 'none';
         isPlaying = true;
